@@ -75,6 +75,18 @@ Public ActivePage As String, CDC As Long, ODC As Long
             Case 1 'FadeOut
                 pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 0, 0, 1)
                 PaintDC ODC, CDC, alpha:=1 - pro
+            Case 2 'ToRight
+                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
+                PaintDC ODC, CDC, (pro * GW), alpha:=1
+            Case 3 'ToLeft
+                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
+                PaintDC ODC, CDC, -(pro * GW), alpha:=1
+            Case 4 'ToUp
+                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
+                PaintDC ODC, CDC, 0, -(pro * GW), alpha:=1
+            Case 5 'ToDown
+                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
+                PaintDC ODC, CDC, 0, (pro * GW), alpha:=1
         End Select
     End Sub
 '========================================================
