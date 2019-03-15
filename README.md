@@ -2,7 +2,7 @@
 面向游戏的轻量级绘图框架，仅限Visual Basic 6.0。
 
 # 支持
-最低：Visual Basic 6.0 
+最低：Visual Basic 6.0  
 最高：Visual Basic 6.0 (SP 6)
 
 # 组成
