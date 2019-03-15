@@ -1,0 +1,1 @@
+﻿# Emerald面向游戏的轻量级绘图框架，仅限Visual Basic 6.0。# 支持最低：Visual Basic 6.0 最高：Visual Basic 6.0 (SP 6)# 组成- Page Manager 管理Pages以及过场特效   创建：   `Dim Manager As GMan     ...     Set Manager = New GMan`
