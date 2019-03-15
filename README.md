@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿# Emerald
+# Emerald
 面向游戏的轻量级绘图框架，仅限Visual Basic 6.0。
 
 # 支持
