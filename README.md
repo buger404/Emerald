@@ -25,6 +25,16 @@ NewTransform [Transform ID],[During]
 Transform ID  
 - 0: Fade In
 - 1: Fade Out  
+- 2: To Right
+- 3: To Left
+- 4: To Top
+- 5: To Bottom
+- 6: To Right(Fade)
+- 7: To Left(Fade)
+- 8: To Top(Fade)
+- 9: To Bottom(Fade)
+- 10: High Light
+- 11: Fall Dark
 ```VBS
 Manager.NewTransform 0,300
 ```
