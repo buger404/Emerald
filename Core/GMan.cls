@@ -21,7 +21,7 @@ Private Type Transform
     during As Long
 End Type
 Dim Pages() As Page, Transform As Transform
-Public ActivePage As String, CDC As Long, ODC As Long
+Public ActivePage As String, CDC As Long, ODC As Long, GG As Long, pB As Long
 '========================================================
 '   Init
     Private Sub Class_Initialize()
@@ -29,8 +29,12 @@ Public ActivePage As String, CDC As Long, ODC As Long
         ReDim Pages(0)
         CDC = CreateCDC(GW, GH)
         ODC = CreateCDC(GW, GH)
+        GdipCreateFromHDC CDC, GG
+        GdipCreateSolidFill argb(255, 255, 255, 255), pB
     End Sub
     Public Sub Dispose()
+        GdipDeleteGraphics GG
+        GdipDeleteBrush pB
         For i = 1 To UBound(Pages)
             Pages(i).p.Dispose
         Next
@@ -54,6 +58,7 @@ Public ActivePage As String, CDC As Long, ODC As Long
         Next
         If GetTickCount - Transform.time <= Transform.during Then Call Translation
         BitBlt GDC, 0, 0, GW, GH, CDC, 0, 0, vbSrcCopy
+        
         If Mouse.State = 2 Then Mouse.State = 0
     End Sub
 '========================================================
@@ -87,6 +92,48 @@ Public ActivePage As String, CDC As Long, ODC As Long
             Case 5 'ToDown
                 pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
                 PaintDC ODC, CDC, 0, (pro * GW), alpha:=1
+            Case 6 'ToRight(Fade)
+                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
+                PaintDC ODC, CDC, (pro * GW), alpha:=1 - pro
+            Case 7 'ToLeft(Fade)
+                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
+                PaintDC ODC, CDC, -(pro * GW), alpha:=1 - pro
+            Case 8 'ToUp(Fade)
+                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
+                PaintDC ODC, CDC, 0, -(pro * GW), alpha:=1 - pro
+            Case 9 'ToDown(Fade)
+                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
+                PaintDC ODC, CDC, 0, (pro * GW), alpha:=1 - pro
+            Case 10 'HighLight
+                pro = (GetTickCount - Transform.time) / Transform.during
+                Select Case pro
+                    Case Is < 0.2
+                        pro = Cubic(pro / 0.2, 0, 1, 1, 1)
+                        GdipSetSolidFillColor pB, argb(pro * 255, 255, 255, 255)
+                        GdipFillRectangle GG, pB, 0, 0, GW, GH
+                    Case Is < 0.8
+                        GdipSetSolidFillColor pB, argb(255, 255, 255, 255)
+                        GdipFillRectangle GG, pB, 0, 0, GW, GH
+                    Case Is < 1
+                        pro = Cubic((pro - 0.8) / 0.2, 0, 0, 0, 1)
+                        GdipSetSolidFillColor pB, argb((1 - pro) * 255, 255, 255, 255)
+                        GdipFillRectangle GG, pB, 0, 0, GW, GH
+                End Select
+            Case 11 'Dark
+                pro = (GetTickCount - Transform.time) / Transform.during
+                Select Case pro
+                    Case Is < 0.2
+                        pro = Cubic(pro / 0.2, 0, 1, 1, 1)
+                        GdipSetSolidFillColor pB, argb(pro * 255, 0, 0, 0)
+                        GdipFillRectangle GG, pB, 0, 0, GW, GH
+                    Case Is < 0.8
+                        GdipSetSolidFillColor pB, argb(255, 0, 0, 0)
+                        GdipFillRectangle GG, pB, 0, 0, GW, GH
+                    Case Is < 1
+                        pro = Cubic((pro - 0.8) / 0.2, 0, 0, 0, 1)
+                        GdipSetSolidFillColor pB, argb((1 - pro) * 255, 0, 0, 0)
+                        GdipFillRectangle GG, pB, 0, 0, GW, GH
+                End Select
         End Select
     End Sub
 '========================================================

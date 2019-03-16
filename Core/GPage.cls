@@ -17,7 +17,7 @@ Private Type GGIF
     time As Long
     frames() As Long
     tick As Long
-    count As Long
+    Count As Long
 End Type
 Private Type GMem
     GIF As GGIF
@@ -25,14 +25,14 @@ Private Type GMem
     hwnd As Long
     name As String
     folder As String
-    W As Long
-    H As Long
+    w As Long
+    h As Long
 End Type
 Private Type GDA
     X As Long
     Y As Long
-    W As Long
-    H As Long
+    w As Long
+    h As Long
 End Type
 Private Const GTick As Long = 1000 / 30
 Dim Mems() As GMem, DrawBox As Object, brush As Long, path As Long, Pen As Long
@@ -66,8 +66,8 @@ Public CDC As Long, gg As Long
                 Case 1 'Graphics
                     GdipDeleteGraphics Mems(i).hwnd
             End Select
-            If Mems(i).GIF.count > 0 Then
-                For s = 0 To Mems(i).GIF.count
+            If Mems(i).GIF.Count > 0 Then
+                For s = 0 To Mems(i).GIF.Count
                     DeleteObject Mems(i).GIF.frames(s)
                 Next
             End If
@@ -86,15 +86,15 @@ Public CDC As Long, gg As Long
     End Sub
 '========================================================
 '   RunTime
-    Private Sub NewGM(mem As Long, kind As Integer, name As String, Optional W, Optional H, Optional folder As String = "")
+    Private Sub NewGM(mem As Long, kind As Integer, name As String, Optional w, Optional h, Optional folder As String = "")
         ReDim Preserve Mems(UBound(Mems) + 1)
         With Mems(UBound(Mems))
             .hwnd = mem
             .kind = kind
             .name = name
             .folder = folder
-            If Not IsMissing(W) Then .W = W
-            If Not IsMissing(H) Then .H = H
+            If Not IsMissing(w) Then .w = w
+            If Not IsMissing(h) Then .h = h
         End With
     End Sub
 '========================================================
@@ -119,31 +119,31 @@ Public CDC As Long, gg As Long
         'when arg1 is missing ; i.w = i.w
         'when arg2 is missing but arg1 has content ; i.w = i.w * arg1
         'other ; i.w = arg1
-        Dim si As Integer, i As Long, W As Long, H As Long, dc As Long, g As Long
+        Dim si As Integer, i As Long, w As Long, h As Long, dc As Long, g As Long
         If IsMissing(arg1) Then si = 0
         If IsMissing(arg2) And (Not IsMissing(arg1)) Then si = 1
         If (Not IsMissing(arg2)) And (Not IsMissing(arg1)) Then si = 2
         
         GdipCreateBitmapFromFile StrPtr(path), i
-        GdipGetImageWidth i, W: GdipGetImageHeight i, H
+        GdipGetImageWidth i, w: GdipGetImageHeight i, h
         
-        If si = 1 Then W = Round(W * arg1): H = Round(H * arg1)
-        If si = 2 Then W = arg1: H = arg2
+        If si = 1 Then w = Round(w * arg1): h = Round(h * arg1)
+        If si = 2 Then w = arg1: h = arg2
         
         Dim gC As clsid, gL As Long, index As Long, temp() As String
         CLSIDFromString StrPtr("{6AEDBD6D-3FB5-418A-83A6-7F45229DC872}"), gC
         GdipImageGetFrameCount i, gC, gL
         If gL > 0 Then  '¶¯Ì¬GIFÖ§³Ö
             temp = Split(path, "\")
-            NewGM 0, 0, temp(UBound(temp)), W, H, temp(UBound(temp) - 1)
+            NewGM 0, 0, temp(UBound(temp)), w, h, temp(UBound(temp) - 1)
             With Mems(UBound(Mems))
-                .GIF.count = gL
+                .GIF.Count = gL
                 ReDim .GIF.frames(gL)
                 For index = 0 To gL
                     GdipImageSelectActiveFrame i, gC, index
-                    dc = CreateCDC(W, H)
+                    dc = CreateCDC(w, h)
                     GdipCreateFromHDC dc, g
-                    GdipDrawImageRect g, i, 0, 0, W, H
+                    GdipDrawImageRect g, i, 0, 0, w, h
                     GdipDeleteGraphics g
                     .GIF.frames(index) = dc
                 Next
@@ -153,17 +153,17 @@ Public CDC As Long, gg As Long
             Exit Sub
         End If
         
-        dc = CreateCDC(W, H)
+        dc = CreateCDC(w, h)
         GdipCreateFromHDC dc, g
-        GdipDrawImageRect g, i, 0, 0, W, H
+        GdipDrawImageRect g, i, 0, 0, w, h
         
         GdipDisposeImage i: GdipDeleteGraphics g
         
         temp = Split(path, "\")
-        NewGM dc, 0, temp(UBound(temp)), W, H, temp(UBound(temp) - 1)
+        NewGM dc, 0, temp(UBound(temp)), w, h, temp(UBound(temp) - 1)
     End Sub
     Public Sub DrawImage(n, X As Long, Y As Long, Optional cx, Optional cy, Optional cw, Optional ch, Optional alpha, Optional Pos As Integer = 0)
-        If OutOfScroll Then Exit Sub
+        'If OutOfScroll Then Exit Sub
         
         Dim b As BLENDFUNCTION, index As Integer, bl As Long
         
@@ -187,8 +187,8 @@ Public CDC As Long, gg As Long
         
         If IsMissing(cx) Then cx = 0
         If IsMissing(cy) Then cy = 0
-        If IsMissing(cw) Then cw = Mems(index).W - cx
-        If IsMissing(ch) Then ch = Mems(index).H - cy
+        If IsMissing(cw) Then cw = Mems(index).w - cx
+        If IsMissing(ch) Then ch = Mems(index).h - cy
         
         If Pos = 1 Then X = Int(X - cw / 2): Y = Int(Y - ch / 2)
         If Pos = 2 Then X = X - cw
@@ -206,11 +206,11 @@ Public CDC As Long, gg As Long
         End If
         
         Dim srcDC As Long
-        If Mems(index).GIF.count = 0 Then
+        If Mems(index).GIF.Count = 0 Then
             srcDC = Mems(index).hwnd
         Else
             If GetTickCount - Mems(index).GIF.time >= GTick Then Mems(index).GIF.tick = Mems(index).GIF.tick + 1
-            If Mems(index).GIF.tick > Mems(index).GIF.count Then Mems(index).GIF.tick = 0
+            If Mems(index).GIF.tick > Mems(index).GIF.Count Then Mems(index).GIF.tick = 0
             srcDC = Mems(index).GIF.frames(Mems(index).GIF.tick)
         End If
         
@@ -236,39 +236,39 @@ Public CDC As Long, gg As Long
     End Function
 '========================================================
 '   Writer
-    Public Sub Writes(ByVal text As String, X As Long, Y As Long, Optional size As Long = 14, Optional Color As Long, Optional W As Long = 0, Optional H As Long = 0, Optional align As StringAlignment = StringAlignmentNear, Optional style As FontStyle = FontStyleRegular)
-        If OutOfScroll Then Exit Sub
+    Public Sub Writes(ByVal text As String, X As Long, Y As Long, Optional size As Long = 14, Optional Color As Long, Optional w As Long = 0, Optional h As Long = 0, Optional align As StringAlignment = StringAlignmentNear, Optional style As FontStyle = FontStyleRegular)
+        'If OutOfScroll Then Exit Sub
         If ScrollMode Then
             X = X + ScrollX + ScrollBX: Y = Y + ScrollY + ScrollBY
             Dim ret As Long
-            GdipIsVisibleRect gg, X, Y, W, H, ret
+            GdipIsVisibleRect gg, X, Y, w, h, ret
             If ret = 0 Then OutOfScroll = True: Exit Sub
         End If
         
-        EF.Writes text, X, Y, gg, Color, size, W, H, align, style
+        EF.Writes text, X, Y, gg, Color, size, w, h, align, style
         With DrawF
             .Left = X
             .top = Y
-            .Right = W
-            .Bottom = H
+            .Right = w
+            .Bottom = h
         End With
     End Sub
 '========================================================
 '   Shape
-    Public Sub Paint(ByVal shape As Integer, X As Long, Y As Long, W As Long, H As Long, Optional Color As Long, Optional Radius As Long, Optional style As Integer = 0)
+    Public Sub Paint(ByVal shape As Integer, X As Long, Y As Long, w As Long, h As Long, Optional Color As Long, Optional Radius As Long, Optional style As Integer = 0)
         'shape:0=rect,1=ellipse,2=rectr
         'style:0=fill,1=border
-        If OutOfScroll Then Exit Sub
+        'If OutOfScroll Then Exit Sub
         If ScrollMode Then
             X = X + ScrollX + ScrollBX: Y = Y + ScrollY + ScrollBY
             Dim ret As Long
-            GdipIsVisibleRect gg, X - 1, Y - 1, W, H, ret
+            GdipIsVisibleRect gg, X - 1, Y - 1, w, h, ret
             If Not ret Then OutOfScroll = True: Exit Sub
         End If
         
         GdipResetPath path
-        If shape = 0 Then GdipAddPathRectangle path, X - 1, Y - 1, W, H
-        If shape = 1 Then GdipAddPathEllipse path, X, Y, W - 1, H - 1
+        If shape = 0 Then GdipAddPathRectangle path, X - 1, Y - 1, w, h
+        If shape = 1 Then GdipAddPathEllipse path, X, Y, w - 1, h - 1
         
         If Color <> 0 Then
             If style = 0 Then GdipSetSolidFillColor brush, Color
@@ -281,18 +281,18 @@ Public CDC As Long, gg As Long
         With DrawF
             .Left = X
             .top = Y
-            .Right = W
-            .Bottom = H
+            .Right = w
+            .Bottom = h
         End With
     End Sub
 '========================================================
 '   Scroll
-    Public Sub StartScroll(X As Long, Y As Long, W As Long, H As Long, SX As Long, SY As Long)
+    Public Sub StartScroll(X As Long, Y As Long, w As Long, h As Long, sx As Long, sy As Long)
         OutOfScroll = False
         ScrollMode = True
-        ScrollX = SX: ScrollY = SY: ScrollBX = X: ScrollBY = Y
-        GdipSetClipRect gg, X, Y, W, H, CombineModeReplace
-        CRgn = CreateRectRgn(X, Y, X + W, Y + H)
+        ScrollX = sx: ScrollY = sy: ScrollBX = X: ScrollBY = Y
+        GdipSetClipRect gg, X, Y, w, h, CombineModeReplace
+        CRgn = CreateRectRgn(X, Y, X + w, Y + h)
         SelectClipRgn CDC, CRgn
     End Sub
     Public Sub EndScroll()
