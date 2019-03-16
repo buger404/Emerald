@@ -4,16 +4,16 @@ Begin VB.Form TestWindow
    BackColor       =   &H80000005&
    BorderStyle     =   1  'Fixed Single
    Caption         =   "Emerald.Test"
-   ClientHeight    =   6675
-   ClientLeft      =   45
-   ClientTop       =   390
+   ClientHeight    =   6672
+   ClientLeft      =   48
+   ClientTop       =   396
    ClientWidth     =   9660
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   445
+   ScaleHeight     =   556
    ScaleMode       =   3  'Pixel
-   ScaleWidth      =   644
+   ScaleWidth      =   805
    StartUpPosition =   2  'ÆÁÄ»ÖÐÐÄ
    Begin VB.Timer DrawTimer 
       Interval        =   10
@@ -33,7 +33,7 @@ Private Sub DrawTimer_Timer()
 End Sub
 
 Private Sub Form_Load()
-    StartEmerald Me.Hwnd, Me.ScaleWidth, Me.ScaleHeight
+    StartEmerald Me.hwnd, Me.ScaleWidth, Me.ScaleHeight
     MakeFont "Î¢ÈíÑÅºÚ"
     
     Set EC = New GMan
@@ -48,7 +48,7 @@ Private Sub Form_MouseDown(button As Integer, Shift As Integer, X As Single, Y A
 End Sub
 
 Private Sub Form_MouseMove(button As Integer, Shift As Integer, X As Single, Y As Single)
-    If Mouse.state = 0 Then UpdateMouse X, Y, 0, button
+    If Mouse.State = 0 Then UpdateMouse X, Y, 0, button
 End Sub
 
 Private Sub Form_MouseUp(button As Integer, Shift As Integer, X As Single, Y As Single)

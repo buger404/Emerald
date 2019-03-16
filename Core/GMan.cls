@@ -21,7 +21,8 @@ Private Type Transform
     during As Long
 End Type
 Dim Pages() As Page, Transform As Transform
-Public ActivePage As String, CDC As Long, ODC As Long, GG As Long, pB As Long
+Dim mPage As String
+Public CDC As Long, ODC As Long, GG As Long, pB As Long
 '========================================================
 '   Init
     Private Sub Class_Initialize()
@@ -50,6 +51,18 @@ Public ActivePage As String, CDC As Long, ODC As Long, GG As Long, pB As Long
             .name = name
         End With
     End Sub
+    Public Property Get ActivePage() As String
+        ActivePage = mPage
+    End Property
+    Public Property Let ActivePage(nPage As String)
+        For i = 1 To UBound(Pages)
+            If mPage = Pages(i).name Then CallByName Pages(i).p.SrcClass, "Leave", VbMethod: Exit For
+        Next
+        mPage = nPage
+        For i = 1 To UBound(Pages)
+            If nPage = Pages(i).name Then CallByName Pages(i).p.SrcClass, "Enter", VbMethod: Exit For
+        Next
+    End Property
 '========================================================
 '   Draw
     Public Sub Display()
@@ -63,13 +76,17 @@ Public ActivePage As String, CDC As Long, ODC As Long, GG As Long, pB As Long
     End Sub
 '========================================================
 '   Transform
-    Public Sub NewTransform(Optional kind As Integer = 0, Optional during As Long = 300)
+    Public Sub NewTransform(Optional kind As Integer = 0, Optional during As Long = 300, Optional newPage)
         PaintDC CDC, ODC
         With Transform
             .during = during
             .kind = kind
             .time = GetTickCount
         End With
+        
+        If Not IsMissing(newPage) Then
+            ActivePage = newPage
+        End If
     End Sub
     Private Sub Translation()
         Dim pro As Single

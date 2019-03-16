@@ -1,6 +1,11 @@
 Attribute VB_Name = "GCore"
 '========================================================
 '   Emerald 绘图框架模块
+'   更新内容(ver.316)
+'   -修复卷轴模式的一些问题
+'   -新增6种过场特效
+'   -新增动画
+'   -新增页面切换事件
 '   更新内容(ver.315)
 '   -新增卷轴模式
 '   -现在可以检测键盘按下
@@ -13,19 +18,20 @@ Private Declare Sub AlphaBlend Lib "msimg32.dll" (ByVal hdcDest As Long, ByVal n
 Public Type MState
     State As Integer
     button As Integer
-    X As Single
-    Y As Single
+    x As Single
+    y As Single
 End Type
-Public ECore As GMan, EF As GFont
+Public ECore As GMan, EF As GFont, EAni As Object
 Public GHwnd As Long, GDC As Long, GW As Long, GH As Long
 Public Mouse As MState, DrawF As RECT
 '========================================================
 '   Init
-    Public Sub StartEmerald(hwnd As Long, W As Long, H As Long)
+    Public Sub StartEmerald(hwnd As Long, w As Long, h As Long)
         InitGDIPlus
         BASS_Init -1, 44100, BASS_DEVICE_3D, hwnd, 0
-        GHwnd = hwnd: GW = W: GH = H
+        GHwnd = hwnd: GW = w: GH = h
         GDC = GetDC(hwnd)
+        Set EAni = New GAnimation
     End Sub
     Public Sub EndEmerald()
         If Not (ECore Is Nothing) Then ECore.Dispose
@@ -40,7 +46,7 @@ Public Mouse As MState, DrawF As RECT
 '========================================================
 '   RunTime
     Public Sub BlurTo(dc As Long, srcDC As Long, buffWin As Form, Optional Radius As Long = 60)
-        Dim i As Long, g As Long, e As Long, b As BlurParams, W As Long, H As Long
+        Dim i As Long, g As Long, e As Long, b As BlurParams, w As Long, h As Long
         '粘贴到缓冲窗口
         buffWin.AutoRedraw = True
         BitBlt buffWin.hdc, 0, 0, GW, GH, srcDC, 0, 0, vbSrcCopy: buffWin.Refresh
@@ -50,8 +56,8 @@ Public Mouse As MState, DrawF As RECT
         
         '模糊操作
         GdipCreateEffect2 GdipEffectType.Blur, e: b.Radius = Radius: GdipSetEffectParameters e, b, LenB(b)
-        GdipGetImageWidth i, W: GdipGetImageHeight i, H
-        GdipBitmapApplyEffect i, e, NewRectL(0, 0, W, H), 0, 0, 0
+        GdipGetImageWidth i, w: GdipGetImageHeight i, h
+        GdipBitmapApplyEffect i, e, NewRectL(0, 0, w, h), 0, 0, 0
         
         '画~
         GdipCreateFromHDC dc, g
@@ -59,13 +65,13 @@ Public Mouse As MState, DrawF As RECT
         GdipDisposeImage i: GdipDeleteGraphics g: GdipDeleteEffect e '垃圾处理
         buffWin.AutoRedraw = False
     End Sub
-    Public Function CreateCDC(W As Long, H As Long) As Long
+    Public Function CreateCDC(w As Long, h As Long) As Long
         Dim bm As BITMAPINFOHEADER, dc As Long, DIB As Long
     
         With bm
             .biBitCount = 32
-            .biHeight = H
-            .biWidth = W
+            .biHeight = h
+            .biWidth = w
             .biPlanes = 1
             .biSizeImage = (.biWidth * .biBitCount + 31) / 32 * 4 * .biHeight
             .biSize = Len(bm)
@@ -77,7 +83,7 @@ Public Mouse As MState, DrawF As RECT
         
         CreateCDC = dc
     End Function
-    Public Sub PaintDC(dc As Long, destDC As Long, Optional X As Long = 0, Optional Y As Long = 0, Optional cx As Long = 0, Optional cy As Long = 0, Optional cw, Optional ch, Optional alpha)
+    Public Sub PaintDC(dc As Long, destDC As Long, Optional x As Long = 0, Optional y As Long = 0, Optional cx As Long = 0, Optional cy As Long = 0, Optional cw, Optional ch, Optional alpha)
         Dim b As BLENDFUNCTION, index As Integer, bl As Long
         
         If Not IsMissing(alpha) Then
@@ -96,9 +102,9 @@ Public Mouse As MState, DrawF As RECT
         If IsMissing(ch) Then ch = GH - cy
         
         If IsMissing(alpha) Then
-            BitBlt destDC, X, Y, cw, ch, dc, cx, cy, vbSrcCopy
+            BitBlt destDC, x, y, cw, ch, dc, cx, cy, vbSrcCopy
         Else
-            AlphaBlend destDC, X, Y, cw, ch, dc, cx, cy, cw, ch, bl
+            AlphaBlend destDC, x, y, cw, ch, dc, cx, cy, cw, ch, bl
         End If
     End Sub
     Function Cubic(t As Single, arg0 As Single, arg1 As Single, arg2 As Single, arg3 As Single) As Single
@@ -108,24 +114,24 @@ Public Mouse As MState, DrawF As RECT
     End Function
 '========================================================
 '   Mouse
-    Public Sub UpdateMouse(X As Single, Y As Single, State As Long, button As Integer)
+    Public Sub UpdateMouse(x As Single, y As Single, State As Long, button As Integer)
         With Mouse
-            .X = X
-            .Y = Y
+            .x = x
+            .y = y
             .State = State
             .button = button
         End With
     End Sub
-    Public Function CheckMouse(X As Long, Y As Long, W As Long, H As Long) As Integer
+    Public Function CheckMouse(x As Long, y As Long, w As Long, h As Long) As Integer
         'Return Value:0=none,1=in,2=down,3=up
-        If Mouse.X >= X And Mouse.Y >= Y And Mouse.X <= X + W And Mouse.Y <= Y + H Then
+        If Mouse.x >= x And Mouse.y >= y And Mouse.x <= x + w And Mouse.y <= y + h Then
             CheckMouse = Mouse.State + 1
             If Mouse.State = 2 Then Mouse.State = 0
         End If
     End Function
     Public Function CheckMouse2() As Integer
         'Return Value:0=none,1=in,2=down,3=up
-        If Mouse.X >= DrawF.Left And Mouse.Y >= DrawF.top And Mouse.X <= DrawF.Left + DrawF.Right And Mouse.Y <= DrawF.top + DrawF.Bottom Then
+        If Mouse.x >= DrawF.Left And Mouse.y >= DrawF.top And Mouse.x <= DrawF.Left + DrawF.Right And Mouse.y <= DrawF.top + DrawF.Bottom Then
             CheckMouse2 = Mouse.State + 1
             If Mouse.State = 2 Then Mouse.State = 0
         End If

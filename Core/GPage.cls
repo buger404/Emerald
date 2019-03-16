@@ -29,25 +29,33 @@ Private Type GMem
     h As Long
 End Type
 Private Type GDA
-    X As Long
-    Y As Long
+    x As Long
+    y As Long
     w As Long
     h As Long
 End Type
+Private Type AniTask
+    start As Long
+    during As Long
+    custom As Boolean
+    func As String
+    profunc As Integer
+End Type
 Private Const GTick As Long = 1000 / 30
+Dim Anis() As AniTask
 Dim Mems() As GMem, DrawBox As Object, brush As Long, path As Long, Pen As Long
-Dim OutOfScroll As Boolean, ScrollMode As Boolean, ScrollX As Long, ScrollY As Long, ScrollBX As Long, ScrollBY As Long, CRgn As Long
-Public CDC As Long, gg As Long
+Dim ScrollMode As Boolean, ScrollX As Long, ScrollY As Long, ScrollBX As Long, ScrollBY As Long, CRgn As Long
+Public CDC As Long, GG As Long, OutOfScroll As Boolean
 '========================================================
 '   Init
     Public Sub Create(dBox As Object)
-        ReDim Mems(0)
+        ReDim Mems(0): ReDim Anis(0)
         
         CDC = CreateCDC(GW, GH)
         NewGM CDC, 0, ""
-        GdipCreateFromHDC CDC, gg
-        GdipSetSmoothingMode gg, SmoothingModeAntiAlias
-        GdipSetTextRenderingHint gg, TextRenderingHintAntiAlias
+        GdipCreateFromHDC CDC, GG
+        GdipSetSmoothingMode GG, SmoothingModeAntiAlias
+        GdipSetTextRenderingHint GG, TextRenderingHintAntiAlias
         
         Set DrawBox = dBox
         
@@ -76,7 +84,7 @@ Public CDC As Long, gg As Long
 '========================================================
 '   Print
     Public Sub Clear()
-        GdipGraphicsClear gg, argb(255, 255, 255, 255)
+        GdipGraphicsClear GG, argb(255, 255, 255, 255)
     End Sub
     Public Sub Update()
         CallByName DrawBox, "Update", VbMethod
@@ -97,6 +105,9 @@ Public CDC As Long, gg As Long
             If Not IsMissing(h) Then .h = h
         End With
     End Sub
+    Public Property Get SrcClass() As Object
+        Set SrcClass = DrawBox
+    End Property
 '========================================================
 '   Images
     Public Sub NewImages(path As String, Optional arg1, Optional arg2)
@@ -162,21 +173,29 @@ Public CDC As Long, gg As Long
         temp = Split(path, "\")
         NewGM dc, 0, temp(UBound(temp)), w, h, temp(UBound(temp) - 1)
     End Sub
-    Public Sub DrawImage(n, X As Long, Y As Long, Optional cx, Optional cy, Optional cw, Optional ch, Optional alpha, Optional Pos As Integer = 0)
+    Public Sub DrawImage(n, x As Long, y As Long, Optional cx, Optional cy, Optional cw, Optional ch, Optional alpha, Optional Pos As Integer = 0, Optional animation As Integer = 0)
         'If OutOfScroll Then Exit Sub
         
         Dim b As BLENDFUNCTION, index As Integer, bl As Long
         
+        If animation <> 0 Then
+            If (GetTickCount - Anis(animation).start) > Anis(animation).during Then animation = 0
+        End If
+        
         If Not IsMissing(alpha) Then
-            If alpha < 0 Then alpha = 0
-            If alpha > 1 Then alpha = 1
-            With b
-                .AlphaFormat = &H1
-                .BlendFlags = &H0
-                .BlendOp = 0
-                .SourceConstantAlpha = Int(alpha * 255)
-            End With
-            CopyMemory bl, b, 4
+            If animation = 0 Then
+setAlpha:
+                If alpha < 0 Then alpha = 0
+                If alpha > 1 Then alpha = 1
+                With b
+                    .AlphaFormat = &H1
+                    .BlendFlags = &H0
+                    .BlendOp = 0
+                    .SourceConstantAlpha = Int(alpha * 255)
+                End With
+                CopyMemory bl, b, 4
+                If animation <> 0 Then Return
+            End If
         End If
         
         If TypeName(n) = "String" Then
@@ -190,17 +209,32 @@ Public CDC As Long, gg As Long
         If IsMissing(cw) Then cw = Mems(index).w - cx
         If IsMissing(ch) Then ch = Mems(index).h - cy
         
-        If Pos = 1 Then X = Int(X - cw / 2): Y = Int(Y - ch / 2)
-        If Pos = 2 Then X = X - cw
-        If Pos = 3 Then Y = Y - ch
-        If Pos = 4 Then X = X + cw
-        If Pos = 5 Then Y = Y + ch
+        If Pos = 1 Then x = Int(x - cw / 2): y = Int(y - ch / 2)
+        If Pos = 2 Then x = x - cw
+        If Pos = 3 Then y = y - ch
+        If Pos = 4 Then x = x + cw
+        If Pos = 5 Then y = y + ch
+        
+        If animation <> 0 Then
+            If (GetTickCount - Anis(animation).start) <= Anis(animation).during Then
+                Dim pro As Single
+                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, ((GetTickCount - Anis(animation).start) / Anis(animation).during))
+                
+                If Anis(animation).custom Then
+                    CallByName DrawBox, Anis(animation).func, VbMethod, x, y, cw, ch, alpha, pro
+                Else
+                    CallByName EAni, Anis(animation).func, VbMethod, x, y, cw, ch, alpha, pro
+                End If
+                
+                GoSub setAlpha
+            End If
+        End If
         
         If ScrollMode Then
-            X = X + ScrollX + ScrollBX: Y = Y + ScrollY + ScrollBY
+            x = x + ScrollX + ScrollBX: y = y + ScrollY + ScrollBY
             Dim ret As Long, Crect As RECT
             With Crect
-                .Left = X: .top = Y: .Right = X + cw: .Bottom = Y + ch
+                .Left = x: .top = y: .Right = x + cw: .Bottom = y + ch
             End With
             If RectVisible(CDC, Crect) <> 1 Then OutOfScroll = True: Exit Sub
         End If
@@ -215,14 +249,14 @@ Public CDC As Long, gg As Long
         End If
         
         If IsMissing(alpha) Then
-            BitBlt CDC, X, Y, cw, ch, srcDC, cx, cy, vbSrcCopy
+            BitBlt CDC, x, y, cw, ch, srcDC, cx, cy, vbSrcCopy
         Else
-            AlphaBlend CDC, X, Y, cw, ch, srcDC, cx, cy, cw, ch, bl
+            AlphaBlend CDC, x, y, cw, ch, srcDC, cx, cy, cw, ch, bl
         End If
         
         With DrawF
-            .Left = X
-            .top = Y
+            .Left = x
+            .top = y
             .Right = cw
             .Bottom = ch
         End With
@@ -236,70 +270,118 @@ Public CDC As Long, gg As Long
     End Function
 '========================================================
 '   Writer
-    Public Sub Writes(ByVal text As String, X As Long, Y As Long, Optional size As Long = 14, Optional Color As Long, Optional w As Long = 0, Optional h As Long = 0, Optional align As StringAlignment = StringAlignmentNear, Optional style As FontStyle = FontStyleRegular)
+    Public Sub Writes(ByVal text As String, x As Long, y As Long, Optional size As Long = 14, Optional Color As Long, Optional w As Long = 0, Optional h As Long = 0, Optional align As StringAlignment = StringAlignmentNear, Optional style As FontStyle = FontStyleRegular, Optional animation As Integer = 0)
         'If OutOfScroll Then Exit Sub
         If ScrollMode Then
-            X = X + ScrollX + ScrollBX: Y = Y + ScrollY + ScrollBY
+            x = x + ScrollX + ScrollBX: y = y + ScrollY + ScrollBY
             Dim ret As Long
-            GdipIsVisibleRect gg, X, Y, w, h, ret
+            GdipIsVisibleRect GG, x, y, w, h, ret
             If ret = 0 Then OutOfScroll = True: Exit Sub
         End If
         
-        EF.Writes text, X, Y, gg, Color, size, w, h, align, style
+        If animation <> 0 Then
+            If (GetTickCount - Anis(animation).start) < Anis(animation).during Then
+                Dim pro As Single, co(3) As Byte, al As Single
+                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).start) / Anis(animation).during)
+                CopyMemory co(0), Color, 4
+                al = co(3): al = al / 255
+                
+                If Anis(animation).custom Then
+                    CallByName DrawBox, Anis(animation).func, VbMethod, x, y, w, h, al, pro
+                Else
+                    CallByName EAni, Anis(animation).func, VbMethod, x, y, w, h, al, pro
+                End If
+                Color = argb(al * 255, co(0), co(1), co(2))
+            End If
+        End If
+        
+        EF.Writes text, x, y, GG, Color, size, w, h, align, style
         With DrawF
-            .Left = X
-            .top = Y
+            .Left = x
+            .top = y
             .Right = w
             .Bottom = h
         End With
     End Sub
 '========================================================
 '   Shape
-    Public Sub Paint(ByVal shape As Integer, X As Long, Y As Long, w As Long, h As Long, Optional Color As Long, Optional Radius As Long, Optional style As Integer = 0)
+    Public Sub Paint(ByVal shape As Integer, x As Long, y As Long, w As Long, h As Long, Optional Color As Long, Optional Radius As Long, Optional style As Integer = 0, Optional animation As Integer = 0)
         'shape:0=rect,1=ellipse,2=rectr
         'style:0=fill,1=border
         'If OutOfScroll Then Exit Sub
         If ScrollMode Then
-            X = X + ScrollX + ScrollBX: Y = Y + ScrollY + ScrollBY
+            x = x + ScrollX + ScrollBX: y = y + ScrollY + ScrollBY
             Dim ret As Long
-            GdipIsVisibleRect gg, X - 1, Y - 1, w, h, ret
+            GdipIsVisibleRect GG, x - 1, y - 1, w, h, ret
             If Not ret Then OutOfScroll = True: Exit Sub
         End If
         
+        If animation <> 0 Then
+            If (GetTickCount - Anis(animation).start) < Anis(animation).during Then
+                Dim pro As Single, co(3) As Byte, al As Single
+                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).start) / Anis(animation).during)
+                CopyMemory co(0), Color, 4
+                al = co(0): al = al / 255
+                
+                If Anis(animation).custom Then
+                    CallByName DrawBox, Anis(animation).func, VbMethod, x, y, w, h, al, pro
+                Else
+                    CallByName EAni, Anis(animation).func, VbMethod, x, y, w, h, al, pro
+                End If
+                Color = argb(al * 255, co(1), co(2), co(3))
+            End If
+        End If
+        
         GdipResetPath path
-        If shape = 0 Then GdipAddPathRectangle path, X - 1, Y - 1, w, h
-        If shape = 1 Then GdipAddPathEllipse path, X, Y, w - 1, h - 1
+        If shape = 0 Then GdipAddPathRectangle path, x - 1, y - 1, w, h
+        If shape = 1 Then GdipAddPathEllipse path, x, y, w - 1, h - 1
         
         If Color <> 0 Then
             If style = 0 Then GdipSetSolidFillColor brush, Color
             If style = 1 Then GdipSetPenColor Pen, Color
         End If
         
-        If style = 0 Then GdipFillPath gg, brush, path
-        If style = 1 Then GdipDrawPath gg, Pen, path
+        If style = 0 Then GdipFillPath GG, brush, path
+        If style = 1 Then GdipDrawPath GG, Pen, path
         
         With DrawF
-            .Left = X
-            .top = Y
+            .Left = x
+            .top = y
             .Right = w
             .Bottom = h
         End With
     End Sub
 '========================================================
 '   Scroll
-    Public Sub StartScroll(X As Long, Y As Long, w As Long, h As Long, sx As Long, sy As Long)
+    Public Sub StartScroll(x As Long, y As Long, w As Long, h As Long, sx As Long, SY As Long)
         OutOfScroll = False
         ScrollMode = True
-        ScrollX = sx: ScrollY = sy: ScrollBX = X: ScrollBY = Y
-        GdipSetClipRect gg, X, Y, w, h, CombineModeReplace
-        CRgn = CreateRectRgn(X, Y, X + w, Y + h)
+        ScrollX = sx: ScrollY = SY: ScrollBX = x: ScrollBY = y
+        GdipSetClipRect GG, x, y, w, h, CombineModeReplace
+        CRgn = CreateRectRgn(x, y, x + w, y + h)
         SelectClipRgn CDC, CRgn
     End Sub
     Public Sub EndScroll()
         OutOfScroll = False
         ScrollMode = False
-        GdipResetClip gg
+        GdipResetClip GG
         DeleteObject CRgn
         SelectClipRgn CDC, ByVal 0
+    End Sub
+'========================================================
+    'Animation
+    Public Function NewAnimation(custom As Boolean, func As String, profunc As Integer, during As Long) As Integer
+        ReDim Preserve Anis(UBound(Anis) + 1)
+        With Anis(UBound(Anis))
+            .custom = custom
+            .during = during
+            .func = func
+            .profunc = profunc
+        End With
+        
+        NewAnimation = UBound(Anis)
+    End Function
+    Public Sub StartAnimation(id As Integer)
+        Anis(id).start = GetTickCount
     End Sub
 '========================================================

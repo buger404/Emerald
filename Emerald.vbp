@@ -13,6 +13,7 @@ Class=GMusic; Core\GMusic.cls
 Class=GMusicList; Core\GMusicList.cls
 Class=GSaving; Core\GSaving.cls
 Module=BMEA_Engine; Core\BMEA_Engine.bas
+Class=GAnimation; Core\GAnimation.cls
 Startup="TestWindow"
 HelpFile=""
 Title="Emerald"
