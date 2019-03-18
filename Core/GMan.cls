@@ -22,6 +22,7 @@ Private Type Transform
 End Type
 Dim Pages() As Page, Transform As Transform
 Dim mPage As String
+Dim OutOfWindow As Boolean
 Public CDC As Long, ODC As Long, GG As Long, pB As Long
 '========================================================
 '   Init
@@ -66,8 +67,22 @@ Public CDC As Long, ODC As Long, GG As Long, pB As Long
 '========================================================
 '   Draw
     Public Sub Display()
+        Dim o As Boolean
+        
         For i = 1 To UBound(Pages)
-            If ActivePage = Pages(i).name Then Pages(i).p.Clear: Pages(i).p.Update: Pages(i).p.Display (CDC): Exit For
+            If ActivePage = Pages(i).name Then
+                Pages(i).p.Clear: Pages(i).p.Update: Pages(i).p.Display (CDC)
+                o = (GetActiveWindow = 0)
+                If o <> OutOfWindow Then
+                    OutOfWindow = o
+                    If OutOfWindow Then
+                        CallByName Pages(i).p.SrcClass, "Lostfocus", VbMethod
+                    Else
+                        CallByName Pages(i).p.SrcClass, "Gotfocus", VbMethod
+                    End If
+                End If
+                Exit For
+            End If
         Next
         If GetTickCount - Transform.time <= Transform.during Then Call Translation
         BitBlt GDC, 0, 0, GW, GH, CDC, 0, 0, vbSrcCopy
