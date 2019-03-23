@@ -3,6 +3,7 @@ Attribute VB_Name = "GCore"
 '   Emerald 绘图框架模块
 '   更新内容(ver.323)
 '   -DPI适应
+'   -鼠标滚轮支持
 '   更新内容(ver.317)
 '   -新增窗口失焦和取得焦点事件
 '   更新内容(ver.316)
@@ -31,6 +32,7 @@ End Type
 Public ECore As GMan, EF As GFont, EAni As Object
 Public GHwnd As Long, GDC As Long, GW As Long, GH As Long
 Public Mouse As MState, DrawF As RECT
+Dim Wndproc As Long
 '========================================================
 '   Init
     Public Sub StartEmerald(hwnd As Long, w As Long, h As Long)
@@ -38,6 +40,8 @@ Public Mouse As MState, DrawF As RECT
         BASS_Init -1, 44100, BASS_DEVICE_3D, hwnd, 0
         GHwnd = hwnd: GW = w: GH = h
         GDC = GetDC(hwnd)
+        If App.LogMode <> 0 Then Wndproc = SetWindowLongA(hwnd, GWL_WNDPROC, AddressOf Process)
+        
         Set EAni = New GAnimation
         
         If Val(GetWinNTVersion) > 6.1 Then               '如果当前系统版本高于win7
@@ -45,6 +49,7 @@ Public Mouse As MState, DrawF As RECT
         End If
     End Sub
     Public Sub EndEmerald()
+        If App.LogMode <> 0 Then SetWindowLongA GHwnd, GWL_WNDPROC, Wndproc
         If Not (ECore Is Nothing) Then ECore.Dispose
         If Not (EF Is Nothing) Then EF.Dispose
         TerminateGDIPlus
@@ -56,6 +61,20 @@ Public Mouse As MState, DrawF As RECT
     End Sub
 '========================================================
 '   RunTime
+    Public Function Process(ByVal hwnd As Long, ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam As Long) As Long
+        On Error GoTo sth
+
+        If uMsg = WM_MOUSEWHEEL Then
+            Dim Direction As Integer, Strong As Single
+            Direction = IIf(wParam < 0, 1, -1): Strong = Abs(wParam / 7864320)
+            ECore.Wheel Direction, Strong
+        End If
+        
+last:
+        Process = CallWindowProcA(Wndproc, hwnd, uMsg, wParam, lParam)
+sth:
+
+    End Function
 '   取得当前系统的WinNT版本
     Public Function GetWinNTVersion() As String
         Dim strComputer, objWMIService, colItems, objItem, strOSversion As String

@@ -21,7 +21,7 @@ Private Type Transform
     during As Long
 End Type
 Dim Pages() As Page, Transform As Transform
-Dim mPage As String
+Dim mPage As String, aPage As Object
 Dim OutOfWindow As Boolean
 Public CDC As Long, ODC As Long, GG As Long, pB As Long
 '========================================================
@@ -61,9 +61,16 @@ Public CDC As Long, ODC As Long, GG As Long, pB As Long
         Next
         mPage = nPage
         For i = 1 To UBound(Pages)
-            If nPage = Pages(i).name Then CallByName Pages(i).p.SrcClass, "Enter", VbMethod: Exit For
+            If nPage = Pages(i).name Then
+                CallByName Pages(i).p.SrcClass, "Enter", VbMethod
+                Set aPage = Pages(i).p.SrcClass
+                Exit For
+            End If
         Next
     End Property
+    Public Sub Wheel(Direction As Integer, Depth As Single)
+        CallByName aPage, "Wheel", VbMethod, Direction, Depth
+    End Sub
 '========================================================
 '   Draw
     Public Sub Display()

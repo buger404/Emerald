@@ -30,6 +30,9 @@ Public Sub Update()
     If IsKeyPress(VK_UP) Then sy = sy + 10
     If IsKeyPress(VK_DOWN) Then sy = sy - 10
 End Sub
+Public Sub Wheel(Direction As Integer, Depth As Single)
+    sy = sy + 10 * Depth * Direction
+End Sub
 Public Sub Enter()
     Page.StartAnimation 1
     Page.StartAnimation 2
