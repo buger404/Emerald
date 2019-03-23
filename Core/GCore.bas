@@ -1,6 +1,8 @@
 Attribute VB_Name = "GCore"
 '========================================================
 '   Emerald 绘图框架模块
+'   更新内容(ver.323)
+'   -DPI适应
 '   更新内容(ver.317)
 '   -新增窗口失焦和取得焦点事件
 '   更新内容(ver.316)
@@ -16,6 +18,9 @@ Attribute VB_Name = "GCore"
 '   更新日志(ver.211)
 '   -添加窗口模糊方法（Blurto）
 '========================================================
+'   DPI适应
+    Public Declare Function SetProcessDpiAwareness Lib "SHCORE.DLL" (ByVal DPImodel As Long) As Long
+'=========================================================================
 Private Declare Sub AlphaBlend Lib "msimg32.dll" (ByVal hdcDest As Long, ByVal nXOriginDest As Long, ByVal nYOriginDest As Long, ByVal nWidthDest As Long, ByVal hHeightDest As Long, ByVal hdcSrc As Long, ByVal nXOriginSrc As Long, ByVal nYOriginSrc As Long, ByVal nWidthSrc As Long, ByVal nHeightSrc As Long, ByVal BLENDFUNCTION As Long) ' As Long
 Public Type MState
     State As Integer
@@ -34,6 +39,10 @@ Public Mouse As MState, DrawF As RECT
         GHwnd = hwnd: GW = w: GH = h
         GDC = GetDC(hwnd)
         Set EAni = New GAnimation
+        
+        If Val(GetWinNTVersion) > 6.1 Then               '如果当前系统版本高于win7
+            SetProcessDpiAwareness 2&                    '调用API使本程序在高DPI情况下不模糊
+        End If
     End Sub
     Public Sub EndEmerald()
         If Not (ECore Is Nothing) Then ECore.Dispose
@@ -47,6 +56,19 @@ Public Mouse As MState, DrawF As RECT
     End Sub
 '========================================================
 '   RunTime
+'   取得当前系统的WinNT版本
+    Public Function GetWinNTVersion() As String
+        Dim strComputer, objWMIService, colItems, objItem, strOSversion As String
+        strComputer = "."
+        Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\cimv2")
+        Set colItems = objWMIService.ExecQuery("Select * from Win32_OperatingSystem")
+        
+        For Each objItem In colItems
+            strOSversion = objItem.Version
+        Next
+        
+        GetWinNTVersion = Left(strOSversion, 3)
+    End Function
     Public Sub BlurTo(dc As Long, srcDC As Long, buffWin As Form, Optional Radius As Long = 60)
         Dim i As Long, g As Long, e As Long, b As BlurParams, w As Long, h As Long
         '粘贴到缓冲窗口
