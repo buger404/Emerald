@@ -40,6 +40,8 @@ Private Type AniTask
     custom As Boolean
     func As String
     profunc As Integer
+    delay As Long
+    mark As Boolean
 End Type
 Private Const GTick As Long = 1000 / 30
 Dim Anis() As AniTask
@@ -87,6 +89,16 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
         GdipGraphicsClear GG, argb(255, 255, 255, 255)
     End Sub
     Public Sub Update()
+        Dim i As Integer
+        For i = 1 To UBound(Anis)
+            If Not Anis(i).mark Then
+                If (GetTickCount - Anis(i).start - Anis(i).delay) > Anis(i).during Then
+                     CallByName DrawBox, "AnimationDone", VbMethod, i
+                    Anis(i).mark = True
+                End If
+            End If
+        Next
+        
         CallByName DrawBox, "Update", VbMethod
     End Sub
     Public Sub Display(dc As Long)
@@ -216,9 +228,9 @@ setAlpha:
         If Pos = 5 Then y = y + ch
         
         If animation <> 0 Then
-            If (GetTickCount - Anis(animation).start) <= Anis(animation).during Then
+            If Not Anis(animation).mark Then
                 Dim pro As Single
-                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, ((GetTickCount - Anis(animation).start) / Anis(animation).during))
+                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, ((GetTickCount - Anis(animation).start - Anis(animation).delay) / Anis(animation).during))
                 
                 If Anis(animation).custom Then
                     CallByName DrawBox, Anis(animation).func, VbMethod, x, y, cw, ch, alpha, pro
@@ -280,9 +292,9 @@ setAlpha:
         End If
         
         If animation <> 0 Then
-            If (GetTickCount - Anis(animation).start) < Anis(animation).during Then
+            If Not Anis(animation).mark Then
                 Dim pro As Single, co(3) As Byte, al As Single
-                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).start) / Anis(animation).during)
+                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).start - Anis(animation).delay) / Anis(animation).during)
                 CopyMemory co(0), Color, 4
                 al = co(3): al = al / 255
                 
@@ -317,18 +329,18 @@ setAlpha:
         End If
         
         If animation <> 0 Then
-            If (GetTickCount - Anis(animation).start) < Anis(animation).during Then
+            If Not Anis(animation).mark Then
                 Dim pro As Single, co(3) As Byte, al As Single
-                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).start) / Anis(animation).during)
+                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).start - Anis(animation).delay) / Anis(animation).during)
                 CopyMemory co(0), Color, 4
-                al = co(0): al = al / 255
+                al = co(3): al = al / 255
                 
                 If Anis(animation).custom Then
                     CallByName DrawBox, Anis(animation).func, VbMethod, x, y, w, h, al, pro
                 Else
                     CallByName EAni, Anis(animation).func, VbMethod, x, y, w, h, al, pro
                 End If
-                Color = argb(al * 255, co(1), co(2), co(3))
+                Color = argb(al * 255, co(0), co(1), co(2))
             End If
         End If
         
@@ -353,10 +365,10 @@ setAlpha:
     End Sub
 '========================================================
 '   Scroll
-    Public Sub StartScroll(x As Long, y As Long, w As Long, h As Long, sx As Long, SY As Long)
+    Public Sub StartScroll(x As Long, y As Long, w As Long, h As Long, sx As Long, sy As Long)
         OutOfScroll = False
         ScrollMode = True
-        ScrollX = sx: ScrollY = SY: ScrollBX = x: ScrollBY = y
+        ScrollX = sx: ScrollY = sy: ScrollBX = x: ScrollBY = y
         GdipSetClipRect GG, x, y, w, h, CombineModeReplace
         CRgn = CreateRectRgn(x, y, x + w, y + h)
         SelectClipRgn CDC, CRgn
@@ -377,11 +389,17 @@ setAlpha:
             .during = during
             .func = func
             .profunc = profunc
+            .mark = True
         End With
         
         NewAnimation = UBound(Anis)
     End Function
-    Public Sub StartAnimation(id As Integer)
+    Public Sub StartAnimation(id As Integer, Optional delay As Long = 0)
         Anis(id).start = GetTickCount
+        Anis(id).delay = delay
+        Anis(id).mark = False
     End Sub
+    Public Function AnimationDone(id As Integer) As Boolean
+        AnimationDone = Anis(id).mark
+    End Function
 '========================================================
