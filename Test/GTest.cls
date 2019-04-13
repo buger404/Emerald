@@ -20,8 +20,8 @@ Public Sub Update()
         Exit Sub
     End If
 
-    Page.DrawImage "404.png", 20, 20, alpha:=1, animation:=1
-    Page.DrawImage "1.png", GW - 160, 20, alpha:=1, animation:=1
+    Page.DrawImage "404.png", 20, 20, Alpha:=1, animation:=1
+    Page.DrawImage "1.png", GW - 160, 20, Alpha:=1, animation:=1
     If CheckMouse2 = 3 Then MsgBox "冰棍被鼠标打了": ECore.NewTransform 10, 1000
     Page.Writes "冰棍", GW - 80, 170, align:=StringAlignmentCenter, Color:=argb(255, 0, 0, 0), animation:=1
     
@@ -29,8 +29,8 @@ Public Sub Update()
     Page.Paint 0, 20, 230, 200 + 1, 300 + 1, argb(255, 180, 180, 180), style:=1, animation:=1
     
     Page.StartScroll 20, 230, 200, 300, 0, sy
-        Page.DrawImage "404.png", 0, 0, alpha:=0.5, animation:=1
-        Page.DrawImage "test.gif", 18, 220, alpha:=1, animation:=1
+        Page.DrawImage "404.png", 0, 0, Alpha:=0.5, animation:=1
+        Page.DrawImage "test.gif", 18, 220, Alpha:=1, animation:=1
         Page.Writes "ScrollY: " & sy, 0, 237, 16, argb(255, 255, 0, 0), 200, 20, align:=StringAlignmentCenter, style:=FontStyleBold, animation:=1
     Page.EndScroll
     

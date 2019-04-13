@@ -16,7 +16,7 @@ Begin VB.Form TestWindow
    ScaleWidth      =   966
    StartUpPosition =   2  'ÆÁÄ»ÖÐÐÄ
    Begin VB.Timer DrawTimer 
-      Interval        =   10
+      Interval        =   5
       Left            =   9000
       Top             =   240
    End
