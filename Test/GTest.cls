@@ -19,7 +19,7 @@ Public Sub Update()
     Page.Writes "±ù¹÷", GW - 80, 170, align:=StringAlignmentCenter, Color:=argb(255, 0, 0, 0), animation:=1
     
     '¾íÖá£¡
-    Page.Paint 0, 20, 230, 200 + 1, 300 + 1, argb(255, 180, 180, 180), style:=1
+    Page.Paint 0, 20, 230, 200 + 1, 300 + 1, argb(255, 180, 180, 180), style:=1, animation:=1
     
     Page.StartScroll 20, 230, 200, 300, 0, SY
         Page.DrawImage "404.png", 0, 0, alpha:=0.5, animation:=1
@@ -32,6 +32,7 @@ Public Sub Update()
 End Sub
 Public Sub Enter()
     Page.StartAnimation 1
+    Page.StartAnimation 2
 End Sub
 Public Sub Leave()
 
@@ -46,4 +47,5 @@ Private Sub Class_Initialize()
     
     'Ìí¼Ó¶¯»­
     Page.NewAnimation False, "FlyInFromLeftFade", 2, 500
+    Page.NewAnimation False, "FlyInFromTopFade", 2, 500
 End Sub
