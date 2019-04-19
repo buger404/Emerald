@@ -5,6 +5,10 @@ Attribute VB_Name = "GCore"
 '   -添加过程一键建立器
 '   -修复滑轮方向错误的问题
 '   -添加文件名检测（Builder）
+'   -添加最新文件更新（Builder）
+'   -现在可以卸载Builder
+'   -现在Builder的提示文本是中文
+'   -现在Builder默认需要管理员权限
 '   更新内容(ver.329)
 '   -添加碰撞箱
 '   -添加调试功能
