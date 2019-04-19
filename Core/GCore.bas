@@ -1,6 +1,10 @@
 Attribute VB_Name = "GCore"
 '========================================================
 '   Emerald 绘图框架模块
+'   更新内容(ver.419)
+'   -添加过程一键建立器
+'   -修复滑轮方向错误的问题
+'   -添加文件名检测（Builder）
 '   更新内容(ver.329)
 '   -添加碰撞箱
 '   -添加调试功能
@@ -88,7 +92,7 @@ Attribute VB_Name = "GCore"
 
         If uMsg = WM_MOUSEWHEEL Then
             Dim Direction As Integer, Strong As Single
-            Direction = IIf(wParam < 0, 1, -1): Strong = Abs(wParam / 7864320)
+            Direction = IIf(wParam < 0, -1, 1): Strong = Abs(wParam / 7864320)
             ECore.Wheel Direction, Strong
         End If
         

@@ -1,10 +1,15 @@
 Attribute VB_Name = "Process"
+Public Function CheckFileName(name As String) As Boolean
+    CheckFileName = ((InStr(name, "*") Or InStr(name, "\") Or InStr(name, "/") Or InStr(name, ":") Or InStr(name, "?") Or InStr(name, """") Or InStr(name, "<") Or InStr(name, ">") Or InStr(name, "|")) = 0)
+End Function
 Sub Main()
     If Command$ <> "" Then
         Dim appn As String, f As String, t As String, p As String
         p = Replace(Command$, """", "")
 
         appn = InputBox("Input your app name.", "New Emerald Project")
+        If CheckFileName(appn) = False Then MsgBox "Wrong File Name.", 16, "Emerald Builder": Exit Sub
+        
         Open App.Path & "\example.vbp" For Input As #1
         Do While Not EOF(1)
         Line Input #1, t
