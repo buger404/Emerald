@@ -41,6 +41,8 @@ Public sToken As Boolean
         End If
         
         sToken = Create
+        
+        Set ESave = Me
     End Function
 '========================================================
 '   RunTime
@@ -62,6 +64,9 @@ Public sToken As Boolean
     End Sub
 '========================================================
 '   Manager
+    Public Function Count() As Long
+        Count = UBound(MySave.Data)
+    End Function
     Public Sub Save()
         If sToken = False Then Exit Sub
         Open path & "\save" For Binary As #1

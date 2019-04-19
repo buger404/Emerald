@@ -4,19 +4,19 @@ Begin VB.Form TestWindow
    BackColor       =   &H80000005&
    BorderStyle     =   1  'Fixed Single
    Caption         =   "Emerald.Test"
-   ClientHeight    =   6672
-   ClientLeft      =   48
-   ClientTop       =   396
+   ClientHeight    =   6670
+   ClientLeft      =   50
+   ClientTop       =   400
    ClientWidth     =   9660
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   556
+   ScaleHeight     =   667
    ScaleMode       =   3  'Pixel
-   ScaleWidth      =   805
+   ScaleWidth      =   966
    StartUpPosition =   2  'ÆÁÄ»ÖÐÐÄ
    Begin VB.Timer DrawTimer 
-      Interval        =   10
+      Interval        =   5
       Left            =   9000
       Top             =   240
    End
@@ -33,11 +33,14 @@ Private Sub DrawTimer_Timer()
 End Sub
 
 Private Sub Form_Load()
-    StartEmerald Me.hwnd, Me.ScaleWidth, Me.ScaleHeight
+    StartEmerald Me.Hwnd, Me.ScaleWidth, Me.ScaleHeight
     MakeFont "Î¢ÈíÑÅºÚ"
     
     Set EC = New GMan
     Set GTest = New GTest
+    
+    Set ESave = New GSaving
+    ESave.Create "emerald.test", "Emerald.test"
     
     EC.ActivePage = "TestPage"
     DrawTimer.Enabled = True

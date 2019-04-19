@@ -1,14 +1,18 @@
-Global：
-Reference=*\G{13FC9823-115E-4CB2-9A02-881895942E28}#1.646#0#E:\Error 404\Muing2\Win32Api.tlb#Win32API之vb6头文件 2017-5-4修正更新 made by 棉花糖 
-Class=GPage; E:\Error 404\Emerald\Core\GPage.cls
-Module=Gdiplus; E:\Error 404\Emerald\Core\Gdiplus.bas
-Module=Bass; E:\Error 404\Emerald\Core\Bass.bas
-Module=GCore; E:\Error 404\Emerald\Core\GCore.bas
-Class=GMan; E:\Error 404\Emerald\Core\GMan.cls
-Class=GFont; E:\Error 404\Emerald\Core\GFont.cls
-
-For Game:
-Class=GMusic; E:\Error 404\Emerald\Core\GMusic.cls
-Class=GMusicList; E:\Error 404\Emerald\Core\GMusicList.cls
-Class=GSaving; E:\Error 404\Emerald\Core\GSaving.cls
-Module=BMEA_Engine; E:\Error 404\Emerald\Core\BMEA_Engine.bas
+Reference=*\G{13FC9823-115E-4CB2-9A02-881895942E28}#1.646#0#Win32Api.tlb#Win32API之vb6头文件 2017-5-4修正更新 made by 棉花糖 
+Class=GPage; Core\GPage.cls
+Module=Gdiplus; Core\Gdiplus.bas
+Module=Bass; Core\Bass.bas
+Module=GCore; Core\GCore.bas
+Class=GMan; Core\GMan.cls
+Class=GFont; Core\GFont.cls
+Class=GMusic; Core\GMusic.cls
+Class=GMusicList; Core\GMusicList.cls
+Class=GSaving; Core\GSaving.cls
+Module=BMEA_Engine; Core\BMEA_Engine.bas
+Class=GAnimation; Core\GAnimation.cls
+Class=GCrashBox; Core\GCrashBox.cls
+Class=aShadow; Core\aShadow.cls
+Module=DebugSwitch; Core\DebugSwitch.bas
+Form=Core\DebugWindow.frm
+Class=GDebug; Core\GDebug.cls
+Form=Core\Debuginfo.frm

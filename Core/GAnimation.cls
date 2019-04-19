@@ -14,15 +14,19 @@ Attribute VB_Exposed = False
 '================================================================
     'Animation Progress
     Public Function GetProgress_0(pro As Single) As Single
+        If pro < 0 Then GetProgress_0 = 0: Exit Function
         GetProgress_0 = pro
     End Function
     Public Function GetProgress_1(pro As Single) As Single
+        If pro < 0 Then GetProgress_1 = 0: Exit Function
         GetProgress_1 = Cubic(pro, 0, 0, 1, 1)
     End Function
     Public Function GetProgress_2(pro As Single) As Single
+        If pro < 0 Then GetProgress_2 = 0: Exit Function
         GetProgress_2 = Cubic(pro, 0, 0, 0, 1)
     End Function
     Public Function GetProgress_3(pro As Single) As Single
+        If pro < 0 Then GetProgress_3 = 0: Exit Function
         GetProgress_3 = Cubic(pro, 0, 1, 1, 1)
     End Function
 '================================================================
