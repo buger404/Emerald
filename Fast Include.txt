@@ -16,3 +16,5 @@ Module=DebugSwitch; Core\DebugSwitch.bas
 Form=Core\DebugWindow.frm
 Class=GDebug; Core\GDebug.cls
 Form=Core\Debuginfo.frm
+Form=Core\EmeraldWindow.frm
+Class=GSysPage; Core\GSysPage.cls

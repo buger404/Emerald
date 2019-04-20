@@ -363,7 +363,12 @@ setAlpha:
             If style = 1 Then GdipSetPenColor Pen, Color
         End If
         
-        If style = 0 Then GdipFillPath GG, brush, path
+        If style = 0 Then
+            If shape = 0 Then GdipSetSmoothingMode GG, SmoothingModeDefault
+            GdipFillPath GG, brush, path
+            If shape = 0 Then GdipSetSmoothingMode GG, SmoothingModeAntiAlias
+        End If
+        
         If style = 1 Then GdipDrawPath GG, Pen, path
         
         With DrawF

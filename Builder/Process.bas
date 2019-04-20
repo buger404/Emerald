@@ -1,5 +1,5 @@
 Attribute VB_Name = "Process"
-Public Const Version As Long = 19041901
+Public Const Version As Long = 19042001
 Public Function CheckFileName(name As String) As Boolean
     CheckFileName = ((InStr(name, "*") Or InStr(name, "\") Or InStr(name, "/") Or InStr(name, ":") Or InStr(name, "?") Or InStr(name, """") Or InStr(name, "<") Or InStr(name, ">") Or InStr(name, "|")) = 0)
 End Function
@@ -22,7 +22,8 @@ Sub Main()
         
         If Dir(p & "\core\GCore.bas") <> "" Then
             If Val(info(0)) < Version Then
-                MsgBox "你的工程已经创建，我们已将最新的文件复制到你的文件夹中，你可以稍后引用它们。" & vbCrLf & vbCrLf & "注意：以下是更新Emerald后新增的文件，需要你手动引用：" & vbCrLf & nList, 64, "Emerald Builder"
+                nList = nList & CompareFolder(App.Path & "\core", p & "\core") & vbCrLf
+                MsgBox "你的工程已经创建，我们已将最新的文件复制到你的文件夹中，你可以稍后引用它们。" & vbCrLf & vbCrLf & "注意：以下是更新Emerald后新增的文件，需要你手动引用（位于目录下的Core文件夹）：" & vbCrLf & nList, 64, "Emerald Builder"
                 GoTo SkipName
             Else
                 MsgBox "你的工程已经在使用最新的Emerald了。", 48, "Emerald Builder"
@@ -68,6 +69,8 @@ SkipName:
         sh = WSHShell.RegRead("HKEY_CLASSES_ROOT\Directory\shell\emerald\version")
 FailRead:
         
+        On Error GoTo FailOper
+        
         If sh <> "" Then
             If Val(sh) = Version Then
                 If MsgBox("Emerald Builder 已经安装，你希望删除它吗？", vbYesNo + 48, "Emerald Builder") = vbYes Then
@@ -108,6 +111,9 @@ FailRead:
         WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\command\", exeP & " ""%v"""
         
         MsgBox "Emerald Builder 成功安装在你的电脑上。", 64
+        
+FailOper:
+        MsgBox "出了一些意外，无法完成部分操作。" & vbCrLf & Err.Description & "(" & Err.Number & ")", 48, "Emerald Builder"
     End If
 End Sub
 Sub CopyInto(Src As String, Dst As String)
@@ -118,3 +124,21 @@ Sub CopyInto(Src As String, Dst As String)
         f = Dir()
     Loop
 End Sub
+Function CompareFolder(Src As String, Dst As String) As String
+    Dim f As String, fs() As String
+    f = Dir(Src & "\")
+    
+    ReDim fs(0)
+    
+    Do While f <> ""
+        ReDim Preserve fs(UBound(fs) + 1)
+        fs(UBound(fs)) = f
+        f = Dir()
+    Loop
+    
+    For i = 1 To UBound(fs)
+        If Dir(Dst & "\" & fs(i)) = "" Then
+            CompareFolder = CompareFolder & fs(i) & vbCrLf
+        End If
+    Next
+End Function

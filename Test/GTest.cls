@@ -22,7 +22,7 @@ Public Sub Update()
 
     Page.DrawImage "404.png", 20, 20, Alpha:=1, animation:=1
     Page.DrawImage "1.png", GW - 160, 20, Alpha:=1, animation:=1
-    If CheckMouse2 = 3 Then MsgBox "冰棍被鼠标打了": ECore.NewTransform 10, 1000
+    If CheckMouse2 = 3 Then StartScreenDialog 600, 400, SysPage
     Page.Writes "冰棍", GW - 80, 170, align:=StringAlignmentCenter, Color:=argb(255, 0, 0, 0), animation:=1
     
     '卷轴！

@@ -1,6 +1,9 @@
 Attribute VB_Name = "GCore"
 '========================================================
 '   Emerald 绘图框架模块
+'   更新内容(ver.420)
+'   -增加屏幕窗口
+'   -修复矩形柔和边缘的问题
 '   更新内容(ver.419)
 '   -添加过程一键建立器
 '   -修复滑轮方向错误的问题
@@ -49,6 +52,7 @@ Attribute VB_Name = "GCore"
     Public GHwnd As Long, GDC As Long, GW As Long, GH As Long
     Public Mouse As MState, DrawF As RECT
     Public FPS As Long, FPSt As Long, tFPS As Long, FPSct As Long, FPSctt As Long
+    Public SysPage As GSysPage
     Dim Wndproc As Long
 '========================================================
 '   Init
@@ -65,6 +69,7 @@ Attribute VB_Name = "GCore"
         If App.LogMode <> 0 Then Wndproc = SetWindowLongA(Hwnd, GWL_WNDPROC, AddressOf Process)
         
         Set EAni = New GAnimation
+        Set SysPage = New GSysPage
         
         If Val(GetWinNTVersion) > 6.1 Then               '如果当前系统版本高于win7
             SetProcessDpiAwareness 2&                    '调用API使本程序在高DPI情况下不模糊
@@ -137,6 +142,17 @@ sth:
         GdipDrawImage g, i, 0, 0
         GdipDisposeImage i: GdipDeleteGraphics g: GdipDeleteEffect e '垃圾处理
         buffWin.AutoRedraw = False
+    End Sub
+    Public Sub BlurImg(img As Long, Radius As Long)
+        Dim b As BlurParams, e As Long, w As Long, h As Long
+        
+        '模糊操作
+        GdipCreateEffect2 GdipEffectType.Blur, e: b.Radius = Radius: GdipSetEffectParameters e, b, LenB(b)
+        GdipGetImageWidth img, w: GdipGetImageHeight img, h
+        GdipBitmapApplyEffect img, e, NewRectL(0, 0, w, h), 0, 0, 0
+        
+        '画~
+        GdipDeleteEffect e '垃圾处理
     End Sub
     Public Function CreateCDC(w As Long, h As Long) As Long
         Dim bm As BITMAPINFOHEADER, DC As Long, DIB As Long
@@ -213,5 +229,11 @@ sth:
 '   KeyBoard
     Public Function IsKeyPress(Code As Long) As Boolean
         IsKeyPress = (GetAsyncKeyState(Code) < 0)
+    End Function
+'========================================================
+'   Screen Window
+    Public Function StartScreenDialog(w As Long, h As Long, ch As Object) As Object
+        Set StartScreenDialog = New EmeraldWindow
+        StartScreenDialog.NewFocusWindow w, h, ch
     End Function
 '========================================================

@@ -19,8 +19,8 @@ End Type
 Private Type SaveFile
     Data() As SaveData
 End Type
-Dim MySave As SaveFile, path As String
-Public sToken As Boolean
+Dim MySave As SaveFile
+Public sToken As Boolean, path As String
 '========================================================
 '   Init
     Public Function Create(name As String, displayname As String) As Boolean
@@ -28,8 +28,16 @@ Public sToken As Boolean
         
         ReDim MySave.Data(0)
         If Dir(path & "\", vbDirectory) = "" Then
-            Create = (MsgBox(displayname & "希望在你的电脑的以下位置储存数据 :" & vbCrLf & path & vbCrLf & "同意吗？（如果不同意该程序将永远保持在初始状态）", 48 Or vbYesNo, displayname) = vbYes)
-            If Create Then MkDir path & "\"
+            SysPage.Index = 0: SysPage.Key = 0
+            Dim Win As Object
+            Set Win = StartScreenDialog(600, 400, SysPage)
+            Set SysPage.Win = Win
+            Do While Not Win.AcceptMark
+                DoEvents
+            Loop
+            Unload Win
+            
+            If SysPage.Key = 1 Then MkDir path & "\"
         Else
             If Dir(path & "\save") <> "" Then
                 Open path & "\save" For Binary As #1
