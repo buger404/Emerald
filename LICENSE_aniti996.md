@@ -1,4 +1,4 @@
-Copyright (c) <2019> <Error 404>
+Copyright (c) 2019 Error 404
 
 "Anti 996" License Version 1.0 (Draft)
 
