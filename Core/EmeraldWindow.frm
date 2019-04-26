@@ -55,7 +55,22 @@ Public Sub Accept()
         SetLayeredWindowAttributes Me.Hwnd, 0, WinAlpha, LWA_ALPHA
         Sleep 10: DoEvents
     Loop
+    Dim f As Object
+    For Each f In VB.Forms
+        f.Enabled = True
+    Next
     AcceptMark = True
+End Sub
+Private Sub DisplayBox_MouseDown(button As Integer, Shift As Integer, X As Single, Y As Single)
+    UpdateMouse X, Y, 1, button
+End Sub
+
+Private Sub DisplayBox_MouseMove(button As Integer, Shift As Integer, X As Single, Y As Single)
+    If Mouse.State = 0 Then UpdateMouse X, Y, 0, button
+End Sub
+
+Private Sub DisplayBox_MouseUp(button As Integer, Shift As Integer, X As Single, Y As Single)
+    UpdateMouse X, Y, 2, button
 End Sub
 Private Sub Form_Load()
     
@@ -75,6 +90,7 @@ Private Sub UpdateTimer_Timer()
     Charge.Page.Clear
     Charge.Page.Update
     Charge.Page.Display DisplayBox.hdc
+    If Mouse.State = 2 Then Mouse.State = 0
 End Sub
 
 Public Sub NewFocusWindow(w As Long, h As Long, ch As Object)

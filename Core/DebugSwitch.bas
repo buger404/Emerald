@@ -1,7 +1,7 @@
 Attribute VB_Name = "DebugSwitch"
 '======================================================
 '   ÊÇ·ñ¿ªÆôDebug
-    Public Const DebugMode As Boolean = False
+    Public Const DebugMode As Boolean = True
 '======================================================
 
 

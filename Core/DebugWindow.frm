@@ -4,18 +4,19 @@ Begin VB.Form DebugWindow
    BackColor       =   &H80000005&
    BorderStyle     =   0  'None
    Caption         =   "Form1"
-   ClientHeight    =   940
+   ClientHeight    =   936
    ClientLeft      =   0
    ClientTop       =   0
-   ClientWidth     =   7030
+   ClientWidth     =   7032
+   ForeColor       =   &H008C8080&
    LinkTopic       =   "Form1"
-   ScaleHeight     =   94
+   ScaleHeight     =   78
    ScaleMode       =   3  'Pixel
-   ScaleWidth      =   703
+   ScaleWidth      =   586
    ShowInTaskbar   =   0   'False
    StartUpPosition =   3  '´°¿ÚÈ±Ê¡
    Begin VB.Timer UpdateTimer 
-      Interval        =   1000
+      Interval        =   20
       Left            =   6600
       Top             =   120
    End
@@ -44,10 +45,11 @@ Private Sub Form_Load()
     Set Charge = New GDebug
     
     Page.Create Charge
-    Page.NewImages App.path & "\assets\debug", 80, 80
+    Page.NewImages App.path & "\assets\debug", 64, 64
     
     Set Charge.Page = Page
     
+    Me.Width = 586 * Screen.TwipsPerPixelX: Me.Height = 78 * Screen.TwipsPerPixelY
     Charge.GW = Me.ScaleWidth: Charge.GH = Me.ScaleHeight
     
     With Sh
@@ -67,7 +69,7 @@ Private Sub Form_Load()
         With touchArea(i)
             .Visible = True
             .ZOrder
-            .Move Me.ScaleWidth - 10 - 80 * i, 5, 80, 80
+            .Move Me.ScaleWidth - 10 - 64 * i, 78 / 2 - 64 / 2, 64, 64
         End With
     Next
 End Sub

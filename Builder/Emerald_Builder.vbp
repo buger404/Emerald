@@ -1,11 +1,15 @@
 Type=Exe
 Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#C:\Windows\SysWOW64\stdole2.tlb#OLE Automation
 Module=Process; Process.bas
+Reference=*\G{642AC760-AAB4-11D0-8494-00A0C90DC8A9}#1.0#0#C:\WINDOWS\SysWow64\MSDBRPTR.DLL#Microsoft Data Report Designer v6.0
+Reference=*\G{6B263850-900B-11D0-9484-00A0C91110ED}#1.0#0#C:\WINDOWS\SysWow64\MSSTDFMT.DLL#Microsoft Data Formatting Object Library
+Form=IconLib.frm
+IconForm="IconLib"
 Startup="Sub Main"
 HelpFile=""
 Title="Emerald Builder"
 ExeName32="Builder.exe"
-Path32="..\Core"
+Path32=".."
 Command32=""
 Name="Emerald_Builder"
 HelpContextID="0"

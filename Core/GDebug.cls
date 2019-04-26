@@ -14,13 +14,13 @@ Attribute VB_Exposed = False
 Public Page As GPage, GW As Long, GH As Long
 Public Sub Update()
     
-    Page.Writes FPS, 15, 14, 48, argb(205, 95, 229, 221)
+    Page.Writes FPS, 15, 14, 34, argb(205, 182, 174, 173)
     
-    Page.DrawImage "mouse" & Mouse.button & ".png", GW - 170, 5, Alpha:=1
-    Page.DrawImage "menu.png", GW - 90, 5, Alpha:=1
+    Page.DrawImage "mouse" & Mouse.button & ".png", GW - 138, 78 / 2 - 64 / 2, Alpha:=1
+    Page.DrawImage "menu.png", GW - 74, 78 / 2 - 64 / 2, Alpha:=1
     
-    Page.DrawImage "focus.png", GW - 250, 5, Alpha:=1
-    If Debug_focus Then Page.Paint 0, GW - 250, 0, 80, GH, argb(50, 95, 229, 221)
+    Page.DrawImage "focus.png", GW - 202, 78 / 2 - 64 / 2, Alpha:=1
+    If Debug_focus Then Page.Paint 0, GW - 202, 0, 64, 78, argb(50, 128, 128, 128)
 End Sub
 Public Sub Wheel(Direction As Integer, Depth As Single)
 

@@ -1,6 +1,12 @@
 Attribute VB_Name = "GCore"
 '========================================================
 '   Emerald 绘图框架模块
+'   更新内容(ver.426)
+'   -修复矩形边框柔和边缘的问题
+'   -添加画笔大小
+'   -现在授权界面可以使用鼠标
+'   -添加鼠标枚举
+'   -全新Debug界面
 '   更新内容(ver.420)
 '   -增加屏幕窗口
 '   -修复矩形柔和边缘的问题
@@ -48,6 +54,12 @@ Attribute VB_Name = "GCore"
         X As Single
         Y As Single
     End Type
+    Public Enum MButtonState
+        mMouseOut = 0
+        mMouseIn = 1
+        mMouseDown = 2
+        mMouseUp = 3
+    End Enum
     Public ECore As GMan, EF As GFont, EAni As Object, ESave As GSaving
     Public GHwnd As Long, GDC As Long, GW As Long, GH As Long
     Public Mouse As MState, DrawF As RECT
@@ -211,14 +223,14 @@ sth:
             .button = button
         End With
     End Sub
-    Public Function CheckMouse(X As Long, Y As Long, w As Long, h As Long) As Integer
+    Public Function CheckMouse(X As Long, Y As Long, w As Long, h As Long) As MButtonState
         'Return Value:0=none,1=in,2=down,3=up
         If Mouse.X >= X And Mouse.Y >= Y And Mouse.X <= X + w And Mouse.Y <= Y + h Then
             CheckMouse = Mouse.State + 1
             If Mouse.State = 2 Then Mouse.State = 0
         End If
     End Function
-    Public Function CheckMouse2() As Integer
+    Public Function CheckMouse2() As MButtonState
         'Return Value:0=none,1=in,2=down,3=up
         If Mouse.X >= DrawF.Left And Mouse.Y >= DrawF.top And Mouse.X <= DrawF.Left + DrawF.Right And Mouse.Y <= DrawF.top + DrawF.Bottom Then
             CheckMouse2 = Mouse.State + 1
@@ -235,5 +247,9 @@ sth:
     Public Function StartScreenDialog(w As Long, h As Long, ch As Object) As Object
         Set StartScreenDialog = New EmeraldWindow
         StartScreenDialog.NewFocusWindow w, h, ch
+        Dim f As Object
+        For Each f In VB.Forms
+            If TypeName(f) <> "EmeraldWindow" Then f.Enabled = False
+        Next
     End Function
 '========================================================

@@ -24,15 +24,20 @@ Public Sub SaveDialog()
     Page.DrawImage "save.png", 40, 40, Alpha:=1
     Page.Writes "你希望该应用在以下位置保存数据吗？" & vbCrLf & ESave.path, 40, 130, 18, argb(255, 64, 64, 64)
     
-    Page.Writes "按下对应的键进行操作，如果不允许，该应用可能永远保持初始状态。", 40, 400 - 110, 16, argb(255, 96, 96, 96)
+    Page.Writes "*如果不允许，该应用可能永远保持初始状态。", 40, 400 - 110, 16, argb(255, 96, 96, 96)
     
-    Page.Paint 0, 600 - 140 * 2 + 20, 400 - 60, 100, 30, argb(255, 95, 229, 221)
+    Dim MouseT As Integer
+    MouseT = CheckMouse(600 - 140 * 2 + 20, 400 - 60, 100, 30)
+    
+    Page.Paint 0, 600 - 140 * 2 + 20, 400 - 60, 100, 30, IIf(MouseT <> 0, argb(255, 247, 181, 99), argb(255, 223, 165, 92))
     Page.Writes "允许（Y）", 600 - 140 * 2 + 20, 400 - 57, 16, argb(255, 255, 255, 255), 110, 30, StringAlignmentCenter
-    If IsKeyPress(VK_Y) Then Key = 1: Win.Accept
+    If IsKeyPress(VK_Y) Or (MouseT > 1) Then Key = 1: Win.Accept
     
-    Page.Paint 0, 600 - 140 * 1 + 10, 400 - 60, 100, 30, argb(255, 180, 180, 180)
+    MouseT = CheckMouse(600 - 140 * 1 + 10, 400 - 60, 100, 30)
+    
+    Page.Paint 0, 600 - 140 * 1 + 10, 400 - 60, 100, 30, IIf(MouseT <> 0, argb(255, 180, 180, 180), argb(255, 200, 200, 200))
     Page.Writes "拒绝（N）", 600 - 140 * 1 + 10, 400 - 57, 16, argb(255, 48, 48, 48), 110, 30, StringAlignmentCenter
-    If IsKeyPress(VK_N) Then Key = 0: Win.Accept
+    If IsKeyPress(VK_N) Or (MouseT > 1) Then Key = 0: Win.Accept
 End Sub
 Public Sub Wheel(Direction As Integer, Depth As Single)
 

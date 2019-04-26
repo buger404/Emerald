@@ -22,7 +22,7 @@ Public Sub Update()
 
     Page.DrawImage "404.png", 20, 20, Alpha:=1, animation:=1
     Page.DrawImage "1.png", GW - 160, 20, Alpha:=1, animation:=1
-    If CheckMouse2 = 3 Then StartScreenDialog 600, 400, SysPage
+    If CheckMouse2 = mMouseUp Then StartScreenDialog 600, 400, SysPage
     Page.Writes "±ù¹÷", GW - 80, 170, align:=StringAlignmentCenter, Color:=argb(255, 0, 0, 0), animation:=1
     
     '¾íÖá£¡

@@ -287,7 +287,7 @@ setAlpha:
     End Function
 '========================================================
 '   Writer
-    Public Sub Writes(ByVal text As String, X As Long, Y As Long, Optional size As Long = 14, Optional Color As Long, Optional w As Long = 0, Optional h As Long = 0, Optional align As StringAlignment = StringAlignmentNear, Optional style As FontStyle = FontStyleRegular, Optional animation As Integer = 0)
+    Public Sub Writes(ByVal text As String, X As Long, Y As Long, Optional Size As Long = 14, Optional Color As Long, Optional w As Long = 0, Optional h As Long = 0, Optional align As StringAlignment = StringAlignmentNear, Optional style As FontStyle = FontStyleRegular, Optional animation As Integer = 0)
         'If OutOfScroll Then Exit Sub
         If ScrollMode Then
             X = X + ScrollX + ScrollBX: Y = Y + ScrollY + ScrollBY
@@ -312,7 +312,7 @@ setAlpha:
             End If
         End If
         
-        EF.Writes text, X, Y, GG, Color, size, w, h, align, style
+        EF.Writes text, X, Y, GG, Color, Size, w, h, align, style
         With DrawF
             .Left = X
             .top = Y
@@ -327,7 +327,7 @@ setAlpha:
     End Sub
 '========================================================
 '   Shape
-    Public Sub Paint(ByVal shape As Integer, X As Long, Y As Long, w As Long, h As Long, Optional Color As Long, Optional Radius As Long, Optional style As Integer = 0, Optional animation As Integer = 0)
+    Public Sub Paint(ByVal shape As Integer, X As Long, Y As Long, w As Long, h As Long, Optional Color As Long, Optional Radius As Long, Optional Size As Long = 1, Optional style As Integer = 0, Optional animation As Integer = 0)
         'shape:0=rect,1=ellipse,2=rectr
         'style:0=fill,1=border
         'If OutOfScroll Then Exit Sub
@@ -360,16 +360,16 @@ setAlpha:
         
         If Color <> 0 Then
             If style = 0 Then GdipSetSolidFillColor brush, Color
-            If style = 1 Then GdipSetPenColor Pen, Color
+            If style = 1 Then
+                GdipSetPenColor Pen, Color
+                GdipSetPenWidth Pen, Size
+            End If
         End If
         
-        If style = 0 Then
-            If shape = 0 Then GdipSetSmoothingMode GG, SmoothingModeDefault
-            GdipFillPath GG, brush, path
-            If shape = 0 Then GdipSetSmoothingMode GG, SmoothingModeAntiAlias
-        End If
-        
+        If shape = 0 Then GdipSetSmoothingMode GG, SmoothingModeDefault
+        If style = 0 Then GdipFillPath GG, brush, path
         If style = 1 Then GdipDrawPath GG, Pen, path
+        If shape = 0 Then GdipSetSmoothingMode GG, SmoothingModeAntiAlias
         
         With DrawF
             .Left = X
