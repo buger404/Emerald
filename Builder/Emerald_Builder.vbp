@@ -1,10 +1,14 @@
 Type=Exe
 Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#C:\Windows\SysWOW64\stdole2.tlb#OLE Automation
-Module=Process; Process.bas
 Reference=*\G{642AC760-AAB4-11D0-8494-00A0C90DC8A9}#1.0#0#C:\WINDOWS\SysWow64\MSDBRPTR.DLL#Microsoft Data Report Designer v6.0
 Reference=*\G{6B263850-900B-11D0-9484-00A0C91110ED}#1.0#0#C:\WINDOWS\SysWow64\MSSTDFMT.DLL#Microsoft Data Formatting Object Library
+Reference=*\G{13FC9823-115E-4CB2-9A02-881895942E28}#1.646#0#..\..\Muing2\Win32Api.tlb#Win32API之vb6头文件 2017-5-4修正更新 made by 棉花糖 
+Module=Process; Process.bas
 Form=IconLib.frm
-IconForm="IconLib"
+Form=MainWindow.frm
+UserControl=EButton.ctl
+UserControl=EEdit.ctl
+IconForm="MainWindow"
 Startup="Sub Main"
 HelpFile=""
 Title="Emerald Builder"

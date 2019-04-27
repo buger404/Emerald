@@ -1,14 +1,86 @@
 Attribute VB_Name = "Process"
-Public Const Version As Long = 19042001
+Public Const Version As Long = 19042703
 Public Function CheckFileName(name As String) As Boolean
     CheckFileName = ((InStr(name, "*") Or InStr(name, "\") Or InStr(name, "/") Or InStr(name, ":") Or InStr(name, "?") Or InStr(name, """") Or InStr(name, "<") Or InStr(name, ">") Or InStr(name, "|")) = 0)
 End Function
+Sub Uninstall()
+    If Dialog("卸载", "Emerald Builder 已经安装，你希望删除它吗？", "卸载", "手滑") = 2 Then End
+
+    Set WSHShell = CreateObject("WScript.Shell")
+    
+    WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\shell\emerald\icon"
+    WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\shell\emerald\version"
+    WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\shell\emerald\command\"
+    WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\shell\emerald\"
+    
+    WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\icon"
+    WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\command\"
+    WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\"
+    
+    WSHShell.RegDelete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\DisplayIcon"
+    WSHShell.RegDelete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\DisplayName"
+    WSHShell.RegDelete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\DisplayVersion"
+    WSHShell.RegDelete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\Publisher"
+    WSHShell.RegDelete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\URLInfoAbout"
+    WSHShell.RegDelete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\UninstallString"
+    WSHShell.RegDelete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\InstallLocation"
+    WSHShell.RegDelete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\"
+    
+    Dialog "再见", "Emerald Builder 已经从你的电脑上删除。", "再见"
+    
+    End
+End Sub
+Sub Setup()
+    Dim exeP As String
+    exeP = """" & App.Path & "\Builder.exe" & """"
+    Set WSHShell = CreateObject("WScript.Shell")
+    
+    WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\shell\emerald\", "在此处创建/更新Emerald工程"
+    WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\shell\emerald\icon", exeP
+    
+    WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\shell\emerald\version", Version
+    
+    WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\shell\emerald\command\", exeP & " ""%v"""
+    
+    WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\", "在此处创建/更新Emerald工程"
+    WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\icon", exeP
+    
+    WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\command\", exeP & " ""%v"""
+    
+    WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\DisplayIcon", exeP
+    WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\DisplayName", "Emerald"
+    WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\DisplayVersion", "Indev " & Version
+    WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\Publisher", "Error 404"
+    WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\InstallLocation", App.Path
+    WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\URLInfoAbout", "http://red-error404.github.io/233"
+    WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\UninstallString", exeP & " ""-uninstall"""
+    
+End Sub
+Sub CheckVersion()
+    On Error Resume Next
+    Dim exeP As String, sh As String
+    exeP = """" & App.Path & "\Builder.exe" & """"
+    Set WSHShell = CreateObject("WScript.Shell")
+    
+    sh = WSHShell.RegRead("HKEY_CLASSES_ROOT\Directory\shell\emerald\version")
+    
+    If sh <> "" Then
+        If Val(sh) <> Version Then
+            If Dialog("更新可用", "使用前需要更新你的Emerald。", "更新", "稍后") = 2 Then End
+            Call Setup
+            Dialog "更新", "更新成功，请重新启动本程序。", "好的"
+            End
+        End If
+    End If
+End Sub
 Sub Main()
     If Command$ <> "" Then
         Dim appn As String, f As String, t As String, p As String
         Dim nList As String, xinfo As String, info() As String
         p = Replace(Command$, """", "")
 
+        If p = "-uninstall" Then Call Uninstall
+        Call CheckVersion
         
         If Dir(p & "\.emerald") <> "" Then
             Open p & "\.emerald" For Input As #1
@@ -23,16 +95,20 @@ Sub Main()
         If Dir(p & "\core\GCore.bas") <> "" Then
             If Val(info(0)) < Version Then
                 nList = nList & CompareFolder(App.Path & "\core", p & "\core") & vbCrLf
-                MsgBox "你的工程已经创建，我们已将最新的文件复制到你的文件夹中，你可以稍后引用它们。" & vbCrLf & vbCrLf & "注意：以下是更新Emerald后新增的文件，需要你手动引用（位于目录下的Core文件夹）：" & vbCrLf & nList, 64, "Emerald Builder"
+                If nList = vbCrLf Then
+                    Dialog "工程更新", "我们已将最新的文件复制到你的文件夹中，本次没有新增的文件。", "好的"
+                Else
+                    Dialog "工程更新", "你的工程已经创建，我们已将最新的文件复制到你的文件夹中，你可以稍后引用它们。" & vbCrLf & vbCrLf & "注意：以下是更新Emerald后新增的文件，需要你手动引用（位于目录下的Core文件夹）：" & vbCrLf & nList, "收到！"
+                End If
                 GoTo SkipName
             Else
-                MsgBox "你的工程已经在使用最新的Emerald了。", 48, "Emerald Builder"
+                Dialog "无操作", "你的工程已经在使用最新的Emerald了。", "手滑"
                 Exit Sub
             End If
         End If
 
-        appn = InputBox("输入你的工程名称", "Emerald Project")
-        If CheckFileName(appn) = False Or appn = "" Then MsgBox "错误的工程名称。", 16, "Emerald Builder": Exit Sub
+        appn = InputAsk("创建工程", "输入你的可爱的工程名称(*^▽^*)~", "完成", "取消")
+        If CheckFileName(appn) = False Or appn = "" Then Dialog "愤怒", "错误的工程名称。", "诶？": Exit Sub
         
         Open App.Path & "\example.vbp" For Input As #1
         Do While Not EOF(1)
@@ -73,49 +149,49 @@ FailRead:
         
         If sh <> "" Then
             If Val(sh) = Version Then
-                If MsgBox("Emerald Builder 已经安装，你希望删除它吗？", vbYesNo + 48, "Emerald Builder") = vbYes Then
-                    
-                    WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\shell\emerald\"
-                    WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\shell\emerald\icon"
-                    
-                    WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\shell\emerald\version"
-                    
-                    WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\shell\emerald\command\"
-                    
-                    WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\"
-                    WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\icon"
-                    
-                    WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\command\"
-                    
-                    MsgBox "Emerald Builder 已经从你的电脑上删除。", 48, "Emerald Builder"
-                    
-                    End
-                Else
-                    End
-                End If
+                Call Uninstall
+                End
             Else
-                If MsgBox("按下确定后更新你的 Emerald Builder .", 64 + vbYesNo, "Emerald Builder") = vbNo Then Exit Sub
+                If Dialog("更新可用", "按下确定后更新你的 Emerald Builder .", "确定", "取消") = 2 Then Exit Sub
             End If
         End If
         
-        WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\shell\emerald\", "在此处创建/更新Emerald工程"
-        WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\shell\emerald\icon", exeP
+        Call Setup
         
-        WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\shell\emerald\version", Version
-        
-        WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\shell\emerald\command\", exeP & " ""%v"""
-        
-        WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\", "在此处创建/更新Emerald工程"
-        WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\icon", exeP
-        
-        WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\command\", exeP & " ""%v"""
-        
-        MsgBox "Emerald Builder 成功安装在你的电脑上。", 64
+        Dialog "成功", "Emerald Builder 成功安装在你的电脑上。", "好"
         
 FailOper:
-        MsgBox "出了一些意外，无法完成部分操作。" & vbCrLf & Err.Description & "(" & Err.Number & ")", 48, "Emerald Builder"
+        If Err.Number <> 0 Then Dialog "错误", "出了一些意外，无法完成部分操作。" & vbCrLf & Err.Description & "(" & Err.Number & ")", "好吧"
     End If
 End Sub
+Function InputAsk(t As String, c As String, ParamArray B()) As String
+    Dim w As New MainWindow, b2()
+    b2 = B
+    
+    w.NewDialog t, c, "", True, b2
+    w.Show
+    
+    Do While w.Visible
+        DoEvents
+    Loop
+    
+    If w.Key = 1 Then InputAsk = w.InputBox.Content
+    Unload w
+End Function
+Function Dialog(t As String, c As String, ParamArray B()) As Integer
+    Dim w As New MainWindow, b2()
+    b2 = B
+    
+    w.NewDialog t, c, "", False, b2
+    w.Show
+    
+    Do While w.Visible
+        DoEvents
+    Loop
+    
+    Dialog = w.Key
+    Unload w
+End Function
 Sub CopyInto(Src As String, Dst As String)
     Dim f As String
     f = Dir(Src & "\")
