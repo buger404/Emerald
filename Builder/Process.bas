@@ -1,7 +1,10 @@
 Attribute VB_Name = "Process"
-Public Const Version As Long = 19042703
+Public Const Version As Long = 19043003
 Public Function CheckFileName(name As String) As Boolean
-    CheckFileName = ((InStr(name, "*") Or InStr(name, "\") Or InStr(name, "/") Or InStr(name, ":") Or InStr(name, "?") Or InStr(name, """") Or InStr(name, "<") Or InStr(name, ">") Or InStr(name, "|")) = 0)
+    CheckFileName = ((InStr(name, "*") Or InStr(name, "\") Or InStr(name, "/") Or InStr(name, ":") Or InStr(name, "?") Or InStr(name, """") Or InStr(name, "<") Or InStr(name, ">") Or InStr(name, "|") Or InStr(name, " ") Or InStr(name, "!") Or InStr(name, "-") Or InStr(name, "+") Or InStr(name, "#") Or InStr(name, "@") Or InStr(name, "$") Or InStr(name, "^") Or InStr(name, "&") Or InStr(name, "(") Or InStr(name, ")")) = 0)
+    Dim t As String
+    If name <> "" Then t = Left(name, 1)
+    CheckFileName = CheckFileName And (Trim(Str(Val(t))) <> t)
 End Function
 Sub Uninstall()
     If Dialog("卸载", "Emerald Builder 已经安装，你希望删除它吗？", "卸载", "手滑") = 2 Then End
@@ -164,9 +167,9 @@ FailOper:
         If Err.Number <> 0 Then Dialog "错误", "出了一些意外，无法完成部分操作。" & vbCrLf & Err.Description & "(" & Err.Number & ")", "好吧"
     End If
 End Sub
-Function InputAsk(t As String, c As String, ParamArray B()) As String
+Function InputAsk(t As String, c As String, ParamArray b()) As String
     Dim w As New MainWindow, b2()
-    b2 = B
+    b2 = b
     
     w.NewDialog t, c, "", True, b2
     w.Show
@@ -178,9 +181,9 @@ Function InputAsk(t As String, c As String, ParamArray B()) As String
     If w.Key = 1 Then InputAsk = w.InputBox.Content
     Unload w
 End Function
-Function Dialog(t As String, c As String, ParamArray B()) As Integer
+Function Dialog(t As String, c As String, ParamArray b()) As Integer
     Dim w As New MainWindow, b2()
-    b2 = B
+    b2 = b
     
     w.NewDialog t, c, "", False, b2
     w.Show
