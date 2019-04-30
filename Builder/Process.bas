@@ -1,5 +1,22 @@
 Attribute VB_Name = "Process"
-Public Const Version As Long = 19043003
+Public Const Version As Long = 19043006
+Public VBIDEPath As String
+Public Sub GetVBIDEPath()
+    On Error GoTo errHandle
+    
+    Dim WSHShell As Object, temp As String, temp2() As String
+    Set WSHShell = CreateObject("WScript.Shell")
+    
+    temp = WSHShell.RegRead("HKEY_CLASSES_ROOT\VisualBasic.Project\shell\open\command\")
+    temp2 = Split(temp, "vb6.exe")
+    VBIDEPath = Replace(temp2(0), """", "")
+    
+errHandle:
+    If Err.Number <> 0 Then
+        Dialog "迷路", "获取VB6路径失败，请确认您的电脑上已经安装VB6（非精简版）。" & vbCrLf & vbCrLf & _
+               "注意：Emerald只适用于VB6", "好吧"
+    End If
+End Sub
 Public Function CheckFileName(name As String) As Boolean
     CheckFileName = ((InStr(name, "*") Or InStr(name, "\") Or InStr(name, "/") Or InStr(name, ":") Or InStr(name, "?") Or InStr(name, """") Or InStr(name, "<") Or InStr(name, ">") Or InStr(name, "|") Or InStr(name, " ") Or InStr(name, "!") Or InStr(name, "-") Or InStr(name, "+") Or InStr(name, "#") Or InStr(name, "@") Or InStr(name, "$") Or InStr(name, "^") Or InStr(name, "&") Or InStr(name, "(") Or InStr(name, ")")) = 0)
     Dim t As String
@@ -9,6 +26,8 @@ End Function
 Sub Uninstall()
     If Dialog("卸载", "Emerald Builder 已经安装，你希望删除它吗？", "卸载", "手滑") = 2 Then End
 
+    On Error Resume Next
+    
     Set WSHShell = CreateObject("WScript.Shell")
     
     WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\shell\emerald\icon"
@@ -28,6 +47,13 @@ Sub Uninstall()
     WSHShell.RegDelete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\UninstallString"
     WSHShell.RegDelete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\InstallLocation"
     WSHShell.RegDelete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\"
+    
+    Kill VBIDEPath & "Template\Forms\Emerald 游戏窗口.frm"
+    Kill VBIDEPath & "Template\Classes\Emerald 页面.cls"
+    
+    If Err.Number <> 0 Then
+        MsgBox "卸载过程中部分步骤出现错误，可能需要您手动确认删除。", 64, "再见"
+    End If
     
     Dialog "再见", "Emerald Builder 已经从你的电脑上删除。", "再见"
     
@@ -58,6 +84,9 @@ Sub Setup()
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\URLInfoAbout", "http://red-error404.github.io/233"
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\UninstallString", exeP & " ""-uninstall"""
     
+    FileCopy App.Path & "\Example\Emerald 游戏窗口.frm", VBIDEPath & "Template\Forms\Emerald 游戏窗口.frm"
+    FileCopy App.Path & "\Example\Emerald 页面.cls", VBIDEPath & "Template\Classes\Emerald 页面.cls"
+    
 End Sub
 Sub CheckVersion()
     On Error Resume Next
@@ -77,6 +106,8 @@ Sub CheckVersion()
     End If
 End Sub
 Sub Main()
+    Call GetVBIDEPath
+    
     If Command$ <> "" Then
         Dim appn As String, f As String, t As String, p As String
         Dim nList As String, xinfo As String, info() As String
