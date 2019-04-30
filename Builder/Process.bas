@@ -1,5 +1,5 @@
 Attribute VB_Name = "Process"
-Public Const Version As Long = 19043006
+Public Const Version As Long = 19043007
 Public VBIDEPath As String
 Public Sub GetVBIDEPath()
     On Error GoTo errHandle
@@ -24,7 +24,7 @@ Public Function CheckFileName(name As String) As Boolean
     CheckFileName = CheckFileName And (Trim(Str(Val(t))) <> t)
 End Function
 Sub Uninstall()
-    If Dialog("卸载", "Emerald Builder 已经安装，你希望删除它吗？", "卸载", "手滑") = 2 Then End
+    If Dialog("卸载", "Emerald Builder 已经安装，你希望删除它吗？", "卸载", "手滑") <> 1 Then End
 
     On Error Resume Next
     
@@ -98,7 +98,7 @@ Sub CheckVersion()
     
     If sh <> "" Then
         If Val(sh) <> Version Then
-            If Dialog("更新可用", "使用前需要更新你的Emerald。", "更新", "稍后") = 2 Then End
+            If Dialog("更新可用", "使用前需要更新你的Emerald。", "更新", "稍后") <> 1 Then End
             Call Setup
             Dialog "更新", "更新成功，请重新启动本程序。", "好的"
             End
@@ -186,7 +186,7 @@ FailRead:
                 Call Uninstall
                 End
             Else
-                If Dialog("更新可用", "按下确定后更新你的 Emerald Builder .", "确定", "取消") = 2 Then Exit Sub
+                If Dialog("更新可用", "按下确定后更新你的 Emerald Builder .", "确定", "取消") <> 1 Then Exit Sub
             End If
         End If
         
