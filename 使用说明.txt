@@ -13,7 +13,7 @@
 3.Builder会对我的VB6 IDE造成修改吗
   不会，但是会向您的VB6 IDE的模板文件中粘贴两个文件，卸载时可以一并删除。
 4.使用Builder更新Emerald会不会对我原来的代码造成影响
-  不会，Builder只会替换Emerald有关的工程
+  不会，Builder只会替换Emerald有关的代码
 5.我该如何使用Emerald开发游戏？
   参加Github页面上的README.md，更详细的教程正在编写中。
 
