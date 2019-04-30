@@ -13,6 +13,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Public Page As GPage, GW As Long, GH As Long
 Public Sub Update()
+    On Error Resume Next
     
     Page.Writes FPS, 15, 14, 34, argb(205, 182, 174, 173)
     

@@ -13,7 +13,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Public Page As GPage, Index As Integer, Win As Object
 Public Key As Integer
-Public OpenTime As Long, DoneMark As Boolean
+Public OpenTime As Long, DoneMark As Boolean, DoneStep As Integer
 Public Sub Update()
     Select Case Index
         Case 0
@@ -28,16 +28,36 @@ Public Sub LOGODialog()
     H = Page.ImgSize("logo.png", imgGetHeight)
     
     Page.Paint 0, 0, 0, GW, GH, argb(255, 12, 12, 30)
-    Page.DrawImageEx "logo.png", GW / 2, GH / 2, GW * 0.45, (GW * 0.45) / W * H, 1
+    
+    If GetTickCount - OpenTime >= 3000 Then
+        If PreLoadCount <> LoadedCount Then
+            Page.DrawImageEx "logo.png", GW / 2, GH * 0.85 / 2, Int(GW * 0.45), Int((GW * 0.45) / W * H), 1
+        End If
+    Else
+        Page.DrawImageEx "logo.png", GW / 2, GH / 2, Int(GW * 0.45), Int((GW * 0.45) / W * H), 1
+    End If
+    
+    Dim pro As Single
+    
     If GetTickCount - OpenTime <= 1000 Then
-        Dim pro As Single
         pro = Cubic((GetTickCount - OpenTime) / 1000, 0, 0, 0, 1)
         Page.Paint 0, 0, 0, GW, GH, argb(255 - pro * 255, 12, 12, 30)
     End If
     
     If GetTickCount - OpenTime >= 3000 Then
-        ECore.NewTransform 1, 1000
-        DoneMark = True
+        If PreLoadCount = LoadedCount Then
+            ECore.NewTransform 1, 1000
+            DoneMark = True
+        Else
+            If DoneStep = 0 Then
+                DoneStep = 1
+                ECore.NewTransform 0, 1000
+            End If
+            pro = LoadedCount / PreLoadCount
+            If pro > 1 Then pro = 1
+            Page.Paint 2, GW / 2 - GW * 0.5 / 2, GH * 0.8, GW * 0.5, 14, argb(255, 127, 127, 127), 14
+            Page.Paint 2, GW / 2 - GW * 0.5 / 2, GH * 0.8, GW * 0.5 * pro, 14, argb(255, 255, 255, 255), 14
+        End If
     End If
 End Sub
 Public Sub SaveDialog()

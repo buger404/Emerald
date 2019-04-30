@@ -146,8 +146,15 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
 '========================================================
 '   Images
     Public Sub NewImages(path As String, Optional arg1, Optional arg2)
-        Dim f As String
+        Dim f As String, c As Long
         If Right(path, 1) <> "\" Then path = path & "\"
+        
+        f = Dir(path)
+        Do While f <> ""
+            c = c + 1
+            f = Dir()
+        Loop
+        PreLoadCount = PreLoadCount + c
         
         f = Dir(path)
         Do While f <> ""
@@ -159,6 +166,8 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
                 newImage path & f, arg1, arg2
             End If
             f = Dir()
+            DoEvents
+            LoadedCount = LoadedCount + 1
         Loop
     End Sub
     Public Sub newImage(path As String, Optional arg1, Optional arg2)

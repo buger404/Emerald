@@ -82,6 +82,7 @@ Attribute VB_Name = "GCore"
     Public Mouse As MState, DrawF As RECT
     Public FPS As Long, FPSt As Long, tFPS As Long, FPSct As Long, FPSctt As Long
     Public SysPage As GSysPage
+    Public PreLoadCount As Long, LoadedCount As Long
     Dim Wndproc As Long
 '========================================================
 '   Init

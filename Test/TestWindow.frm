@@ -4,18 +4,19 @@ Begin VB.Form TestWindow
    BackColor       =   &H80000005&
    BorderStyle     =   1  'Fixed Single
    Caption         =   "Emerald.Test"
-   ClientHeight    =   6670
-   ClientLeft      =   50
-   ClientTop       =   400
+   ClientHeight    =   6672
+   ClientLeft      =   48
+   ClientTop       =   396
    ClientWidth     =   9660
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   667
+   ScaleHeight     =   556
    ScaleMode       =   3  'Pixel
-   ScaleWidth      =   966
+   ScaleWidth      =   805
    StartUpPosition =   2  'ÆÁÄ»ÖÐÐÄ
    Begin VB.Timer DrawTimer 
+      Enabled         =   0   'False
       Interval        =   5
       Left            =   9000
       Top             =   240
@@ -37,13 +38,16 @@ Private Sub Form_Load()
     MakeFont "Î¢ÈíÑÅºÚ"
     
     Set EC = New GMan
-    Set GTest = New GTest
     
     Set ESave = New GSaving
     ESave.Create "emerald.test", "Emerald.test"
     
     EC.ActivePage = "TestPage"
+    
+    Me.Show
     DrawTimer.Enabled = True
+    
+    Set GTest = New GTest
 End Sub
 
 Private Sub Form_MouseDown(button As Integer, Shift As Integer, X As Single, Y As Single)
