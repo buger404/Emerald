@@ -4,6 +4,7 @@ Attribute VB_Name = "GCore"
 '   更新内容(ver.430)
 '   -添加ImgCount，ImgSize
 '   -添加启动页面
+'   -添加资源加载进度条
 '   更新内容(ver.427)
 '   -修复Builder零错误问题
 '   -修改图标使其能够被清晰地察觉
