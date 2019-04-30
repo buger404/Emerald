@@ -26,14 +26,14 @@ Private Type GMem
     ImgHwnd As Long
     name As String
     folder As String
-    w As Long
-    h As Long
+    W As Long
+    H As Long
 End Type
 Private Type GDA
     X As Long
     Y As Long
-    w As Long
-    h As Long
+    W As Long
+    H As Long
 End Type
 Private Type AniTask
     start As Long
@@ -108,19 +108,40 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
     End Sub
 '========================================================
 '   RunTime
-    Private Sub NewGM(mem As Long, kind As Integer, name As String, Optional w, Optional h, Optional folder As String = "")
+    Private Sub NewGM(mem As Long, kind As Integer, name As String, Optional W, Optional H, Optional folder As String = "")
         ReDim Preserve Mems(UBound(Mems) + 1)
         With Mems(UBound(Mems))
             .Hwnd = mem
             .kind = kind
             .name = name
             .folder = folder
-            If Not IsMissing(w) Then .w = w
-            If Not IsMissing(h) Then .h = h
+            If Not IsMissing(W) Then .W = W
+            If Not IsMissing(H) Then .H = H
         End With
     End Sub
     Public Property Get SrcClass() As Object
         Set SrcClass = DrawBox
+    End Property
+    Public Property Get ImgCount() As Long
+        ImgCount = UBound(Mems)
+    End Property
+    Public Property Get ImgSize(n, sizeIndex As imgIndex)
+        Dim Index As Integer
+        
+        If TypeName(n) = "String" Then
+            Index = GetImage(n)
+        Else
+            Index = n
+        End If
+    
+        Select Case sizeIndex
+            Case 0
+                ImgSize = Mems(Index).W
+            Case 1
+                ImgSize = Mems(Index).H
+            Case 2
+                ImgSize = Mems(Index).GIF.Count
+        End Select
     End Property
 '========================================================
 '   Images
@@ -144,31 +165,31 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
         'when arg1 is missing ; i.w = i.w
         'when arg2 is missing but arg1 has content ; i.w = i.w * arg1
         'other ; i.w = arg1
-        Dim si As Integer, i As Long, w As Long, h As Long, DC As Long, g As Long
+        Dim si As Integer, i As Long, W As Long, H As Long, DC As Long, g As Long
         If IsMissing(arg1) Then si = 0
         If IsMissing(arg2) And (Not IsMissing(arg1)) Then si = 1
         If (Not IsMissing(arg2)) And (Not IsMissing(arg1)) Then si = 2
         
         GdipCreateBitmapFromFile StrPtr(path), i
-        GdipGetImageWidth i, w: GdipGetImageHeight i, h
+        GdipGetImageWidth i, W: GdipGetImageHeight i, H
         
-        If si = 1 Then w = Round(w * arg1): h = Round(h * arg1)
-        If si = 2 Then w = arg1: h = arg2
+        If si = 1 Then W = Round(W * arg1): H = Round(H * arg1)
+        If si = 2 Then W = arg1: H = arg2
         
         Dim gC As clsid, gL As Long, Index As Long, temp() As String
         CLSIDFromString StrPtr("{6AEDBD6D-3FB5-418A-83A6-7F45229DC872}"), gC
         GdipImageGetFrameCount i, gC, gL
         If gL > 0 Then  '¶¯Ì¬GIFÖ§³Ö
             temp = Split(path, "\")
-            NewGM 0, 0, temp(UBound(temp)), w, h, temp(UBound(temp) - 1)
+            NewGM 0, 0, temp(UBound(temp)), W, H, temp(UBound(temp) - 1)
             With Mems(UBound(Mems))
                 .GIF.Count = gL
                 ReDim .GIF.frames(gL)
                 For Index = 0 To gL
                     GdipImageSelectActiveFrame i, gC, Index
-                    DC = CreateCDC(w, h)
+                    DC = CreateCDC(W, H)
                     GdipCreateFromHDC DC, g
-                    GdipDrawImageRect g, i, 0, 0, w, h
+                    GdipDrawImageRect g, i, 0, 0, W, H
                     GdipDeleteGraphics g
                     .GIF.frames(Index) = DC
                 Next
@@ -178,17 +199,17 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
             Exit Sub
         End If
         
-        DC = CreateCDC(w, h)
+        DC = CreateCDC(W, H)
         GdipCreateFromHDC DC, g
-        GdipDrawImageRect g, i, 0, 0, w, h
+        GdipDrawImageRect g, i, 0, 0, W, H
         
         GdipDeleteGraphics g
         
         temp = Split(path, "\")
-        NewGM DC, 0, temp(UBound(temp)), w, h, temp(UBound(temp) - 1)
+        NewGM DC, 0, temp(UBound(temp)), W, H, temp(UBound(temp) - 1)
         Mems(UBound(Mems)).ImgHwnd = i
     End Sub
-    Public Sub DrawImageEx(n, X As Long, Y As Long, Optional w, Optional h, Optional Pos As Integer = 0, Optional animation As Integer = 0)
+    Public Sub DrawImageEx(n, X As Long, Y As Long, Optional W, Optional H, Optional Pos As Integer = 0, Optional animation As Integer = 0)
         Dim Index As Integer
         
         If animation <> 0 Then
@@ -197,9 +218,9 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
                 pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).start - Anis(animation).delay) / Anis(animation).during)
                 
                 If Anis(animation).custom Then
-                    CallByName DrawBox, Anis(animation).func, VbMethod, X, Y, w, h, 0, pro
+                    CallByName DrawBox, Anis(animation).func, VbMethod, X, Y, W, H, 0, pro
                 Else
-                    CallByName EAni, Anis(animation).func, VbMethod, X, Y, w, h, 0, pro
+                    CallByName EAni, Anis(animation).func, VbMethod, X, Y, W, H, 0, pro
                 End If
 
             End If
@@ -211,23 +232,23 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
             Index = n
         End If
         
-        If IsMissing(w) Then GdipGetImageWidth Mems(Index).ImgHwnd, w
-        If IsMissing(h) Then GdipGetImageWidth Mems(Index).ImgHwnd, h
+        If IsMissing(W) Then GdipGetImageWidth Mems(Index).ImgHwnd, W
+        If IsMissing(H) Then GdipGetImageWidth Mems(Index).ImgHwnd, H
         
-        If Pos = 1 Then X = Int(X - w / 2): Y = Int(Y - h / 2)
-        If Pos = 2 Then X = X - w
-        If Pos = 3 Then Y = Y - h
-        If Pos = 4 Then X = X + w
-        If Pos = 5 Then Y = Y + h
+        If Pos = 1 Then X = Int(X - W / 2): Y = Int(Y - H / 2)
+        If Pos = 2 Then X = X - W
+        If Pos = 3 Then Y = Y - H
+        If Pos = 4 Then X = X + W
+        If Pos = 5 Then Y = Y + H
         
         If ScrollMode Then
             X = X + ScrollX + ScrollBX: Y = Y + ScrollY + ScrollBY
             Dim Ret As Long
-            GdipIsVisibleRect GG, X - 1, Y - 1, w, h, Ret
+            GdipIsVisibleRect GG, X - 1, Y - 1, W, H, Ret
             If Not Ret Then OutOfScroll = True: Exit Sub
         End If
         
-        GdipDrawImageRect GG, Mems(Index).ImgHwnd, X, Y, w, h
+        GdipDrawImageRect GG, Mems(Index).ImgHwnd, X, Y, W, H
         
         With DrawF
             .Left = X
@@ -238,7 +259,7 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
         
         If Debug_focus Then
             GdipSetPenColor Pen, argb(255, 255, 0, 255)
-            GdipDrawRectangle GG, Pen, X, Y, w - 1, h - 1
+            GdipDrawRectangle GG, Pen, X, Y, W - 1, H - 1
         End If
     End Sub
     Public Sub DrawImage(n, X As Long, Y As Long, Optional cx, Optional cy, Optional cw, Optional ch, Optional Alpha, Optional Pos As Integer = 0, Optional animation As Integer = 0)
@@ -274,8 +295,8 @@ setAlpha:
         
         If IsMissing(cx) Then cx = 0
         If IsMissing(cy) Then cy = 0
-        If IsMissing(cw) Then cw = Mems(Index).w - cx
-        If IsMissing(ch) Then ch = Mems(Index).h - cy
+        If IsMissing(cw) Then cw = Mems(Index).W - cx
+        If IsMissing(ch) Then ch = Mems(Index).H - cy
         
         If Pos = 1 Then X = Int(X - cw / 2): Y = Int(Y - ch / 2)
         If Pos = 2 Then X = X - cw
@@ -343,12 +364,12 @@ setAlpha:
     End Function
 '========================================================
 '   Writer
-    Public Sub Writes(ByVal text As String, X As Long, Y As Long, Optional size As Long = 14, Optional Color As Long, Optional w As Long = 0, Optional h As Long = 0, Optional align As StringAlignment = StringAlignmentNear, Optional style As FontStyle = FontStyleRegular, Optional animation As Integer = 0)
+    Public Sub Writes(ByVal text As String, X As Long, Y As Long, Optional size As Long = 14, Optional Color As Long, Optional W As Long = 0, Optional H As Long = 0, Optional align As StringAlignment = StringAlignmentNear, Optional style As FontStyle = FontStyleRegular, Optional animation As Integer = 0)
         'If OutOfScroll Then Exit Sub
         If ScrollMode Then
             X = X + ScrollX + ScrollBX: Y = Y + ScrollY + ScrollBY
             Dim Ret As Long
-            GdipIsVisibleRect GG, X, Y, w, h, Ret
+            GdipIsVisibleRect GG, X, Y, W, H, Ret
             If Ret = 0 Then OutOfScroll = True: Exit Sub
         End If
         
@@ -360,37 +381,37 @@ setAlpha:
                 al = co(3): al = al / 255
                 
                 If Anis(animation).custom Then
-                    CallByName DrawBox, Anis(animation).func, VbMethod, X, Y, w, h, al, pro
+                    CallByName DrawBox, Anis(animation).func, VbMethod, X, Y, W, H, al, pro
                 Else
-                    CallByName EAni, Anis(animation).func, VbMethod, X, Y, w, h, al, pro
+                    CallByName EAni, Anis(animation).func, VbMethod, X, Y, W, H, al, pro
                 End If
                 Color = argb(al * 255, co(0), co(1), co(2))
             End If
         End If
         
-        EF.Writes text, X, Y, GG, Color, size, w, h, align, style
+        EF.Writes text, X, Y, GG, Color, size, W, H, align, style
         With DrawF
             .Left = X
             .top = Y
-            .Right = w
-            .Bottom = h
+            .Right = W
+            .Bottom = H
         End With
         
         If Debug_focus Then
             GdipSetPenColor Pen, argb(255, 0, 255, 0)
-            GdipDrawRectangle GG, Pen, X, Y, w - 1, h - 1
+            GdipDrawRectangle GG, Pen, X, Y, W - 1, H - 1
         End If
     End Sub
 '========================================================
 '   Shape
-    Public Sub Paint(ByVal shape As Integer, X As Long, Y As Long, w As Long, h As Long, Optional Color As Long, Optional Radius As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional animation As Integer = 0)
+    Public Sub Paint(ByVal shape As Integer, X As Long, Y As Long, W As Long, H As Long, Optional Color As Long, Optional Radius As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional animation As Integer = 0)
         'shape:0=rect,1=ellipse,2=rectr
         'style:0=fill,1=border
         'If OutOfScroll Then Exit Sub
         If ScrollMode Then
             X = X + ScrollX + ScrollBX: Y = Y + ScrollY + ScrollBY
             Dim Ret As Long
-            GdipIsVisibleRect GG, X - 1, Y - 1, w, h, Ret
+            GdipIsVisibleRect GG, X - 1, Y - 1, W, H, Ret
             If Not Ret Then OutOfScroll = True: Exit Sub
         End If
         
@@ -402,9 +423,9 @@ setAlpha:
                 al = co(3): al = al / 255
                 
                 If Anis(animation).custom Then
-                    CallByName DrawBox, Anis(animation).func, VbMethod, X, Y, w, h, al, pro
+                    CallByName DrawBox, Anis(animation).func, VbMethod, X, Y, W, H, al, pro
                 Else
-                    CallByName EAni, Anis(animation).func, VbMethod, X, Y, w, h, al, pro
+                    CallByName EAni, Anis(animation).func, VbMethod, X, Y, W, H, al, pro
                 End If
                 Color = argb(al * 255, co(0), co(1), co(2))
             End If
@@ -412,21 +433,21 @@ setAlpha:
         
         GdipResetPath path
 ReShape:
-        If shape = 0 Then GdipAddPathRectangle path, X, Y, w - 1, h - 1
-        If shape = 1 Then GdipAddPathEllipse path, X, Y, w - 1, h - 1
+        If shape = 0 Then GdipAddPathRectangle path, X, Y, W - 1, H - 1
+        If shape = 1 Then GdipAddPathEllipse path, X, Y, W - 1, H - 1
         If shape = 2 Then
         
             If Radius = 0 Then
                 shape = 0: GoTo ReShape
             End If
             
-            If Radius > w Then Radius = w
-            If Radius > h Then Radius = h
+            If Radius > W Then Radius = W
+            If Radius > H Then Radius = H
             
             GdipAddPathArc path, X, Y, Radius, Radius, 180, 90
-            GdipAddPathArc path, X + w - Radius, Y, Radius, Radius, 270, 90
-            GdipAddPathArc path, X + w - Radius, Y + h - Radius, Radius, Radius, 0, 90
-            GdipAddPathArc path, X, Y + h - Radius, Radius, Radius, 90, 90
+            GdipAddPathArc path, X + W - Radius, Y, Radius, Radius, 270, 90
+            GdipAddPathArc path, X + W - Radius, Y + H - Radius, Radius, Radius, 0, 90
+            GdipAddPathArc path, X, Y + H - Radius, Radius, Radius, 90, 90
             GdipClosePathFigure path
             
         End If
@@ -447,23 +468,23 @@ ReShape:
         With DrawF
             .Left = X
             .top = Y
-            .Right = w
-            .Bottom = h
+            .Right = W
+            .Bottom = H
         End With
         
         If Debug_focus Then
             GdipSetPenColor Pen, argb(255, 255, 0, 0)
-            GdipDrawRectangle GG, Pen, X, Y, w - 1, h - 1
+            GdipDrawRectangle GG, Pen, X, Y, W - 1, H - 1
         End If
     End Sub
 '========================================================
 '   Scroll
-    Public Sub StartScroll(X As Long, Y As Long, w As Long, h As Long, sx As Long, sy As Long)
+    Public Sub StartScroll(X As Long, Y As Long, W As Long, H As Long, sx As Long, sy As Long)
         OutOfScroll = False
         ScrollMode = True
         ScrollX = sx: ScrollY = sy: ScrollBX = X: ScrollBY = Y
-        GdipSetClipRect GG, X, Y, w, h, CombineModeReplace
-        CRgn = CreateRectRgn(X, Y, X + w, Y + h)
+        GdipSetClipRect GG, X, Y, W, H, CombineModeReplace
+        CRgn = CreateRectRgn(X, Y, X + W, Y + H)
         SelectClipRgn CDC, CRgn
     End Sub
     Public Sub EndScroll()

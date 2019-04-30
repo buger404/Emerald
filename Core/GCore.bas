@@ -1,6 +1,9 @@
 Attribute VB_Name = "GCore"
 '========================================================
 '   Emerald 绘图框架模块
+'   更新内容(ver.430)
+'   -添加ImgCount，ImgSize
+'   -添加启动页面
 '   更新内容(ver.427)
 '   -修复Builder零错误问题
 '   -修改图标使其能够被清晰地察觉
@@ -63,6 +66,11 @@ Attribute VB_Name = "GCore"
         X As Single
         Y As Single
     End Type
+    Public Enum imgIndex
+        imgGetWidth = 0
+        imgGetHeight = 1
+        imgGetGIFFrameCount = 2
+    End Enum
     Public Enum MButtonState
         mMouseOut = 0
         mMouseIn = 1
@@ -77,7 +85,7 @@ Attribute VB_Name = "GCore"
     Dim Wndproc As Long
 '========================================================
 '   Init
-    Public Sub StartEmerald(Hwnd As Long, w As Long, h As Long)
+    Public Sub StartEmerald(Hwnd As Long, W As Long, H As Long)
     
         If DebugMode Then
             If App.LogMode <> 0 Then MsgBox "错误：生成时未关闭Debug模式。": End
@@ -85,7 +93,7 @@ Attribute VB_Name = "GCore"
         
         InitGDIPlus
         BASS_Init -1, 44100, BASS_DEVICE_3D, Hwnd, 0
-        GHwnd = Hwnd: GW = w: GH = h
+        GHwnd = Hwnd: GW = W: GH = H
         GDC = GetDC(Hwnd)
         If App.LogMode <> 0 Then Wndproc = SetWindowLongA(Hwnd, GWL_WNDPROC, AddressOf Process)
         
@@ -99,6 +107,7 @@ Attribute VB_Name = "GCore"
         If DebugMode Then
             DebugWindow.Show
         End If
+
     End Sub
     Public Sub EndEmerald()
         If DebugMode Then
@@ -145,7 +154,7 @@ sth:
         GetWinNTVersion = Left(strOSversion, 3)
     End Function
     Public Sub BlurTo(DC As Long, srcDC As Long, buffWin As Form, Optional Radius As Long = 60)
-        Dim i As Long, g As Long, e As Long, b As BlurParams, w As Long, h As Long
+        Dim i As Long, g As Long, e As Long, b As BlurParams, W As Long, H As Long
         '粘贴到缓冲窗口
         buffWin.AutoRedraw = True
         BitBlt buffWin.hdc, 0, 0, GW, GH, srcDC, 0, 0, vbSrcCopy: buffWin.Refresh
@@ -155,8 +164,8 @@ sth:
         
         '模糊操作
         GdipCreateEffect2 GdipEffectType.Blur, e: b.Radius = Radius: GdipSetEffectParameters e, b, LenB(b)
-        GdipGetImageWidth i, w: GdipGetImageHeight i, h
-        GdipBitmapApplyEffect i, e, NewRectL(0, 0, w, h), 0, 0, 0
+        GdipGetImageWidth i, W: GdipGetImageHeight i, H
+        GdipBitmapApplyEffect i, e, NewRectL(0, 0, W, H), 0, 0, 0
         
         '画~
         GdipCreateFromHDC DC, g
@@ -165,23 +174,23 @@ sth:
         buffWin.AutoRedraw = False
     End Sub
     Public Sub BlurImg(img As Long, Radius As Long)
-        Dim b As BlurParams, e As Long, w As Long, h As Long
+        Dim b As BlurParams, e As Long, W As Long, H As Long
         
         '模糊操作
         GdipCreateEffect2 GdipEffectType.Blur, e: b.Radius = Radius: GdipSetEffectParameters e, b, LenB(b)
-        GdipGetImageWidth img, w: GdipGetImageHeight img, h
-        GdipBitmapApplyEffect img, e, NewRectL(0, 0, w, h), 0, 0, 0
+        GdipGetImageWidth img, W: GdipGetImageHeight img, H
+        GdipBitmapApplyEffect img, e, NewRectL(0, 0, W, H), 0, 0, 0
         
         '画~
         GdipDeleteEffect e '垃圾处理
     End Sub
-    Public Function CreateCDC(w As Long, h As Long) As Long
+    Public Function CreateCDC(W As Long, H As Long) As Long
         Dim bm As BITMAPINFOHEADER, DC As Long, DIB As Long
     
         With bm
             .biBitCount = 32
-            .biHeight = h
-            .biWidth = w
+            .biHeight = H
+            .biWidth = W
             .biPlanes = 1
             .biSizeImage = (.biWidth * .biBitCount + 31) / 32 * 4 * .biHeight
             .biSize = Len(bm)
@@ -232,9 +241,9 @@ sth:
             .button = button
         End With
     End Sub
-    Public Function CheckMouse(X As Long, Y As Long, w As Long, h As Long) As MButtonState
+    Public Function CheckMouse(X As Long, Y As Long, W As Long, H As Long) As MButtonState
         'Return Value:0=none,1=in,2=down,3=up
-        If Mouse.X >= X And Mouse.Y >= Y And Mouse.X <= X + w And Mouse.Y <= Y + h Then
+        If Mouse.X >= X And Mouse.Y >= Y And Mouse.X <= X + W And Mouse.Y <= Y + H Then
             CheckMouse = Mouse.State + 1
             If Mouse.State = 2 Then Mouse.State = 0
         End If
@@ -253,9 +262,9 @@ sth:
     End Function
 '========================================================
 '   Screen Window
-    Public Function StartScreenDialog(w As Long, h As Long, ch As Object) As Object
+    Public Function StartScreenDialog(W As Long, H As Long, ch As Object) As Object
         Set StartScreenDialog = New EmeraldWindow
-        StartScreenDialog.NewFocusWindow w, h, ch
+        StartScreenDialog.NewFocusWindow W, H, ch
         Dim f As Object
         For Each f In VB.Forms
             If TypeName(f) <> "EmeraldWindow" Then f.Enabled = False

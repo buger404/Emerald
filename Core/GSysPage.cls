@@ -13,11 +13,32 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Public Page As GPage, Index As Integer, Win As Object
 Public Key As Integer
+Public OpenTime As Long, DoneMark As Boolean
 Public Sub Update()
     Select Case Index
         Case 0
         Call SaveDialog
+        Case 1
+        Call LOGODialog
     End Select
+End Sub
+Public Sub LOGODialog()
+    Dim W As Long, H As Long
+    W = Page.ImgSize("logo.png", imgGetWidth)
+    H = Page.ImgSize("logo.png", imgGetHeight)
+    
+    Page.Paint 0, 0, 0, GW, GH, argb(255, 12, 12, 30)
+    Page.DrawImageEx "logo.png", GW / 2, GH / 2, GW * 0.45, (GW * 0.45) / W * H, 1
+    If GetTickCount - OpenTime <= 1000 Then
+        Dim pro As Single
+        pro = Cubic((GetTickCount - OpenTime) / 1000, 0, 0, 0, 1)
+        Page.Paint 0, 0, 0, GW, GH, argb(255 - pro * 255, 12, 12, 30)
+    End If
+    
+    If GetTickCount - OpenTime >= 3000 Then
+        ECore.NewTransform 1, 1000
+        DoneMark = True
+    End If
 End Sub
 Public Sub SaveDialog()
     Page.Paint 0, 0, 0, 600, 76, argb(255, 242, 242, 242)

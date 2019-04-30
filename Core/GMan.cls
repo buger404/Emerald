@@ -23,6 +23,7 @@ End Type
 Dim Pages() As Page, Transform As Transform
 Dim mPage As String, aPage As Object
 Dim OutOfWindow As Boolean
+Dim FirstPlay As Boolean
 Public CDC As Long, ODC As Long, GG As Long, pB As Long
 '========================================================
 '   Init
@@ -77,6 +78,20 @@ Public CDC As Long, ODC As Long, GG As Long, pB As Long
         Dim o As Boolean, t As Long
         
         t = Timer * 1000
+        
+        If ECore Is Me Then
+            If (Not FirstPlay) Then
+                FirstPlay = True: SysPage.OpenTime = GetTickCount: SysPage.Index = 1
+                Call NewTransform
+            End If
+            If (Not SysPage.DoneMark) Then
+                SysPage.Page.Clear
+                SysPage.Page.Update
+                SysPage.Page.Display CDC
+                GoTo skipPage
+            End If
+        End If
+
         For i = 1 To UBound(Pages)
             If ActivePage = Pages(i).name Then
                 Pages(i).p.Clear: Pages(i).p.Update: Pages(i).p.Display (CDC)
@@ -92,6 +107,8 @@ Public CDC As Long, ODC As Long, GG As Long, pB As Long
                 Exit For
             End If
         Next
+        
+skipPage:
         If GetTickCount - Transform.time <= Transform.during Then Call Translation
         BitBlt GDC, 0, 0, GW, GH, CDC, 0, 0, vbSrcCopy
         tFPS = tFPS + 1: FPSctt = FPSctt + (Timer * 1000 - t)
