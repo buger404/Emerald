@@ -6,6 +6,7 @@ Attribute VB_Name = "GCore"
 '   -新增开场LOGO设置
 '   -添加版本更新注意事项
 '   -添加过场效果枚举
+'   -修复部分字体样式不可用的问题
 '   更新内容(ver.430)
 '   -添加ImgCount，ImgSize
 '   -添加启动页面
