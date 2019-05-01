@@ -109,7 +109,7 @@ Attribute VB_Name = "GCore"
     Public FPS As Long, FPSt As Long, tFPS As Long, FPSct As Long, FPSctt As Long
     Public SysPage As GSysPage
     Public PreLoadCount As Long, LoadedCount As Long
-    Public Const Version As Long = 19050106
+    Public Const Version As Long = 19050107
     Dim LastKeyUpRet As Boolean
     Dim Wndproc As Long
 '========================================================
@@ -325,7 +325,7 @@ sth:
             Loop
             ret = XmlHttp.responseText
             Set XmlHttp = Nothing
-            Debug.Print Now, "检查版本完毕，最新版本号：" & ret
+            Debug.Print Now, "Emerald：检查版本完毕，最新版本号 " & Val(ret)
             
             If Val(ret) <> Version Then
                 Data.PutData "UpdateAble", 1
