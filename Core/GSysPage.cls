@@ -27,7 +27,7 @@ Public Sub LOGODialog()
     W = Page.ImgSize("logo.png", imgGetWidth)
     H = Page.ImgSize("logo.png", imgGetHeight)
     
-    Page.Paint 0, 0, 0, GW, GH, argb(255, 12, 12, 30)
+    Page.Paint 0, 0, 0, GW, GH, argb(255, 16, 16, 35)
     
     If GetTickCount - OpenTime >= 2000 Then
         If PreLoadCount <> LoadedCount Then
@@ -41,7 +41,7 @@ Public Sub LOGODialog()
     
     If (GetTickCount - OpenTime <= 1000) And (Not HideLOGO) Then
         pro = Cubic((GetTickCount - OpenTime) / 1000, 0, 0, 0, 1)
-        Page.Paint 0, 0, 0, GW, GH, argb(255 - pro * 255, 12, 12, 30)
+        Page.Paint 0, 0, 0, GW, GH, argb(255 - pro * 255, 16, 16, 35)
     End If
     
     If HideLOGO And PreLoadCount = LoadedCount Then

@@ -5,6 +5,7 @@ Attribute VB_Name = "GCore"
 '   -添加IsKeyUp
 '   -新增开场LOGO设置
 '   -添加版本更新注意事项
+'   -添加过场效果枚举
 '   更新内容(ver.430)
 '   -添加ImgCount，ImgSize
 '   -添加启动页面
@@ -85,6 +86,20 @@ Attribute VB_Name = "GCore"
         mMouseIn = 1
         mMouseDown = 2
         mMouseUp = 3
+    End Enum
+    Public Enum TranslationKind
+        transFadeIn = 0
+        transFadeOut = 1
+        transToRight = 2
+        transToLeft = 3
+        transToUp = 4
+        transToDown = 5
+        transToRightFade = 6
+        transToLeftFade = 7
+        transToUpFade = 8
+        transToDownFade = 9
+        transHighLight = 10
+        transFallDark = 11
     End Enum
     Public ECore As GMan, EF As GFont, EAni As Object, ESave As GSaving
     Public GHwnd As Long, GDC As Long, GW As Long, GH As Long

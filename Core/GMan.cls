@@ -16,7 +16,7 @@ Private Type Page
     name As String
 End Type
 Private Type Transform
-    kind As Integer
+    kind As TranslationKind
     time As Long
     during As Long
 End Type
@@ -122,7 +122,7 @@ skipPage:
     End Sub
 '========================================================
 '   Transform
-    Public Sub NewTransform(Optional kind As Integer = 0, Optional during As Long = 300, Optional newPage)
+    Public Sub NewTransform(Optional kind As TranslationKind = transFadeIn, Optional during As Long = 300, Optional newPage)
         PaintDC CDC, ODC
         With Transform
             .during = during
