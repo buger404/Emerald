@@ -1,6 +1,8 @@
 Attribute VB_Name = "GCore"
 '========================================================
 '   Emerald 绘图框架模块
+'   更新内容(ver.501)
+'   -添加IsKeyUp
 '   更新内容(ver.430)
 '   -添加ImgCount，ImgSize
 '   -添加启动页面
@@ -88,6 +90,7 @@ Attribute VB_Name = "GCore"
     Public FPS As Long, FPSt As Long, tFPS As Long, FPSct As Long, FPSctt As Long
     Public SysPage As GSysPage
     Public PreLoadCount As Long, LoadedCount As Long
+    Dim LastKeyUpRet As Boolean
     Dim Wndproc As Long
 '========================================================
 '   Init
@@ -265,6 +268,12 @@ sth:
 '   KeyBoard
     Public Function IsKeyPress(Code As Long) As Boolean
         IsKeyPress = (GetAsyncKeyState(Code) < 0)
+    End Function
+    Public Function IsKeyUp(Code As Long) As Boolean
+        Dim t As Boolean
+        t = LastKeyUpRet
+        LastKeyUpRet = (GetAsyncKeyState(Code) < 0)
+        If t = True And LastKeyUpRet = False Then IsKeyUp = True
     End Function
 '========================================================
 '   Screen Window
