@@ -28,16 +28,20 @@ Public sToken As Boolean, path As String
         
         ReDim MySave.Data(0)
         If Dir(path & "\", vbDirectory) = "" Then
-            SysPage.Index = 0: SysPage.Key = 0
-            Dim Win As Object
-            Set Win = StartScreenDialog(600, 400, SysPage)
-            Set SysPage.Win = Win
-            Do While Not Win.AcceptMark
-                DoEvents
-            Loop
-            Unload Win
-            
-            If SysPage.Key = 1 Then MkDir path & "\"
+            If name <> "Emerald.Core" Then
+                SysPage.Index = 0: SysPage.Key = 0
+                Dim Win As Object
+                Set Win = StartScreenDialog(600, 400, SysPage)
+                Set SysPage.Win = Win
+                Do While Not Win.AcceptMark
+                    DoEvents
+                Loop
+                Unload Win
+                
+                If SysPage.Key = 1 Then MkDir path & "\"
+            Else
+                MkDir path & "\"
+            End If
         Else
             If Dir(path & "\save") <> "" Then
                 Open path & "\save" For Binary As #1
@@ -55,19 +59,19 @@ Public sToken As Boolean, path As String
 '========================================================
 '   RunTime
     Public Sub CheckSave()
-        Dim msg As String
+        Dim Msg As String
         For i = 1 To UBound(MySave.Data)
             If MySave.Data(i).value <> "" Then
                 If MySave.Data(i).datacheck <> BMEA(MySave.Data(i).value & i) Then
-                    msg = msg & MySave.Data(i).name & vbCrLf
+                    Msg = Msg & MySave.Data(i).name & vbCrLf
                     MySave.Data(i).value = ""
                 End If
             End If
         Next
         
-        If msg <> "" Then
+        If Msg <> "" Then
             Call Save
-            MsgBox "已经发现并删除存档中以下非法数据：" & vbCrLf & msg, 64
+            MsgBox "已经发现并删除存档中以下非法数据：" & vbCrLf & Msg, 64
         End If
     End Sub
 '========================================================

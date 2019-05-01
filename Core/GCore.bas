@@ -7,6 +7,7 @@ Attribute VB_Name = "GCore"
 '   -添加版本更新注意事项
 '   -添加过场效果枚举
 '   -修复部分字体样式不可用的问题
+'   -添加版本更新检测
 '   更新内容(ver.430)
 '   -添加ImgCount，ImgSize
 '   -添加启动页面
@@ -108,6 +109,7 @@ Attribute VB_Name = "GCore"
     Public FPS As Long, FPSt As Long, tFPS As Long, FPSct As Long, FPSctt As Long
     Public SysPage As GSysPage
     Public PreLoadCount As Long, LoadedCount As Long
+    Public Const Version As Long = 19050106
     Dim LastKeyUpRet As Boolean
     Dim Wndproc As Long
 '========================================================
@@ -135,7 +137,8 @@ Attribute VB_Name = "GCore"
         If DebugMode Then
             DebugWindow.Show
         End If
-
+        
+        If App.LogMode = 0 Then Call CheckUpdate
     End Sub
     Public Sub EndEmerald()
         If DebugMode Then
@@ -304,4 +307,32 @@ sth:
             If TypeName(f) <> "EmeraldWindow" Then f.Enabled = False
         Next
     End Function
+'========================================================
+'   Update
+    Public Sub CheckUpdate()
+        On Error Resume Next
+        Dim Data As New GSaving
+        Data.Create "Emerald.Core", "Emerald.Core"
+        If Now - CDate(Data.GetData("UpdateTime")) >= UpdateCheckInterval Or Data.GetData("UpdateAble") = 1 Then
+            Data.PutData "UpdateTime", Now
+            
+            Dim XmlHttp As Object, ret As String
+            Set XmlHttp = CreateObject("Microsoft.XMLHTTP")
+            XmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
+            XmlHttp.Send
+            Do While XmlHttp.ReadyState <> 4
+                DoEvents
+            Loop
+            ret = XmlHttp.responseText
+            Set XmlHttp = Nothing
+            Debug.Print Now, "检查版本完毕，最新版本号：" & ret
+            
+            If Val(ret) <> Version Then
+                Data.PutData "UpdateAble", 1
+                If MsgBox("发现Emerald存在新版本，您希望现在前往下载吗？", vbYesNo + 48, "Emerald") = vbNo Then Exit Sub
+                Data.PutData "UpdateAble", 0
+                ShellExecuteA 0, "open", "https://github.com/Red-Error404/Emerald", "", "", SW_SHOW
+            End If
+        End If
+    End Sub
 '========================================================
