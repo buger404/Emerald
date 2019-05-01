@@ -3,6 +3,8 @@ Attribute VB_Name = "GCore"
 '   Emerald 绘图框架模块
 '   更新内容(ver.501)
 '   -添加IsKeyUp
+'   -新增开场LOGO设置
+'   -添加版本更新注意事项
 '   更新内容(ver.430)
 '   -添加ImgCount，ImgSize
 '   -添加启动页面
@@ -103,6 +105,7 @@ Attribute VB_Name = "GCore"
         InitGDIPlus
         BASS_Init -1, 44100, BASS_DEVICE_3D, Hwnd, 0
         GHwnd = Hwnd: GW = W: GH = H
+        SetWindowPos Hwnd, 0, 0, 0, W, H + 30, SWP_NOMOVE Or SWP_NOZORDER
         GDC = GetDC(Hwnd)
         If App.LogMode <> 0 Then Wndproc = SetWindowLongA(Hwnd, GWL_WNDPROC, AddressOf Process)
         

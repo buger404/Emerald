@@ -29,7 +29,7 @@ Public Sub LOGODialog()
     
     Page.Paint 0, 0, 0, GW, GH, argb(255, 12, 12, 30)
     
-    If GetTickCount - OpenTime >= 3000 Then
+    If GetTickCount - OpenTime >= 2000 Then
         If PreLoadCount <> LoadedCount Then
             Page.DrawImageEx "logo.png", GW / 2, GH * 0.85 / 2, Int(GW * 0.45), Int((GW * 0.45) / W * H), 1
         End If
@@ -39,12 +39,17 @@ Public Sub LOGODialog()
     
     Dim pro As Single
     
-    If GetTickCount - OpenTime <= 1000 Then
+    If (GetTickCount - OpenTime <= 1000) And (Not HideLOGO) Then
         pro = Cubic((GetTickCount - OpenTime) / 1000, 0, 0, 0, 1)
         Page.Paint 0, 0, 0, GW, GH, argb(255 - pro * 255, 12, 12, 30)
     End If
     
-    If GetTickCount - OpenTime >= 3000 Then
+    If HideLOGO And PreLoadCount = LoadedCount Then
+        ECore.NewTransform 1, 1000
+        DoneMark = True
+    End If
+    
+    If GetTickCount - OpenTime >= 2000 Then
         If PreLoadCount = LoadedCount Then
             ECore.NewTransform 1, 1000
             DoneMark = True
