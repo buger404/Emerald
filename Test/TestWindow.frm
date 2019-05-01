@@ -3,7 +3,7 @@ Begin VB.Form TestWindow
    Appearance      =   0  'Flat
    BackColor       =   &H80000005&
    BorderStyle     =   1  'Fixed Single
-   Caption         =   "Emerald.Test"
+   Caption         =   "拖入音乐Enjoy"
    ClientHeight    =   6672
    ClientLeft      =   48
    ClientTop       =   396
@@ -11,6 +11,7 @@ Begin VB.Form TestWindow
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
+   OLEDropMode     =   1  'Manual
    ScaleHeight     =   556
    ScaleMode       =   3  'Pixel
    ScaleWidth      =   805
@@ -27,7 +28,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-Dim GTest As GTest, EC As GMan
+Dim MainPage As MainPage, EC As GMan
 
 Private Sub DrawTimer_Timer()
     EC.Display
@@ -44,26 +45,30 @@ Private Sub Form_Load()
     
     '创建音乐列表
     Set MusicList = New GMusicList
-    MusicList.Create App.path & "\music"
+    MusicList.Create App.Path & "\music"
     
     EC.ActivePage = "MainPage"
     
     Me.Show
     DrawTimer.Enabled = True
     
-    Set GTest = New GTest
+    Set MainPage = New MainPage
 End Sub
 
-Private Sub Form_MouseDown(button As Integer, Shift As Integer, X As Single, Y As Single)
-    UpdateMouse X, Y, 1, button
+Private Sub Form_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
+    UpdateMouse X, Y, 1, Button
 End Sub
 
-Private Sub Form_MouseMove(button As Integer, Shift As Integer, X As Single, Y As Single)
-    If Mouse.State = 0 Then UpdateMouse X, Y, 0, button
+Private Sub Form_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
+    If Mouse.State = 0 Then UpdateMouse X, Y, 0, Button
 End Sub
 
-Private Sub Form_MouseUp(button As Integer, Shift As Integer, X As Single, Y As Single)
-    UpdateMouse X, Y, 2, button
+Private Sub Form_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
+    UpdateMouse X, Y, 2, Button
+End Sub
+
+Private Sub Form_OLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, X As Single, Y As Single)
+    MainPage.PlayNew Data.Files(1)
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)

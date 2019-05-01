@@ -1,5 +1,5 @@
 Attribute VB_Name = "Process"
-Public Const Version As Long = 19050108
+Public Const Version As Long = 19050109
 Public VBIDEPath As String
 Public Sub GetVBIDEPath()
     On Error GoTo errHandle

@@ -13,17 +13,41 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '======================================
 '   页面绘制器
-    Dim Page As GPage
+    Dim Page As GPage, Music As GMusic
 '======================================
 
 Public Sub Update()
     '绘制事件
+    Dim Map() As Single, MapTotal As Long, w As Long, h As Long
     
-    '================================================================
-    '   示例：绘制文字
-    '   Page.Writes "我是文字", 20,20, Color:=argb(255, 0, 0, 0)
-    '================================================================
+    On Error Resume Next
+    Map = Music.GetMusicMap
+    For i = 0 To UBound(Map)
+        MapTotal = MapTotal + Map(i)
+    Next
     
+    Dim pro As Single
+    Page.Paint 0, 0, GH / 2 - 1, GW, 4, argb(255, 222, 222, 222)
+    
+    Page.Paint 1, GW / 2 - 256 / 2, GH / 2 - 256 / 2, 256, 256, argb(255, 222, 222, 222)
+    pro = MapTotal / 100000
+    If pro > 1 Then pro = 1
+    Page.Paint 1, GW / 2 - 256 / 2, GH / 2 - 256 / 2, 256, 256, argb(255 * pro, 0, 176, 240)
+
+    For i = 0 To 20
+        pro = Map(i) / 3000
+        If pro > 1 Then pro = 1
+        Page.Paint 0, GW / 2 + Int(GW / 30) * i + 148, GH / 2 - GH * pro / 2, 5, GH * pro, argb(255, 0, 176, 240)
+        Page.Paint 0, GW / 2 - Int(GW / 30) * i - 148, GH / 2 - GH * pro / 2, 5, GH * pro, argb(255, 0, 176, 240)
+    Next
+    Page.DrawImage "music.png", GW / 2, GH / 2, Alpha:=1, Pos:=1
+    
+    If Not Music.IsPlaying Then Music.Play
+End Sub
+Public Sub PlayNew(Path As String)
+    Music.Dispose
+    Music.Create Path
+    Music.Play
 End Sub
 Public Sub Wheel(Direction As Integer, Depth As Single)
     '鼠标滚轮事件
@@ -50,9 +74,12 @@ Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
     '导入游戏资源
-    Page.NewImages App.path & "\assets"
+    Page.NewImages App.Path & "\assets"
     '创建页面
     ECore.Add Page, "MainPage"
+    
+    Set Music = New GMusic
+    PlayNew App.Path & "\music\Anticipation.mp3"
     
     '===============================================
     '   如果需要添加动画，请放置在此处
