@@ -20,6 +20,7 @@ Class=GDebug; Core\GDebug.cls
 Form=Core\Debuginfo.frm
 Form=Core\EmeraldWindow.frm
 Class=GSysPage; Core\GSysPage.cls
+Module=Core; Core\Core.bas
 Startup="Sub Main"
 HelpFile=""
 Title="{app}"

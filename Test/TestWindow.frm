@@ -42,7 +42,11 @@ Private Sub Form_Load()
     Set ESave = New GSaving
     ESave.Create "emerald.test", "Emerald.test"
     
-    EC.ActivePage = "TestPage"
+    '创建音乐列表
+    Set MusicList = New GMusicList
+    MusicList.Create App.path & "\music"
+    
+    EC.ActivePage = "MainPage"
     
     Me.Show
     DrawTimer.Enabled = True

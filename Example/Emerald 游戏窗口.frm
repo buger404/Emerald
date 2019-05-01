@@ -51,6 +51,10 @@ Private Sub Form_Load()
     'Set ESave = New GSaving
     'ESave.Create "emerald.test", "Emerald.test"
     
+    '创建音乐列表
+    Set MusicList = New GMusicList
+    MusicList.Create App.path & "\music"
+
     '设置活动页面
     EC.ActivePage = "[你的页面名称]"
     

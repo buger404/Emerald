@@ -1,5 +1,5 @@
 Attribute VB_Name = "Process"
-Public Const Version As Long = 19050107
+Public Const Version As Long = 19050108
 Public VBIDEPath As String
 Public Sub GetVBIDEPath()
     On Error GoTo errHandle
@@ -164,6 +164,7 @@ SkipName:
         If Dir(p & "\assets\debug", vbDirectory) = "" Then MkDir p & "\assets\debug"
         CopyInto App.Path & "\assets\debug", p & "\assets\debug"
         CopyInto App.Path & "\framework", p
+        If Dir(p & "\music", vbDirectory) = "" Then MkDir p & "\music"
         
         Open p & "\.emerald" For Output As #1
         Print #1, Version 'version

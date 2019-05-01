@@ -8,6 +8,7 @@ Attribute VB_Name = "GCore"
 '   -添加过场效果枚举
 '   -修复部分字体样式不可用的问题
 '   -添加版本更新检测
+'   -现在新建工程时会自动创建好音乐列表
 '   更新内容(ver.430)
 '   -添加ImgCount，ImgSize
 '   -添加启动页面
@@ -109,7 +110,7 @@ Attribute VB_Name = "GCore"
     Public FPS As Long, FPSt As Long, tFPS As Long, FPSct As Long, FPSctt As Long
     Public SysPage As GSysPage
     Public PreLoadCount As Long, LoadedCount As Long
-    Public Const Version As Long = 19050107
+    Public Const Version As Long = 19050108
     Dim LastKeyUpRet As Boolean
     Dim Wndproc As Long
 '========================================================
@@ -333,6 +334,8 @@ sth:
                 Data.PutData "UpdateAble", 0
                 ShellExecuteA 0, "open", "https://github.com/Red-Error404/Emerald", "", "", SW_SHOW
             End If
+        Else
+            Debug.Print Now, "Emerald：上次检查更新时间 " & CDate(Data.GetData("UpdateTime"))
         End If
     End Sub
 '========================================================
