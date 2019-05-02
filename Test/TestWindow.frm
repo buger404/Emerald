@@ -55,19 +55,19 @@ Private Sub Form_Load()
     Set MainPage = New MainPage
 End Sub
 
-Private Sub Form_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
-    UpdateMouse X, Y, 1, Button
+Private Sub Form_MouseDown(button As Integer, Shift As Integer, X As Single, Y As Single)
+    UpdateMouse X, Y, 1, button
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
-    If Mouse.State = 0 Then UpdateMouse X, Y, 0, Button
+Private Sub Form_MouseMove(button As Integer, Shift As Integer, X As Single, Y As Single)
+    If Mouse.State = 0 Then UpdateMouse X, Y, 0, button
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
-    UpdateMouse X, Y, 2, Button
+Private Sub Form_MouseUp(button As Integer, Shift As Integer, X As Single, Y As Single)
+    UpdateMouse X, Y, 2, button
 End Sub
 
-Private Sub Form_OLEDragDrop(Data As DataObject, Effect As Long, Button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_OLEDragDrop(Data As DataObject, Effect As Long, button As Integer, Shift As Integer, X As Single, Y As Single)
     MainPage.PlayNew Data.Files(1)
 End Sub
 

@@ -35,6 +35,8 @@ Public CDC As Long, ODC As Long, GG As Long, pB As Long
         CDC = CreateCDC(GW, GH)
         ODC = CreateCDC(GW, GH)
         GdipCreateFromHDC CDC, GG
+        GdipSetSmoothingMode GG, SmoothingModeAntiAlias
+        GdipSetTextRenderingHint GG, TextRenderingHintAntiAlias
         GdipCreateSolidFill argb(255, 255, 255, 255), pB
     End Sub
     Public Sub Dispose()
@@ -77,7 +79,7 @@ Public CDC As Long, ODC As Long, GG As Long, pB As Long
 '========================================================
 '   Draw
     Public Sub Display()
-        Dim o As Boolean, t As Long
+        Dim o As Boolean, t As Long, played As Boolean
         
         t = Timer * 1000
         
@@ -90,6 +92,7 @@ Public CDC As Long, ODC As Long, GG As Long, pB As Long
                 SysPage.Page.Clear
                 SysPage.Page.Update
                 SysPage.Page.Display CDC
+                played = True
                 GoTo skipPage
             End If
         End If
@@ -97,6 +100,7 @@ Public CDC As Long, ODC As Long, GG As Long, pB As Long
         For i = 1 To UBound(Pages)
             If ActivePage = Pages(i).name Then
                 Pages(i).p.Clear: Pages(i).p.Update: Pages(i).p.Display (CDC)
+                played = True
                 o = (GetActiveWindow = 0)
                 If o <> OutOfWindow Then
                     OutOfWindow = o
@@ -111,6 +115,11 @@ Public CDC As Long, ODC As Long, GG As Long, pB As Long
         Next
         
 skipPage:
+        If Not played Then
+            GdipGraphicsClear GG, argb(255, 255, 255, 255)
+            EF.Writes "Ò³Ãæ""" & ActivePage & """²»´æÔÚ", GW / 2, GH / 2, GG, argb(255, 27, 27, 27), 20, 0, 0, StringAlignmentCenter, FontStyleBold
+        End If
+        
         If GetTickCount - Transform.time <= Transform.during Then Call Translation
         BitBlt GDC, 0, 0, GW, GH, CDC, 0, 0, vbSrcCopy
         tFPS = tFPS + 1: FPSctt = FPSctt + (Timer * 1000 - t)
