@@ -415,7 +415,7 @@ setAlpha:
     End Sub
 '========================================================
 '   Shape
-    Public Sub Paint(ByVal shape As Integer, X As Long, Y As Long, w As Long, h As Long, Optional Color As Long, Optional Radius As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional animation As Integer = 0)
+    Public Sub Paint(ByVal shape As Integer, X As Long, Y As Long, w As Long, h As Long, Optional Color As Long, Optional Radius As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional Pos As Integer = 0, Optional animation As Integer = 0)
         'shape:0=rect,1=ellipse,2=rectr
         'style:0=fill,1=border
         'If OutOfScroll Then Exit Sub
@@ -443,6 +443,13 @@ setAlpha:
         End If
         
         GdipResetPath Path
+        
+        If Pos = 1 Then X = Int(X - w / 2): Y = Int(Y - h / 2)
+        If Pos = 2 Then X = X - w
+        If Pos = 3 Then Y = Y - h
+        If Pos = 4 Then X = X + w
+        If Pos = 5 Then Y = Y + h
+        
 ReShape:
         If shape = 0 Then GdipAddPathRectangle Path, X, Y, w - 1, h - 1
         If shape = 1 Then GdipAddPathEllipse Path, X, Y, w - 1, h - 1

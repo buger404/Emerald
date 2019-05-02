@@ -3,6 +3,7 @@ Attribute VB_Name = "GCore"
 '   Emerald 绘图框架模块
 '   更新内容(ver.502)
 '   -修复更新问题和代码不可用问题
+'   -Paint添加Pos参数
 '   更新内容(ver.501)
 '   -添加IsKeyUp
 '   -新增开场LOGO设置
@@ -119,7 +120,7 @@ Attribute VB_Name = "GCore"
 '========================================================
 '   Init
     Public Sub StartEmerald(Hwnd As Long, w As Long, h As Long)
-    
+        
         If DebugMode Then
             If App.LogMode <> 0 Then MsgBox "错误：生成时未关闭Debug模式。": End
         End If
@@ -325,22 +326,22 @@ sth:
         If Now - CDate(Data.GetData("UpdateTime")) >= UpdateCheckInterval Or Data.GetData("UpdateAble") = 1 Then
             Data.PutData "UpdateTime", Now
             
-            Dim XmlHttp As Object, Ret As String
-            Set XmlHttp = CreateObject("Microsoft.XMLHTTP")
-            XmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
-            XmlHttp.Send
-            Do While XmlHttp.ReadyState <> 4
-                DoEvents
+            Dim xmlHttp As Object, Ret As String
+            Set xmlHttp = CreateObject("Microsoft.XMLHTTP")
+            xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
+            xmlHttp.send
+            Do While xmlHttp.ReadyState <> 4
             Loop
-            Ret = XmlHttp.responseText
-            Set XmlHttp = Nothing
+            Ret = xmlHttp.responseText
+            Set xmlHttp = Nothing
             Debug.Print Now, "Emerald：检查版本完毕，最新版本号 " & Val(Ret)
             
             If Val(Ret) > Version Then
                 Data.PutData "UpdateAble", 1
                 If MsgBox("发现Emerald存在新版本，您希望现在前往下载吗？", vbYesNo + 48, "Emerald") = vbNo Then Exit Sub
-                Data.PutData "UpdateAble", 0
+                
                 ShellExecuteA 0, "open", "https://github.com/Red-Error404/Emerald", "", "", SW_SHOW
+                Data.PutData "UpdateAble", 0
             End If
         Else
             Debug.Print Now, "Emerald：上次检查更新时间 " & CDate(Data.GetData("UpdateTime"))
