@@ -23,6 +23,7 @@ Form=Core\EmeraldWindow.frm
 Class=GSysPage; Core\GSysPage.cls
 Class=MainPage; Test\MainPage.cls
 Module=Core; Core\Core.bas
+Module=AboutMe; AboutMe.bas
 IconForm="TestWindow"
 Startup="TestWindow"
 HelpFile=""
