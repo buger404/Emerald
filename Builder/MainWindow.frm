@@ -37,13 +37,13 @@ Begin VB.Form MainWindow
       Top             =   3048
       Visible         =   0   'False
       Width           =   6828
-      _extentx        =   12044
-      _extenty        =   529
-      content         =   "EEdit1"
-      forecolor       =   8422784
-      bordercolor     =   13556506
-      alignment       =   0
-      lockinput       =   0
+      _ExtentX        =   12044
+      _ExtentY        =   529
+      Content         =   "EEdit1"
+      ForeColor       =   8422784
+      BorderColor     =   13556506
+      Alignment       =   0
+      LockInput       =   0   'False
    End
    Begin Emerald_Builder.EButton Buttons 
       Height          =   420
@@ -53,14 +53,22 @@ Begin VB.Form MainWindow
       Top             =   3576
       Visible         =   0   'False
       Width           =   948
-      _extentx        =   1672
-      _extenty        =   741
-      defaultcolor    =   15592941
-      hovercolor      =   13556250
-      align           =   0
-      forecolor       =   8422784
-      font            =   "MainWindow.frx":1BCC2
-      content         =   "OK"
+      _ExtentX        =   1672
+      _ExtentY        =   741
+      DefaultColor    =   15592941
+      HoverColor      =   13556250
+      ForeColor       =   8422784
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Î¢ÈíÑÅºÚ"
+         Size            =   9.6
+         Charset         =   134
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Content         =   "OK"
+      Align           =   0
    End
    Begin VB.Label Content 
       Appearance      =   0  'Flat
@@ -150,6 +158,3 @@ Private Sub Buttons_Click(Index As Integer)
     Me.Hide
 End Sub
 
-Private Sub Form_Load()
-
-End Sub

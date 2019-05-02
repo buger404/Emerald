@@ -10,7 +10,7 @@ Public Sub CheckUpdate()
     Set WSHShell = CreateObject("WScript.Shell")
     
     temp = WSHShell.RegRead("HKEY_CLASSES_ROOT\Directory\shell\emerald\version")
-    IsUpdate = (Val(temp) = Version)
+    IsUpdate = (Val(temp) <> Version)
     
 errHandle:
     
