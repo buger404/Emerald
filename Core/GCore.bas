@@ -8,6 +8,7 @@ Attribute VB_Name = "GCore"
 '   -添加弧形，扇形的绘制
 '   -添加页面不存在提示
 '   -添加Builder修复功能
+'   -Debug栏添加ToolTip
 '   更新内容(ver.501)
 '   -添加IsKeyUp
 '   -新增开场LOGO设置

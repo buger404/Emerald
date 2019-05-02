@@ -71,6 +71,14 @@ Private Sub Form_Load()
             .Visible = True
             .ZOrder
             .Move Me.ScaleWidth - 10 - 64 * i, 78 / 2 - 64 / 2, 64, 64
+            Select Case i
+                Case 1
+                    .ToolTipText = "详细信息窗口"
+                Case 2
+                    .ToolTipText = "鼠标状态指示"
+                Case 3
+                    .ToolTipText = "显示/不显示绘制矩形"
+            End Select
         End With
     Next
 End Sub
