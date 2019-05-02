@@ -11,6 +11,8 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'Emerald 相关代码
+
 Public Page As GPage, Index As Integer, Win As Object
 Public Key As Integer
 Public OpenTime As Long, DoneMark As Boolean, DoneStep As Integer
@@ -23,18 +25,18 @@ Public Sub Update()
     End Select
 End Sub
 Public Sub LOGODialog()
-    Dim W As Long, H As Long
-    W = Page.ImgSize("logo.png", imgGetWidth)
-    H = Page.ImgSize("logo.png", imgGetHeight)
+    Dim w As Long, h As Long
+    w = Page.ImgSize("logo.png", imgGetWidth)
+    h = Page.ImgSize("logo.png", imgGetHeight)
     
     Page.Paint 0, 0, 0, GW, GH, argb(255, 16, 16, 35)
     
     If GetTickCount - OpenTime >= 2000 Then
         If PreLoadCount <> LoadedCount Then
-            Page.DrawImageEx "logo.png", GW / 2, GH * 0.85 / 2, Int(GW * 0.45), Int((GW * 0.45) / W * H), 1
+            Page.DrawImageEx "logo.png", GW / 2, GH * 0.85 / 2, Int(GW * 0.45), Int((GW * 0.45) / w * h), 1
         End If
     Else
-        Page.DrawImageEx "logo.png", GW / 2, GH / 2, Int(GW * 0.45), Int((GW * 0.45) / W * H), 1
+        Page.DrawImageEx "logo.png", GW / 2, GH / 2, Int(GW * 0.45), Int((GW * 0.45) / w * h), 1
     End If
     
     Dim pro As Single
@@ -68,7 +70,7 @@ End Sub
 Public Sub SaveDialog()
     Page.Paint 0, 0, 0, 600, 76, argb(255, 242, 242, 242)
     Page.DrawImage "save.png", 40, 40, Alpha:=1
-    Page.Writes "你希望该应用在以下位置保存数据吗？" & vbCrLf & ESave.path, 40, 130, 18, argb(255, 64, 64, 64)
+    Page.Writes "你希望该应用在以下位置保存数据吗？" & vbCrLf & ESave.Path, 40, 130, 18, argb(255, 64, 64, 64)
     
     Page.Writes "*如果不允许，该应用可能永远保持初始状态。", 40, 400 - 110, 16, argb(255, 96, 96, 96)
     
@@ -106,5 +108,5 @@ End Sub
 Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
-    Page.NewImages App.path & "\assets\debug"
+    Page.NewImages App.Path & "\assets\debug"
 End Sub

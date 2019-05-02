@@ -11,6 +11,8 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'Emerald Ïà¹Ø´úÂë
+
 Private Declare Function AddFontResource Lib "gdi32" Alias "AddFontResourceA" (ByVal lpFileName As String) As Long
 Private Declare Function RemoveFontResource Lib "gdi32" Alias "RemoveFontResourceA" (ByVal lpFileName As String) As Long
 Dim brush As Long, fFile As String, fFam As Long, strF(2) As Long, Font(8, 1 To 100) As Long
@@ -48,13 +50,13 @@ Dim brush As Long, fFile As String, fFam As Long, strF(2) As Long, Font(8, 1 To 
     End Sub
 '========================================================
 '   Writer
-    Public Sub Writes(text As String, X As Long, Y As Long, g As Long, Color As Long, size As Long, W As Long, H As Long, ByVal align As StringAlignment, ByVal style As FontStyle)
+    Public Sub Writes(text As String, X As Long, Y As Long, g As Long, Color As Long, size As Long, w As Long, h As Long, ByVal align As StringAlignment, ByVal style As FontStyle)
         On Error Resume Next
         If Font(style, size) = 0 Then
             GdipCreateFont fFam, size, style, UnitPixel, Font(style, size)
         End If
         
         If Color <> 0 Then GdipSetSolidFillColor brush, Color
-        GdipDrawString g, StrPtr(text), -1, Font(style, size), NewRectF(X, Y, W, H), strF(align), brush
+        GdipDrawString g, StrPtr(text), -1, Font(style, size), NewRectF(X, Y, w, h), strF(align), brush
     End Sub
 '========================================================

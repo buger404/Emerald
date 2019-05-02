@@ -11,6 +11,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'   Emerald 相关代码
 '======================================================
 '   碰撞箱
 '   制作：Error 404
@@ -82,14 +83,14 @@ Attribute VB_Exposed = False
         
         Dim cx As Long, cy As Long, crashed As Boolean
         Dim rl As Long, rt As Long, rr As Long, rb As Long
-        Dim x As Long, y As Long, h As Long, w As Long
+        Dim X As Long, Y As Long, h As Long, w As Long
         Dim Step As Integer
         
         '计算缩放矩形
-        x = mx * Act: y = my * Act: w = (mw + 1) * Act: h = (mh + 1) * Act
+        X = mx * Act: Y = my * Act: w = (mw + 1) * Act: h = (mh + 1) * Act
         
         '计算矩形四边
-        rl = x: rt = y: rr = x + w: rb = y + h
+        rl = X: rt = Y: rr = X + w: rb = Y + h
         
         '填充矩形边框到碰撞地图
         cy = rt
@@ -136,6 +137,6 @@ Binggo:
         End If
         crashed = True: CheckCrashRect = Map(cx, cy): Return
     End Function
-    Public Sub AddCrashRect(x As Long, y As Long, w As Long, h As Long, tag1 As Integer, tag2 As Integer)
-        CheckCrashRect x, y, w, h, tag1, tag2, True
+    Public Sub AddCrashRect(X As Long, Y As Long, w As Long, h As Long, tag1 As Integer, tag2 As Integer)
+        CheckCrashRect X, Y, w, h, tag1, tag2, True
     End Sub

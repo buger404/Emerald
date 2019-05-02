@@ -1,4 +1,6 @@
 Attribute VB_Name = "DebugSwitch"
+'   Emerald 设置项
+
 '======================================================
 '   是否开启Debug
     Public Const DebugMode As Boolean = False

@@ -39,13 +39,14 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+'Emerald Ïà¹Ø´úÂë
 Dim Page As GPage, Charge As GDebug, Sh As New aShadow
 Private Sub Form_Load()
     Set Page = New GPage
     Set Charge = New GDebug
     
     Page.Create Charge
-    Page.NewImages App.path & "\assets\debug", 64, 64
+    Page.NewImages App.Path & "\assets\debug", 64, 64
     
     Set Charge.Page = Page
     

@@ -1,4 +1,6 @@
 Attribute VB_Name = "Process"
+'Emerald ฯเนุด๚ย๋
+
 Public Const Version As Long = 19050109
 Public VBIDEPath As String
 Public Sub GetVBIDEPath()

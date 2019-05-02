@@ -39,6 +39,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+'Emerald Ïà¹Ø´úÂë
 Public Charge As Object, AcceptMark As Boolean, AcceptMark2 As Boolean
 Dim OpenTime As Long, WinAlpha As Long
 
@@ -93,7 +94,7 @@ Private Sub UpdateTimer_Timer()
     If Mouse.State = 2 Then Mouse.State = 0
 End Sub
 
-Public Sub NewFocusWindow(W As Long, H As Long, ch As Object)
+Public Sub NewFocusWindow(w As Long, h As Long, ch As Object)
     Me.Show
     
     Dim Sc As Long, Dh As Long
@@ -103,8 +104,8 @@ Public Sub NewFocusWindow(W As Long, H As Long, ch As Object)
     Dim g As Long, b As Long, img As Long, g2 As Long
     GdipCreateFromHDC Me.hdc, g
     
-    DisplayBox.Width = W: DisplayBox.Height = H
-    DisplayBox.Move Me.ScaleWidth / 2 - W / 2, Me.ScaleHeight / 2 - H / 2
+    DisplayBox.Width = w: DisplayBox.Height = h
+    DisplayBox.Move Me.ScaleWidth / 2 - w / 2, Me.ScaleHeight / 2 - h / 2
     X = DisplayBox.Left: Y = DisplayBox.top + 10
     
     BitBlt Me.hdc, 0, 0, Me.ScaleWidth, Me.ScaleHeight, Sc, 0, 0, vbSrcCopy
@@ -123,7 +124,7 @@ Public Sub NewFocusWindow(W As Long, H As Long, ch As Object)
     
     GdipCreateSolidFill argb(100, 0, 0, 0), b
     
-    GdipFillRectangle g2, b, X, Y, W + 1, H + 1
+    GdipFillRectangle g2, b, X, Y, w + 1, h + 1
     BlurImg img, 30
     GdipDrawImage g, img, 0, 0
     

@@ -63,6 +63,8 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'Emerald Ïà¹Ø´úÂë
+
 Event Click()
 Event hover(Button As Integer, Shift As Integer, X As Single, Y As Single)
 Event Leave()
@@ -141,7 +143,7 @@ End Sub
 Private Sub UserControl_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
     If X >= 0 And Y >= 0 And X <= UserControl.ScaleWidth And Y <= UserControl.ScaleHeight Then
         If cd = False Then
-            cd = True: SetCapture UserControl.hwnd
+            cd = True: SetCapture UserControl.hWnd
             inTime = GetTickCount: CopyMemory lc(0), UserControl.Backcolor, 4: CopyMemory nc(0), nhoc, 4
             Animation.Enabled = True
             di = 1

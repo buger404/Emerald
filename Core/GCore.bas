@@ -1,6 +1,8 @@
 Attribute VB_Name = "GCore"
 '========================================================
 '   Emerald 绘图框架模块
+'   更新内容(ver.502)
+'   -修复更新问题和代码不可用问题
 '   更新内容(ver.501)
 '   -添加IsKeyUp
 '   -新增开场LOGO设置
@@ -76,7 +78,7 @@ Attribute VB_Name = "GCore"
     Private Declare Sub AlphaBlend Lib "msimg32.dll" (ByVal hdcDest As Long, ByVal nXOriginDest As Long, ByVal nYOriginDest As Long, ByVal nWidthDest As Long, ByVal hHeightDest As Long, ByVal hdcSrc As Long, ByVal nXOriginSrc As Long, ByVal nYOriginSrc As Long, ByVal nWidthSrc As Long, ByVal nHeightSrc As Long, ByVal BLENDFUNCTION As Long) ' As Long
     Public Type MState
         State As Integer
-        Button As Integer
+        button As Integer
         X As Single
         Y As Single
     End Type
@@ -236,7 +238,7 @@ sth:
         CreateCDC = DC
     End Function
     Public Sub PaintDC(DC As Long, destDC As Long, Optional X As Long = 0, Optional Y As Long = 0, Optional cx As Long = 0, Optional cy As Long = 0, Optional cw, Optional ch, Optional Alpha)
-        Dim b As BLENDFUNCTION, index As Integer, bl As Long
+        Dim b As BLENDFUNCTION, Index As Integer, bl As Long
         
         If Not IsMissing(Alpha) Then
             If Alpha < 0 Then Alpha = 0
@@ -266,12 +268,12 @@ sth:
     End Function
 '========================================================
 '   Mouse
-    Public Sub UpdateMouse(X As Single, Y As Single, State As Long, Button As Integer)
+    Public Sub UpdateMouse(X As Single, Y As Single, State As Long, button As Integer)
         With Mouse
             .X = X
             .Y = Y
             .State = State
-            .Button = Button
+            .button = button
         End With
     End Sub
     Public Function CheckMouse(X As Long, Y As Long, w As Long, h As Long) As MButtonState
@@ -313,23 +315,28 @@ sth:
 '   Update
     Public Sub CheckUpdate()
         On Error Resume Next
+        If InternetGetConnectedState(0&, 0&) = 0 Then
+            Debug.Print Now, "Emerald：未连接网络，检查更新取消。"
+            Exit Sub
+        End If
+        
         Dim Data As New GSaving
         Data.Create "Emerald.Core", "Emerald.Core"
         If Now - CDate(Data.GetData("UpdateTime")) >= UpdateCheckInterval Or Data.GetData("UpdateAble") = 1 Then
             Data.PutData "UpdateTime", Now
             
-            Dim XmlHttp As Object, ret As String
+            Dim XmlHttp As Object, Ret As String
             Set XmlHttp = CreateObject("Microsoft.XMLHTTP")
             XmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
             XmlHttp.Send
             Do While XmlHttp.ReadyState <> 4
                 DoEvents
             Loop
-            ret = XmlHttp.responseText
+            Ret = XmlHttp.responseText
             Set XmlHttp = Nothing
-            Debug.Print Now, "Emerald：检查版本完毕，最新版本号 " & Val(ret)
+            Debug.Print Now, "Emerald：检查版本完毕，最新版本号 " & Val(Ret)
             
-            If Val(ret) <> Version Then
+            If Val(Ret) > Version Then
                 Data.PutData "UpdateAble", 1
                 If MsgBox("发现Emerald存在新版本，您希望现在前往下载吗？", vbYesNo + 48, "Emerald") = vbNo Then Exit Sub
                 Data.PutData "UpdateAble", 0

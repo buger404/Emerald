@@ -46,6 +46,8 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'Emerald Ïà¹Ø´úÂë
+
 Event Change()
 Event Commit()
 Dim dic As Integer, mlText As String
@@ -87,10 +89,10 @@ Public Property Set Font(f As StdFont)
     Set mEdit.Font = f
 End Property
 Public Property Get Content() As String
-    Content = mEdit.text
+    Content = mEdit.Text
 End Property
 Public Property Let Content(c As String)
-    mEdit.text = c
+    mEdit.Text = c
 End Property
 
 Private Sub Ani_Timer()
@@ -110,17 +112,17 @@ Private Sub mEdit_Change()
     RaiseEvent Change
 End Sub
 Private Sub mEdit_GotFocus()
-    mlText = mEdit.text
+    mlText = mEdit.Text
     mEdit.Backcolor = GetFocusColor
     dic = 0: Ani.Enabled = True
 End Sub
 Private Sub mEdit_KeyUp(KeyCode As Integer, Shift As Integer)
     If KeyCode = 13 Then
-        If mEdit.text <> mlText Then mlText = mEdit.text: RaiseEvent Commit
+        If mEdit.Text <> mlText Then mlText = mEdit.Text: RaiseEvent Commit
     End If
 End Sub
 Private Sub mEdit_LostFocus()
-    If mEdit.text <> mlText Then mlText = mEdit.text: RaiseEvent Commit
+    If mEdit.Text <> mlText Then mlText = mEdit.Text: RaiseEvent Commit
     mEdit.Backcolor = UserControl.Backcolor
     aline.Visible = True
     dic = 1: Ani.Enabled = True
@@ -143,11 +145,11 @@ Private Sub UserControl_InitProperties()
     mEdit.Backcolor = RGB(255, 255, 255)
     mEdit.ForeColor = RGB(192, 192, 192)
     
-    mEdit.text = Extender.name
+    mEdit.Text = Extender.name
 End Sub
 Private Sub UserControl_ReadProperties(PropBag As PropertyBag)
     mEdit.Backcolor = Val(PropBag.ReadProperty("BackColor", RGB(255, 255, 255)))
-    mEdit.text = PropBag.ReadProperty("Content", Extender.name)
+    mEdit.Text = PropBag.ReadProperty("Content", Extender.name)
     mEdit.ForeColor = PropBag.ReadProperty("ForeColor", RGB(192, 192, 192))
     aline.Bordercolor = PropBag.ReadProperty("BorderColor", aline.Bordercolor)
     mEdit.Alignment = PropBag.ReadProperty("Alignment", AlignmentConstants.vbLeftJustify)
@@ -159,7 +161,7 @@ Private Sub UserControl_ReadProperties(PropBag As PropertyBag)
     
     Call UserControl_Resize
     
-    mlText = mEdit.text
+    mlText = mEdit.Text
 End Sub
 
 Private Sub UserControl_Resize()
@@ -171,7 +173,7 @@ End Sub
 
 Private Sub UserControl_WriteProperties(PropBag As PropertyBag)
     PropBag.WriteProperty "BackColor", mEdit.Backcolor, RGB(255, 255, 255)
-    PropBag.WriteProperty "Content", mEdit.text, Extender.name
+    PropBag.WriteProperty "Content", mEdit.Text, Extender.name
     PropBag.WriteProperty "ForeColor", mEdit.ForeColor
     PropBag.WriteProperty "BorderColor", aline.Bordercolor
     PropBag.WriteProperty "Alignment", mEdit.Alignment

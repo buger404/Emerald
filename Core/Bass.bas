@@ -1,4 +1,5 @@
 Attribute VB_Name = "Bass"
+' BASS
 ' BASS 2.4 Visual Basic module
 
 ' NOTE: VB does not support 64-bit integers, so VB users only have access
@@ -145,7 +146,7 @@ Global Const DSCAPS_SECONDARY16BIT = 2048  ' 16 bit
 Type BASS_RECORDINFO
     flags As Long         ' device capabilities (DSCCAPS_xxx flags)
     formats As Long       ' supported standard formats (WAVE_FORMAT_xxx flags)
-    inputs As Long        ' number of inputs
+    Inputs As Long        ' number of inputs
     singlein As Long      ' BASSTRUE = only 1 input can be set at a time
     freq As Long          ' current input rate
 End Type
@@ -171,7 +172,7 @@ Global Const WAVE_FORMAT_4S16 = &H800        ' 44.1   kHz, Stereo, 16-bit
 ' Sample info structure
 Type BASS_SAMPLE
     freq As Long          ' default playback rate
-    volume As Single      ' default volume (0-100)
+    Volume As Single      ' default volume (0-100)
     pan As Single         ' default pan (-100=left, 0=middle, 100=right)
     flags As Long         ' BASS_SAMPLE_xxx flags
     length As Long        ' length (in samples, not bytes)
@@ -473,7 +474,7 @@ End Type
 ' Binary APEv2 tag structure
 Type TAG_APE_BINARY
     Key As Long
-    data As Long
+    Data As Long
     length As Long
 End Type
 
@@ -626,7 +627,7 @@ Declare Function BASS_GetConfigPtr Lib "bass.dll" (ByVal opt As Long) As Long
 Declare Function BASS_GetVersion Lib "bass.dll" () As Long
 Declare Function BASS_ErrorGetCode Lib "bass.dll" () As Long
 Declare Function BASS_GetDeviceInfo Lib "bass.dll" (ByVal device As Long, ByRef Info As BASS_DEVICEINFO) As Long
-Declare Function BASS_Init Lib "bass.dll" (ByVal device As Long, ByVal freq As Long, ByVal flags As Long, ByVal win As Long, ByVal clsid As Long) As Long
+Declare Function BASS_Init Lib "bass.dll" (ByVal device As Long, ByVal freq As Long, ByVal flags As Long, ByVal Win As Long, ByVal clsid As Long) As Long
 Declare Function BASS_SetDevice Lib "bass.dll" (ByVal device As Long) As Long
 Declare Function BASS_GetDevice Lib "bass.dll" () As Long
 Declare Function BASS_Free Lib "bass.dll" () As Long
@@ -637,7 +638,7 @@ Declare Function BASS_GetCPU Lib "bass.dll" () As Single
 Declare Function BASS_Start Lib "bass.dll" () As Long
 Declare Function BASS_Stop Lib "bass.dll" () As Long
 Declare Function BASS_Pause Lib "bass.dll" () As Long
-Declare Function BASS_SetVolume Lib "bass.dll" (ByVal volume As Single) As Long
+Declare Function BASS_SetVolume Lib "bass.dll" (ByVal Volume As Single) As Long
 Declare Function BASS_GetVolume Lib "bass.dll" () As Single
 
 Declare Function BASS_PluginLoad Lib "bass.dll" (ByVal filename As String, ByVal flags As Long) As Long
@@ -682,8 +683,8 @@ Declare Function BASS_RecordGetDevice Lib "bass.dll" () As Long
 Declare Function BASS_RecordFree Lib "bass.dll" () As Long
 Declare Function BASS_RecordGetInfo Lib "bass.dll" (ByRef Info As BASS_RECORDINFO) As Long
 Declare Function BASS_RecordGetInputName Lib "bass.dll" (ByVal inputn As Long) As Long
-Declare Function BASS_RecordSetInput Lib "bass.dll" (ByVal inputn As Long, ByVal flags As Long, ByVal volume As Single) As Long
-Declare Function BASS_RecordGetInput Lib "bass.dll" (ByVal inputn As Long, ByRef volume As Single) As Long
+Declare Function BASS_RecordSetInput Lib "bass.dll" (ByVal inputn As Long, ByVal flags As Long, ByVal Volume As Single) As Long
+Declare Function BASS_RecordGetInput Lib "bass.dll" (ByVal inputn As Long, ByRef Volume As Single) As Long
 Declare Function BASS_RecordStart Lib "bass.dll" (ByVal freq As Long, ByVal chans As Long, ByVal flags As Long, ByVal proc As Long, ByVal user As Long) As Long
 
 Declare Function BASS_ChannelBytes2Seconds64 Lib "bass.dll" Alias "BASS_ChannelBytes2Seconds" (ByVal handle As Long, ByVal Pos As Long, ByVal poshigh As Long) As Double
@@ -701,7 +702,7 @@ Declare Function BASS_ChannelStop Lib "bass.dll" (ByVal handle As Long) As Long
 Declare Function BASS_ChannelPause Lib "bass.dll" (ByVal handle As Long) As Long
 Declare Function BASS_ChannelSetAttribute Lib "bass.dll" (ByVal handle As Long, ByVal attrib As Long, ByVal value As Single) As Long
 Declare Function BASS_ChannelGetAttribute Lib "bass.dll" (ByVal handle As Long, ByVal attrib As Long, ByRef value As Single) As Long
-Declare Function BASS_ChannelSlideAttribute Lib "bass.dll" (ByVal handle As Long, ByVal attrib As Long, ByVal value As Single, ByVal Time As Long) As Long
+Declare Function BASS_ChannelSlideAttribute Lib "bass.dll" (ByVal handle As Long, ByVal attrib As Long, ByVal value As Single, ByVal time As Long) As Long
 Declare Function BASS_ChannelIsSliding Lib "bass.dll" (ByVal handle As Long, ByVal attrib As Long) As Long
 Declare Function BASS_ChannelSet3DAttributes Lib "bass.dll" (ByVal handle As Long, ByVal Mode As Long, ByVal min As Single, ByVal max As Single, ByVal iangle As Long, ByVal oangle As Long, ByVal outvol As Single) As Long
 Declare Function BASS_ChannelGet3DAttributes Lib "bass.dll" (ByVal handle As Long, ByRef Mode As Long, ByRef min As Single, ByRef max As Single, ByRef iangle As Long, ByRef oangle As Long, ByRef outvol As Single) As Long
@@ -804,7 +805,7 @@ Sub DOWNLOADPROC(ByVal buffer As Long, ByVal length As Long, ByVal user As Long)
     
 End Sub
 
-Sub SYNCPROC(ByVal handle As Long, ByVal channel As Long, ByVal data As Long, ByVal user As Long)
+Sub SYNCPROC(ByVal handle As Long, ByVal channel As Long, ByVal Data As Long, ByVal user As Long)
     
     'CALLBACK FUNCTION !!!
     

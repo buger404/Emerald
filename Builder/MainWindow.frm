@@ -43,7 +43,7 @@ Begin VB.Form MainWindow
       forecolor       =   8422784
       bordercolor     =   13556506
       alignment       =   0
-      lockinput       =   0   'False
+      lockinput       =   0
    End
    Begin Emerald_Builder.EButton Buttons 
       Height          =   420
@@ -112,8 +112,10 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+'Emerald Ïà¹Ø´úÂë
+
 Public Key As Integer
-Public Sub NewDialog(t As String, c As String, Pic As String, InputMode As Boolean, B())
+Public Sub NewDialog(t As String, c As String, Pic As String, InputMode As Boolean, b())
     Key = 0
     PicBox.Visible = (Pic <> "")
     
@@ -128,12 +130,12 @@ Public Sub NewDialog(t As String, c As String, Pic As String, InputMode As Boole
     
     InputBox.Visible = InputMode
     
-    For i = 0 To UBound(B)
+    For i = 0 To UBound(b)
         Load Buttons(Buttons.UBound + 1)
         With Buttons(Buttons.UBound)
-            .Content = B(i)
+            .Content = b(i)
             .Top = Buttons(0).Top
-            .Left = Me.ScaleWidth - (20 + Buttons(0).Width) * (UBound(B) - i + 1) - 10
+            .Left = Me.ScaleWidth - (20 + Buttons(0).Width) * (UBound(b) - i + 1) - 10
             .Width = Buttons(0).Width
             .Height = Buttons(0).Height
             .Visible = True
@@ -148,3 +150,6 @@ Private Sub Buttons_Click(Index As Integer)
     Me.Hide
 End Sub
 
+Private Sub Form_Load()
+
+End Sub

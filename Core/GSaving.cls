@@ -11,6 +11,8 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'Emerald Ïà¹Ø´úÂë
+
 Private Type SaveData
     name As String
     value As String
@@ -20,14 +22,14 @@ Private Type SaveFile
     Data() As SaveData
 End Type
 Dim MySave As SaveFile
-Public sToken As Boolean, path As String
+Public sToken As Boolean, Path As String
 '========================================================
 '   Init
     Public Function Create(name As String, displayname As String) As Boolean
-        path = "C:\Users\" & CreateObject("Wscript.Network").Username & "\AppData\Local\" & name
+        Path = "C:\Users\" & CreateObject("Wscript.Network").Username & "\AppData\Local\" & name
         
         ReDim MySave.Data(0)
-        If Dir(path & "\", vbDirectory) = "" Then
+        If Dir(Path & "\", vbDirectory) = "" Then
             If name <> "Emerald.Core" Then
                 SysPage.Index = 0: SysPage.Key = 0
                 Dim Win As Object
@@ -38,13 +40,13 @@ Public sToken As Boolean, path As String
                 Loop
                 Unload Win
                 
-                If SysPage.Key = 1 Then MkDir path & "\"
+                If SysPage.Key = 1 Then MkDir Path & "\"
             Else
-                MkDir path & "\"
+                MkDir Path & "\"
             End If
         Else
-            If Dir(path & "\save") <> "" Then
-                Open path & "\save" For Binary As #1
+            If Dir(Path & "\save") <> "" Then
+                Open Path & "\save" For Binary As #1
                 Get #1, , MySave
                 Close #1
                 Call CheckSave
@@ -81,7 +83,7 @@ Public sToken As Boolean, path As String
     End Function
     Public Sub Save()
         If sToken = False Then Exit Sub
-        Open path & "\save" For Binary As #1
+        Open Path & "\save" For Binary As #1
         Put #1, , MySave
         Close #1
     End Sub

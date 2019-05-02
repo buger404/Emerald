@@ -11,6 +11,8 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'Emerald ฯเนุด๚ย๋
+
 Public Enum PlayState
     Stopped = 0
     Playing = 1

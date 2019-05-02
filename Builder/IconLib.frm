@@ -20,3 +20,8 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+'Emerald ฯเนุด๚ย๋
+
+Private Sub Form_Load()
+
+End Sub

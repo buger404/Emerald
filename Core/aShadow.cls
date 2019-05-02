@@ -11,6 +11,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'窗口阴影 - 从网路复制
 '*************************************************************************************************
 '* cShadow - cSelfSub based sample that creates a form shadow.
 '*
@@ -691,7 +692,7 @@ Private Sub sc_Terminate()
     If Not (z_Funk Is Nothing) Then                                             'Ensure that subclassing has been started 确保子类化已经启动
         With z_Funk
             For i = .Count To 1 Step -1                                         'Loop through the collection of window handles in reverse order 遍历集合用倒序的窗口句柄
-                z_ScMem = .item(i)                                              'Get the thunk address 铛的地址
+                z_ScMem = .Item(i)                                              'Get the thunk address 铛的地址
                 If IsBadCodePtr(z_ScMem) = 0 Then                               'Ensure that the thunk hasn't already released its memory 确保铛没有已经发布了记忆
                     sc_UnSubclass zData(IDX_HWND)                               'UnSubclass
                 End If

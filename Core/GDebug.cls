@@ -11,6 +11,8 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'Emerald ฯเนุด๚ย๋
+
 Public Page As GPage, GW As Long, GH As Long
 Public Sub Update()
     On Error Resume Next

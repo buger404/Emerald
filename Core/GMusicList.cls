@@ -11,9 +11,11 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'Emerald Ïà¹Ø´úÂë
+
 Private Type MusicL
     name As String
-    music As GMusic
+    Music As GMusic
 End Type
 Dim List() As MusicL
 '========================================================
@@ -30,8 +32,8 @@ Dim List() As MusicL
         
         Do While file <> ""
             ReDim Preserve List(UBound(List) + 1)
-            Set List(UBound(List)).music = New GMusic
-            List(UBound(List)).music.Create folder & file
+            Set List(UBound(List)).Music = New GMusic
+            List(UBound(List)).Music.Create folder & file
             List(UBound(List)).name = file
             file = Dir()
         Loop
@@ -40,7 +42,7 @@ Dim List() As MusicL
 '   Play
     Public Sub Play(name As String)
         For i = 1 To UBound(List)
-            If List(i).name = name Then List(i).music.Play: Exit For
+            If List(i).name = name Then List(i).Music.Play: Exit For
         Next
     End Sub
 '========================================================
