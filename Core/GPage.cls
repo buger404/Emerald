@@ -38,7 +38,7 @@ Private Type GDA
     h As Long
 End Type
 Private Type AniTask
-    start As Long
+    Start As Long
     during As Long
     custom As Boolean
     func As String
@@ -96,7 +96,7 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
         Dim i As Integer
         For i = 1 To UBound(Anis)
             If Not Anis(i).mark Then
-                If (GetTickCount - Anis(i).start - Anis(i).delay) > Anis(i).during Then
+                If (GetTickCount - Anis(i).Start - Anis(i).delay) > Anis(i).during Then
                      CallByName DrawBox, "AnimationDone", VbMethod, i
                     Anis(i).mark = True
                 End If
@@ -226,7 +226,7 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
         If animation <> 0 Then
             If Not Anis(animation).mark Then
                 Dim pro As Single
-                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).start - Anis(animation).delay) / Anis(animation).during)
+                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).Start - Anis(animation).delay) / Anis(animation).during)
                 
                 If Anis(animation).custom Then
                     CallByName DrawBox, Anis(animation).func, VbMethod, X, Y, w, h, 0, pro
@@ -279,7 +279,7 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
         Dim b As BLENDFUNCTION, Index As Integer, bl As Long
         
         If animation <> 0 Then
-            If (GetTickCount - Anis(animation).start) > Anis(animation).during Then animation = 0
+            If (GetTickCount - Anis(animation).Start) > Anis(animation).during Then animation = 0
         End If
         
         If Not IsMissing(Alpha) Then
@@ -318,7 +318,7 @@ setAlpha:
         If animation <> 0 Then
             If Not Anis(animation).mark Then
                 Dim pro As Single
-                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, ((GetTickCount - Anis(animation).start - Anis(animation).delay) / Anis(animation).during))
+                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, ((GetTickCount - Anis(animation).Start - Anis(animation).delay) / Anis(animation).during))
                 
                 If Anis(animation).custom Then
                     CallByName DrawBox, Anis(animation).func, VbMethod, X, Y, cw, ch, Alpha, pro
@@ -387,7 +387,7 @@ setAlpha:
         If animation <> 0 Then
             If Not Anis(animation).mark Then
                 Dim pro As Single, co(3) As Byte, al As Single
-                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).start - Anis(animation).delay) / Anis(animation).during)
+                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).Start - Anis(animation).delay) / Anis(animation).during)
                 CopyMemory co(0), Color, 4
                 al = co(3): al = al / 255
                 
@@ -429,7 +429,7 @@ setAlpha:
         If animation <> 0 Then
             If Not Anis(animation).mark Then
                 Dim pro As Single, co(3) As Byte, al As Single
-                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).start - Anis(animation).delay) / Anis(animation).during)
+                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).Start - Anis(animation).delay) / Anis(animation).during)
                 CopyMemory co(0), Color, 4
                 al = co(3): al = al / 255
                 
@@ -495,6 +495,66 @@ ReShape:
             GdipDrawRectangle GG, Pen, X, Y, w - 1, h - 1
         End If
     End Sub
+    Public Sub PaintArc(X As Long, Y As Long, w As Long, h As Long, Degree As Long, Optional Start As Long = 0, Optional Color As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional Pos As PosAlign = posNormal, Optional animation As Integer = 0)
+        'style:0=fill,1=border,2=sector
+        If ScrollMode Then
+            X = X + ScrollX + ScrollBX: Y = Y + ScrollY + ScrollBY
+            Dim Ret As Long
+            GdipIsVisibleRect GG, X - 1, Y - 1, w, h, Ret
+            If Not Ret Then OutOfScroll = True: Exit Sub
+        End If
+        
+        If animation <> 0 Then
+            If Not Anis(animation).mark Then
+                Dim pro As Single, co(3) As Byte, al As Single
+                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).Start - Anis(animation).delay) / Anis(animation).during)
+                CopyMemory co(0), Color, 4
+                al = co(3): al = al / 255
+                
+                If Anis(animation).custom Then
+                    CallByName DrawBox, Anis(animation).func, VbMethod, X, Y, w, h, al, pro
+                Else
+                    CallByName EAni, Anis(animation).func, VbMethod, X, Y, w, h, al, pro
+                End If
+                Color = argb(al * 255, co(0), co(1), co(2))
+            End If
+        End If
+        
+        GdipResetPath Path
+        
+        If Pos = 1 Then X = Int(X - w / 2): Y = Int(Y - h / 2)
+        If Pos = 2 Then X = X - w
+        If Pos = 3 Then Y = Y - h
+        If Pos = 4 Then X = X + w
+        If Pos = 5 Then Y = Y + h
+        
+        GdipAddPathArc Path, X, Y, w, h, Start, Degree
+        If style = 2 Then GdipAddPathLine Path, X + w / 2, Y + w / 2, X + w / 2, Y + w / 2
+        If style = 0 Then GdipClosePathFigure Path
+        
+        If Color <> 0 Then
+            If style = 0 Or style = 2 Then GdipSetSolidFillColor brush, Color
+            If style = 1 Then
+                GdipSetPenColor Pen, Color
+                GdipSetPenWidth Pen, size
+            End If
+        End If
+        
+        If style = 0 Or style = 2 Then GdipFillPath GG, brush, Path
+        If style = 1 Then GdipDrawPath GG, Pen, Path
+        
+        With DrawF
+            .Left = X
+            .top = Y
+            .Right = w
+            .Bottom = h
+        End With
+        
+        If Debug_focus Then
+            GdipSetPenColor Pen, argb(255, 0, 255, 255)
+            GdipDrawRectangle GG, Pen, X, Y, w - 1, h - 1
+        End If
+    End Sub
 '========================================================
 '   Scroll
     Public Sub StartScroll(X As Long, Y As Long, w As Long, h As Long, sx As Long, sy As Long)
@@ -527,7 +587,7 @@ ReShape:
         NewAnimation = UBound(Anis)
     End Function
     Public Sub StartAnimation(id As Integer, Optional delay As Long = 0)
-        Anis(id).start = GetTickCount
+        Anis(id).Start = GetTickCount
         Anis(id).delay = delay
         Anis(id).mark = False
     End Sub

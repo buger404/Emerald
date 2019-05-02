@@ -5,6 +5,7 @@ Attribute VB_Name = "GCore"
 '   -修复更新问题和代码不可用问题
 '   -Paint添加Pos参数
 '   -添加PosAlign枚举
+'   -添加弧形，扇形的绘制
 '   更新内容(ver.501)
 '   -添加IsKeyUp
 '   -新增开场LOGO设置
