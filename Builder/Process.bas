@@ -2,7 +2,31 @@ Attribute VB_Name = "Process"
 'Emerald 相关代码
 
 Public Const Version As Long = 19050109
-Public VBIDEPath As String
+Public VBIDEPath As String, InstalledPath As String, IsUpdate As Boolean
+Public Sub CheckUpdate()
+    On Error GoTo errHandle
+    
+    Dim WSHShell As Object, temp As String
+    Set WSHShell = CreateObject("WScript.Shell")
+    
+    temp = WSHShell.RegRead("HKEY_CLASSES_ROOT\Directory\shell\emerald\version")
+    IsUpdate = (Val(temp) = Version)
+    
+errHandle:
+    
+End Sub
+Public Sub GetInstalledPath()
+    On Error GoTo errHandle
+    
+    Dim WSHShell As Object, temp As String
+    Set WSHShell = CreateObject("WScript.Shell")
+    
+    temp = WSHShell.RegRead("HKEY_CLASSES_ROOT\Directory\shell\emerald\icon")
+    InstalledPath = Replace(temp, """", "")
+    
+errHandle:
+    
+End Sub
 Public Sub GetVBIDEPath()
     On Error GoTo errHandle
     
@@ -107,8 +131,18 @@ Sub CheckVersion()
         End If
     End If
 End Sub
+Sub Repair()
+    If Dir(InstalledPath) = "" Then
+        If Dialog("修复", "发现旧的Emerald已经被删除，重新安装吗？", "好的", "不要！") <> 1 Then End
+        Call Setup
+        End
+    End If
+End Sub
 Sub Main()
+    Call CheckUpdate
     Call GetVBIDEPath
+    Call GetInstalledPath
+    Call Repair
     
     If Command$ <> "" Then
         Dim appn As String, f As String, t As String, p As String
@@ -134,7 +168,7 @@ Sub Main()
                 If nList = vbCrLf Then
                     Dialog "工程更新", "我们已将最新的文件复制到你的文件夹中，本次没有新增的文件。", "好的"
                 Else
-                    Dialog "工程更新", "你的工程已经创建，我们已将最新的文件复制到你的文件夹中，你可以稍后引用它们。" & vbCrLf & vbCrLf & "注意：以下是更新Emerald后新增的文件，需要你手动引用（位于目录下的Core文件夹）：" & vbCrLf & nList, "收到！"
+                    Dialog "工程更新", "你的工程已经创建，" & vbCrLf & "我们已将最新的文件复制到你的文件夹中，你可以稍后引用它们。" & vbCrLf & vbCrLf & "注意：以下是更新Emerald后新增的文件，需要你手动引用" & vbCrLf & "（位于目录下的Core文件夹）：" & vbCrLf & nList, "收到！"
                 End If
                 GoTo SkipName
             Else
@@ -174,23 +208,14 @@ SkipName:
         Close #1
         
     Else
-        Dim exeP As String, sh As String
-        exeP = """" & App.Path & "\Builder.exe" & """"
-        Set WSHShell = CreateObject("WScript.Shell")
-        
-        On Error GoTo FailRead
-        sh = WSHShell.RegRead("HKEY_CLASSES_ROOT\Directory\shell\emerald\version")
-FailRead:
         
         On Error GoTo FailOper
         
-        If sh <> "" Then
-            If Val(sh) = Version Then
-                Call Uninstall
-                End
-            Else
-                If Dialog("更新可用", "按下确定后更新你的 Emerald Builder .", "确定", "取消") <> 1 Then Exit Sub
-            End If
+        If Not IsUpdate Then
+            Call Uninstall
+            End
+        Else
+            If Dialog("更新可用", "按下确定后更新你的 Emerald Builder .", "确定", "取消") <> 1 Then Exit Sub
         End If
         
         Call Setup
