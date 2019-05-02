@@ -4,6 +4,7 @@ Attribute VB_Name = "GCore"
 '   更新内容(ver.502)
 '   -修复更新问题和代码不可用问题
 '   -Paint添加Pos参数
+'   -添加PosAlign枚举
 '   更新内容(ver.501)
 '   -添加IsKeyUp
 '   -新增开场LOGO设置
@@ -93,6 +94,14 @@ Attribute VB_Name = "GCore"
         mMouseIn = 1
         mMouseDown = 2
         mMouseUp = 3
+    End Enum
+    Public Enum PosAlign
+        posNormal = 0
+        posOnCenter = 1
+        posOnLeft = 2
+        posOnTop = 3
+        posOnRight = 4
+        posOnBottom = 5
     End Enum
     Public Enum TranslationKind
         transFadeIn = 0

@@ -220,7 +220,7 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
         NewGM DC, 0, temp(UBound(temp)), w, h, temp(UBound(temp) - 1)
         Mems(UBound(Mems)).ImgHwnd = i
     End Sub
-    Public Sub DrawImageEx(n, X As Long, Y As Long, Optional w, Optional h, Optional Pos As Integer = 0, Optional animation As Integer = 0)
+    Public Sub DrawImageEx(n, X As Long, Y As Long, Optional w, Optional h, Optional Pos As PosAlign = posNormal, Optional animation As Integer = 0)
         Dim Index As Integer
         
         If animation <> 0 Then
@@ -273,7 +273,7 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
             GdipDrawRectangle GG, Pen, X, Y, w - 1, h - 1
         End If
     End Sub
-    Public Sub DrawImage(n, X As Long, Y As Long, Optional cx, Optional cy, Optional cw, Optional ch, Optional Alpha, Optional Pos As Integer = 0, Optional animation As Integer = 0)
+    Public Sub DrawImage(n, X As Long, Y As Long, Optional cx, Optional cy, Optional cw, Optional ch, Optional Alpha, Optional Pos As PosAlign = posNormal, Optional animation As Integer = 0)
         'If OutOfScroll Then Exit Sub
         
         Dim b As BLENDFUNCTION, Index As Integer, bl As Long
@@ -415,7 +415,7 @@ setAlpha:
     End Sub
 '========================================================
 '   Shape
-    Public Sub Paint(ByVal shape As Integer, X As Long, Y As Long, w As Long, h As Long, Optional Color As Long, Optional Radius As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional Pos As Integer = 0, Optional animation As Integer = 0)
+    Public Sub Paint(ByVal shape As Integer, X As Long, Y As Long, w As Long, h As Long, Optional Color As Long, Optional Radius As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional Pos As PosAlign = posNormal, Optional animation As Integer = 0)
         'shape:0=rect,1=ellipse,2=rectr
         'style:0=fill,1=border
         'If OutOfScroll Then Exit Sub
