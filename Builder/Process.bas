@@ -1,7 +1,7 @@
 Attribute VB_Name = "Process"
 'Emerald ฯเนุด๚ย๋
 
-Public Const Version As Long = 19050208
+Public Const Version As Long = 19050307
 Public VBIDEPath As String, InstalledPath As String, IsUpdate As Boolean
 Public Sub CheckUpdate()
     On Error GoTo errHandle

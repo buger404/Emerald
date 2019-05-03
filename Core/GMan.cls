@@ -126,7 +126,12 @@ skipPage:
         
         If GetTickCount - FPSt >= 1000 Then
             FPSt = GetTickCount: FPS = tFPS: tFPS = 0
-            If FPS < 20 And (Not FPSWarn) Then FPSWarn = True: Suggest "FPS¹ýµÍÁËàÞ£¡ÄãÊÇÏëÒªÈÃÍæ¼ÒÍæPPTÂï£¡"
+            If FPS < 20 Then
+                If FPSWarn < 10 Then FPSWarn = FPSWarn + 1
+                If FPSWarn = 10 Then Suggest "FPS¹ýµÍÁËàÞ£¡ÄãÊÇÏëÒªÈÃÍæ¼ÒÍæPPTÂï£¡": FPSWarn = FPSWarn + 1
+            ElseIf FPSWarn <> 0 Then
+                FPSWarn = 0
+            End If
             FPSct = FPSctt: FPSctt = 0
         End If
         

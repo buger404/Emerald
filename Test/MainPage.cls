@@ -14,6 +14,7 @@ Attribute VB_Exposed = False
 '======================================
 '   页面绘制器
     Dim Page As GPage, Music As GMusic
+    Dim test As Boolean
 '======================================
 
 Public Sub Update()
@@ -32,7 +33,7 @@ Public Sub Update()
     Page.Paint 1, GW / 2 - 256 / 2, GH / 2 - 256 / 2, 256, 256, argb(255, 222, 222, 222)
     pro = MapTotal / 100000
     If pro > 1 Then pro = 1
-    Page.PaintArc GW / 2 - 256 / 2, GH / 2 - 256 / 2, 256, 256, pro * 360, Color:=argb(255, 0, 176, 240), size:=3, Style:=1
+    Page.PaintArc GW / 2 - 256 / 2, GH / 2 - 256 / 2, 256, 256, pro * 360, Color:=argb(255, 0, 176, 240), Size:=3, Style:=1
     Page.Paint 1, GW / 2 - 256 / 2, GH / 2 - 256 / 2, 256, 256, argb(255 * pro, 0, 176, 240)
 
     For i = 0 To 20
@@ -76,6 +77,7 @@ Private Sub Class_Initialize()
     Page.Create Me
     '导入游戏资源
     Page.NewImages App.Path & "\assets"
+    Page.NewImages App.Path & "\assets\debug"
     '创建页面
     ECore.Add Page, "MainPage"
     
