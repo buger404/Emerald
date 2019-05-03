@@ -15,22 +15,6 @@ Attribute VB_Exposed = False
 
 Private Declare Function CLSIDFromString Lib "ole32.dll" (ByVal lpszProgID As Long, pCLSID As clsid) As Long
 Private Declare Sub AlphaBlend Lib "msimg32.dll" (ByVal hdcDest As Long, ByVal nXOriginDest As Long, ByVal nYOriginDest As Long, ByVal nWidthDest As Long, ByVal hHeightDest As Long, ByVal hdcSrc As Long, ByVal nXOriginSrc As Long, ByVal nYOriginSrc As Long, ByVal nWidthSrc As Long, ByVal nHeightSrc As Long, ByVal BLENDFUNCTION As Long) ' As Long
-Private Type GGIF
-    time As Long
-    frames() As Long
-    tick As Long
-    Count As Long
-End Type
-Private Type GMem
-    GIF As GGIF
-    kind As Integer
-    Hwnd As Long
-    ImgHwnd As Long
-    name As String
-    folder As String
-    w As Long
-    h As Long
-End Type
 Private Type GDA
     X As Long
     Y As Long
@@ -73,17 +57,19 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
         GdipDeletePen Pen
         GdipDeletePath Path
         For i = 1 To UBound(Mems)
-            Select Case Mems(i).kind
-                Case 0 'DC
-                    DeleteObject Mems(i).Hwnd
-                    GdipDisposeImage Mems(i).ImgHwnd
-                Case 1 'Graphics
-                    GdipDeleteGraphics Mems(i).Hwnd
-            End Select
-            If Mems(i).GIF.Count > 0 Then
-                For s = 0 To Mems(i).GIF.Count
-                    DeleteObject Mems(i).GIF.frames(s)
-                Next
+            If Not Mems(i).copyed Then
+                Select Case Mems(i).kind
+                    Case 0 'DC
+                        DeleteObject Mems(i).Hwnd
+                        GdipDisposeImage Mems(i).ImgHwnd
+                    Case 1 'Graphics
+                        GdipDeleteGraphics Mems(i).Hwnd
+                End Select
+                If Mems(i).GIF.Count > 0 Then
+                    For s = 0 To Mems(i).GIF.Count
+                        DeleteObject Mems(i).GIF.frames(s)
+                    Next
+                End If
             End If
         Next
     End Sub
@@ -128,21 +114,21 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
         ImgCount = UBound(Mems)
     End Property
     Public Property Get ImgSize(n, sizeIndex As imgIndex)
-        Dim Index As Integer
+        Dim index As Integer
         
         If TypeName(n) = "String" Then
-            Index = GetImage(n)
+            index = GetImage(n)
         Else
-            Index = n
+            index = n
         End If
     
         Select Case sizeIndex
             Case 0
-                ImgSize = Mems(Index).w
+                ImgSize = Mems(index).w
             Case 1
-                ImgSize = Mems(Index).h
+                ImgSize = Mems(index).h
             Case 2
-                ImgSize = Mems(Index).GIF.Count
+                ImgSize = Mems(index).GIF.Count
         End Select
     End Property
 '========================================================
@@ -151,14 +137,30 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
         Dim f As String, c As Long
         If Right(Path, 1) <> "\" Then Path = Path & "\"
         
+        Dim index As Integer, Tree As AssetsTree
+        Tree.Path = Path: ReDim Tree.Files(0)
+        index = FindAssetsTree(Path)
+        
         f = Dir(Path)
         Do While f <> ""
             c = c + 1
+            ReDim Preserve Tree.Files(UBound(Tree.Files) + 1)
             f = Dir()
         Loop
-        PreLoadCount = PreLoadCount + c
+        If index = 0 Then
+            PreLoadCount = PreLoadCount + c
+        Else
+            Tree = GetAssetsTree(Path)
+            For i = 1 To UBound(Tree.Files)
+                ReDim Preserve Mems(UBound(Mems) + 1)
+                Mems(UBound(Mems)) = Tree.Files(i)
+                Mems(UBound(Mems)).copyed = True
+            Next
+            Exit Sub
+        End If
         
         f = Dir(Path)
+        i = 1
         Do While f <> ""
             If IsMissing(arg1) Then
                 newImage Path & f
@@ -167,10 +169,14 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
             Else
                 newImage Path & f, arg1, arg2
             End If
+            Tree.Files(i) = Mems(UBound(Mems))
+            i = i + 1
             f = Dir()
             DoEvents
             LoadedCount = LoadedCount + 1
         Loop
+        
+        If index = 0 Then AddAssetsTree Tree
     End Sub
     Public Sub newImage(Path As String, Optional arg1, Optional arg2)
         'when arg1 is missing ; i.w = i.w
@@ -187,7 +193,7 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
         If si = 1 Then w = Round(w * arg1): h = Round(h * arg1)
         If si = 2 Then w = arg1: h = arg2
         
-        Dim gC As clsid, gL As Long, Index As Long, temp() As String
+        Dim gC As clsid, gL As Long, index As Long, temp() As String
         CLSIDFromString StrPtr("{6AEDBD6D-3FB5-418A-83A6-7F45229DC872}"), gC
         GdipImageGetFrameCount i, gC, gL
         If gL > 0 Then  '¶¯Ì¬GIFÖ§³Ö
@@ -196,13 +202,13 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
             With Mems(UBound(Mems))
                 .GIF.Count = gL
                 ReDim .GIF.frames(gL)
-                For Index = 0 To gL
-                    GdipImageSelectActiveFrame i, gC, Index
+                For index = 0 To gL
+                    GdipImageSelectActiveFrame i, gC, index
                     DC = CreateCDC(w, h)
                     GdipCreateFromHDC DC, g
                     GdipDrawImageRect g, i, 0, 0, w, h
                     GdipDeleteGraphics g
-                    .GIF.frames(Index) = DC
+                    .GIF.frames(index) = DC
                 Next
             End With
             
@@ -221,7 +227,7 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
         Mems(UBound(Mems)).ImgHwnd = i
     End Sub
     Public Sub DrawImageEx(n, X As Long, Y As Long, Optional w, Optional h, Optional Pos As PosAlign = posNormal, Optional animation As Integer = 0)
-        Dim Index As Integer
+        Dim index As Integer
         
         If animation <> 0 Then
             If Not Anis(animation).mark Then
@@ -238,13 +244,13 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
         End If
         
         If TypeName(n) = "String" Then
-            Index = GetImage(n)
+            index = GetImage(n)
         Else
-            Index = n
+            index = n
         End If
         
-        If IsMissing(w) Then GdipGetImageWidth Mems(Index).ImgHwnd, w
-        If IsMissing(h) Then GdipGetImageWidth Mems(Index).ImgHwnd, h
+        If IsMissing(w) Then GdipGetImageWidth Mems(index).ImgHwnd, w
+        If IsMissing(h) Then GdipGetImageWidth Mems(index).ImgHwnd, h
         
         If Pos = 1 Then X = Int(X - w / 2): Y = Int(Y - h / 2)
         If Pos = 2 Then X = X - w
@@ -259,7 +265,7 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
             If Not Ret Then OutOfScroll = True: Exit Sub
         End If
         
-        GdipDrawImageRect GG, Mems(Index).ImgHwnd, X, Y, w, h
+        GdipDrawImageRect GG, Mems(index).ImgHwnd, X, Y, w, h
         
         With DrawF
             .Left = X
@@ -276,7 +282,7 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
     Public Sub DrawImage(n, X As Long, Y As Long, Optional cx, Optional cy, Optional cw, Optional ch, Optional Alpha, Optional Pos As PosAlign = posNormal, Optional animation As Integer = 0)
         'If OutOfScroll Then Exit Sub
         
-        Dim b As BLENDFUNCTION, Index As Integer, bl As Long
+        Dim b As BLENDFUNCTION, index As Integer, bl As Long
         
         If animation <> 0 Then
             If (GetTickCount - Anis(animation).Start) > Anis(animation).during Then animation = 0
@@ -299,15 +305,15 @@ setAlpha:
         End If
         
         If TypeName(n) = "String" Then
-            Index = GetImage(n)
+            index = GetImage(n)
         Else
-            Index = n
+            index = n
         End If
         
         If IsMissing(cx) Then cx = 0
         If IsMissing(cy) Then cy = 0
-        If IsMissing(cw) Then cw = Mems(Index).w - cx
-        If IsMissing(ch) Then ch = Mems(Index).h - cy
+        If IsMissing(cw) Then cw = Mems(index).w - cx
+        If IsMissing(ch) Then ch = Mems(index).h - cy
         
         If Pos = 1 Then X = Int(X - cw / 2): Y = Int(Y - ch / 2)
         If Pos = 2 Then X = X - cw
@@ -340,12 +346,12 @@ setAlpha:
         End If
         
         Dim srcDC As Long
-        If Mems(Index).GIF.Count = 0 Then
-            srcDC = Mems(Index).Hwnd
+        If Mems(index).GIF.Count = 0 Then
+            srcDC = Mems(index).Hwnd
         Else
-            If GetTickCount - Mems(Index).GIF.time >= GTick Then Mems(Index).GIF.tick = Mems(Index).GIF.tick + 1
-            If Mems(Index).GIF.tick > Mems(Index).GIF.Count Then Mems(Index).GIF.tick = 0
-            srcDC = Mems(Index).GIF.frames(Mems(Index).GIF.tick)
+            If GetTickCount - Mems(index).GIF.time >= GTick Then Mems(index).GIF.tick = Mems(index).GIF.tick + 1
+            If Mems(index).GIF.tick > Mems(index).GIF.Count Then Mems(index).GIF.tick = 0
+            srcDC = Mems(index).GIF.frames(Mems(index).GIF.tick)
         End If
         
         If IsMissing(Alpha) Then

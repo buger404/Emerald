@@ -43,6 +43,27 @@ Attribute VB_Name = "GCore"
         transHighLight = 10
         transFallDark = 11
     End Enum
+    Public Type GGIF
+        time As Long
+        frames() As Long
+        tick As Long
+        Count As Long
+    End Type
+    Public Type GMem
+        GIF As GGIF
+        kind As Integer
+        Hwnd As Long
+        ImgHwnd As Long
+        name As String
+        folder As String
+        w As Long
+        h As Long
+        copyed As Boolean
+    End Type
+    Public Type AssetsTree
+        Files() As GMem
+        Path As String
+    End Type
     Public ECore As GMan, EF As GFont, EAni As Object, ESave As GSaving
     Public GHwnd As Long, GDC As Long, GW As Long, GH As Long
     Public Mouse As MState, DrawF As RECT
@@ -50,6 +71,7 @@ Attribute VB_Name = "GCore"
     Public SysPage As GSysPage
     Public PreLoadCount As Long, LoadedCount As Long
     Public Const Version As Long = 19050208
+    Dim AssetsTrees() As AssetsTree
     Dim LastKeyUpRet As Boolean
     Dim Wndproc As Long
 '========================================================
@@ -59,6 +81,8 @@ Attribute VB_Name = "GCore"
         If DebugMode Then
             If App.LogMode <> 0 Then MsgBox "错误：生成时未关闭Debug模式。": End
         End If
+        
+        ReDim AssetsTrees(0)
         
         InitGDIPlus
         BASS_Init -1, 44100, BASS_DEVICE_3D, Hwnd, 0
@@ -176,7 +200,7 @@ sth:
         CreateCDC = DC
     End Function
     Public Sub PaintDC(DC As Long, destDC As Long, Optional X As Long = 0, Optional Y As Long = 0, Optional cx As Long = 0, Optional cy As Long = 0, Optional cw, Optional ch, Optional Alpha)
-        Dim b As BLENDFUNCTION, Index As Integer, bl As Long
+        Dim b As BLENDFUNCTION, index As Integer, bl As Long
         
         If Not IsMissing(Alpha) Then
             If Alpha < 0 Then Alpha = 0
@@ -291,4 +315,20 @@ sth:
             Debug.Print Now, "Emerald：上次检查更新时间 " & CDate(Data.GetData("UpdateTime"))
         End If
     End Sub
+'========================================================
+'   AssetsTree
+    Public Function AddAssetsTree(Tree As AssetsTree)
+        ReDim Preserve AssetsTrees(UBound(AssetsTrees) + 1)
+        AssetsTrees(UBound(AssetsTrees)) = Tree
+    End Function
+    Public Function FindAssetsTree(Path As String) As Integer
+        For i = 1 To UBound(AssetsTrees)
+            If AssetsTrees(i).Path = Path Then FindAssetsTree = i: Exit For
+        Next
+    End Function
+    Public Function GetAssetsTree(Path As String) As AssetsTree
+        For i = 1 To UBound(AssetsTrees)
+            If AssetsTrees(i).Path = Path Then GetAssetsTree = AssetsTrees(i): Exit For
+        Next
+    End Function
 '========================================================
