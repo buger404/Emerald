@@ -1,62 +1,1 @@
-# Emerald
-面向游戏的轻量级绘图框架，仅限Visual Basic 6.0。
-
-# 支持
-最低：Visual Basic 6.0  
-最高：Visual Basic 6.0 (SP 6)
-
-# 组成
-# Page Manager
-管理```Pages```以及```过场特效```  
-# 创建
-```VBS
-Dim Manager As GMan  
-...
-Set Manager = New GMan
-```
-# 页面的设置
-```VBS
-Manager.ActivePage = "MyPage"
-```
-# 过场特效
-```VBS
-NewTransform [Transform ID],[During]  
-```
-Transform ID  
-- 0: Fade In
-- 1: Fade Out  
-- 2: To Right
-- 3: To Left
-- 4: To Top
-- 5: To Bottom
-- 6: To Right(Fade)
-- 7: To Left(Fade)
-- 8: To Top(Fade)
-- 9: To Bottom(Fade)
-- 10: High Light
-- 11: Fall Dark
-```VBS
-Manager.NewTransform 0,300
-```
-
-# Page
-你的游戏页面，通过`Page Manager`进行管理。
-# 创建
-```VBS
-Dim Page As GPage
-Public Sub Update()
-    ...
-End Sub
-...
-Private Sub Class_Initialize()
-    Set Page = New GPage
-    Page.Create Me
-    ...
-    ECore.Add Page, "MyPage" '加入到Page Manager
-End Sub
-```
-# 加入资源组
-从指定文件夹中加载所有图片文件
-```VBS
-Page.NewImages [path]
-```
+﻿# Emerald面向游戏的轻量级绘图框架，仅限Visual Basic 6.0。# 支持最低：Visual Basic 6.0  最高：Visual Basic 6.0 (SP 6)# 性能  常规配置下，最高FPS：1000（CPU占用率较高，对于平板、笔记本用户可能比较耗电）# 使用教程  正在努力编写中，请见“学习手册.docx”# 功能游戏页面分离，切换页面时支持伴随过场特效（11种预设）  支持直接绘制各种图片（包括动态图片）  支持绘制基本图形，文本，多边形，以及常规控件  支持图片透明度（快速绘制）  支持动画  鼠标检测，按键检测  安全存档和碰撞箱  封装Bass  支持启动LOGO，资源加载进度条，重复资源检测  支持使用Builder一键建立你的工程，并保持框架代码更新  为Visual Basic 6提供游戏页面模板  
