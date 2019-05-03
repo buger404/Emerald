@@ -1,7 +1,7 @@
 Attribute VB_Name = "Process"
 'Emerald 相关代码
 
-Public Const Version As Long = 19050307
+Public Const Version As Long = 19050308
 Public VBIDEPath As String, InstalledPath As String, IsUpdate As Boolean
 Public Sub CheckUpdate()
     On Error GoTo errHandle
@@ -132,6 +132,8 @@ Sub CheckVersion()
     End If
 End Sub
 Sub Repair()
+    If InstalledPath = "" Then Exit Sub
+    
     If Dir(InstalledPath) = "" Then
         If Dialog("修复", "发现旧的Emerald已经被删除，重新安装吗？", "好的", "不要！") <> 1 Then End
         Call Setup
@@ -211,11 +213,17 @@ SkipName:
         
         On Error GoTo FailOper
         
-        If Not IsUpdate Then
-            Call Uninstall
-            End
-        Else
-            If Dialog("更新可用", "按下确定后更新你的 Emerald Builder .", "确定", "取消") <> 1 Then Exit Sub
+        If InstalledPath <> "" Then
+            If (Not IsUpdate) Then
+                Call Uninstall
+                End
+            Else
+                If Dialog("更新可用", "按下确定后更新你的 Emerald Builder .", "确定", "取消") <> 1 Then Exit Sub
+            End If
+        End If
+        
+        If InstalledPath = "" Then
+            If Dialog("我来啦~", "现在安装 Emerald Builder 吗？", "是的", "我手残而已") <> 1 Then Exit Sub
         End If
         
         Call Setup

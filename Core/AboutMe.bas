@@ -46,6 +46,7 @@ Attribute VB_Name = "AboutMe"
 '   -重复资源检查
 '   -增加一点点建议
 '   -添加控件绘制
+'   -修复Builder安装错误的问题
 '   更新内容(ver.502)
 '   -修复更新问题和代码不可用问题
 '   -Paint添加Pos参数

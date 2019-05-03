@@ -7,8 +7,8 @@ Attribute VB_Name = "GCore"
     Public Type MState
         State As Integer
         button As Integer
-        x As Single
-        y As Single
+        X As Single
+        Y As Single
     End Type
     Public Enum imgIndex
         imgGetWidth = 0
@@ -71,7 +71,7 @@ Attribute VB_Name = "GCore"
     Public SysPage As GSysPage
     Public PreLoadCount As Long, LoadedCount As Long, ReLoadCount As Long
     Public FPSWarn As Long
-    Public Const Version As Long = 19050307
+    Public Const Version As Long = 19050308
     Dim AssetsTrees() As AssetsTree
     Dim LastKeyUpRet As Boolean
     Dim Wndproc As Long
@@ -206,8 +206,8 @@ sth:
         
         CreateCDC = DC
     End Function
-    Public Sub PaintDC(DC As Long, destDC As Long, Optional x As Long = 0, Optional y As Long = 0, Optional cx As Long = 0, Optional cy As Long = 0, Optional cw, Optional ch, Optional Alpha)
-        Dim b As BLENDFUNCTION, index As Integer, bl As Long
+    Public Sub PaintDC(DC As Long, destDC As Long, Optional X As Long = 0, Optional Y As Long = 0, Optional cx As Long = 0, Optional cy As Long = 0, Optional cw, Optional ch, Optional Alpha)
+        Dim b As BLENDFUNCTION, Index As Integer, bl As Long
         
         If Not IsMissing(Alpha) Then
             If Alpha < 0 Then Alpha = 0
@@ -225,9 +225,9 @@ sth:
         If IsMissing(ch) Then ch = GH - cy
         
         If IsMissing(Alpha) Then
-            BitBlt destDC, x, y, cw, ch, DC, cx, cy, vbSrcCopy
+            BitBlt destDC, X, Y, cw, ch, DC, cx, cy, vbSrcCopy
         Else
-            AlphaBlend destDC, x, y, cw, ch, DC, cx, cy, cw, ch, bl
+            AlphaBlend destDC, X, Y, cw, ch, DC, cx, cy, cw, ch, bl
         End If
     End Sub
     Function Cubic(t As Single, arg0 As Single, arg1 As Single, arg2 As Single, arg3 As Single) As Single
@@ -237,24 +237,24 @@ sth:
     End Function
 '========================================================
 '   Mouse
-    Public Sub UpdateMouse(x As Single, y As Single, State As Long, button As Integer)
+    Public Sub UpdateMouse(X As Single, Y As Single, State As Long, button As Integer)
         With Mouse
-            .x = x
-            .y = y
+            .X = X
+            .Y = Y
             .State = State
             .button = button
         End With
     End Sub
-    Public Function CheckMouse(x As Long, y As Long, w As Long, h As Long) As MButtonState
+    Public Function CheckMouse(X As Long, Y As Long, w As Long, h As Long) As MButtonState
         'Return Value:0=none,1=in,2=down,3=up
-        If Mouse.x >= x And Mouse.y >= y And Mouse.x <= x + w And Mouse.y <= y + h Then
+        If Mouse.X >= X And Mouse.Y >= Y And Mouse.X <= X + w And Mouse.Y <= Y + h Then
             CheckMouse = Mouse.State + 1
             If Mouse.State = 2 Then Mouse.State = 0
         End If
     End Function
     Public Function CheckMouse2() As MButtonState
         'Return Value:0=none,1=in,2=down,3=up
-        If Mouse.x >= DrawF.Left And Mouse.y >= DrawF.top And Mouse.x <= DrawF.Left + DrawF.Right And Mouse.y <= DrawF.top + DrawF.Bottom Then
+        If Mouse.X >= DrawF.Left And Mouse.Y >= DrawF.top And Mouse.X <= DrawF.Left + DrawF.Right And Mouse.Y <= DrawF.top + DrawF.Bottom Then
             CheckMouse2 = Mouse.State + 1
             If Mouse.State = 2 Then Mouse.State = 0
         End If
