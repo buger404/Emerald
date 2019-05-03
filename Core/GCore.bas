@@ -69,7 +69,8 @@ Attribute VB_Name = "GCore"
     Public Mouse As MState, DrawF As RECT
     Public FPS As Long, FPSt As Long, tFPS As Long, FPSct As Long, FPSctt As Long
     Public SysPage As GSysPage
-    Public PreLoadCount As Long, LoadedCount As Long
+    Public PreLoadCount As Long, LoadedCount As Long, ReLoadCount As Long
+    Public FPSWarn As Boolean
     Public Const Version As Long = 19050208
     Dim AssetsTrees() As AssetsTree
     Dim LastKeyUpRet As Boolean
@@ -105,6 +106,12 @@ Attribute VB_Name = "GCore"
         End If
         
         If App.LogMode = 0 Then Call CheckUpdate
+        
+        If ReLoadCount > LoadedCount Then Suggest "重复加载的资源数量太多啦！不考虑每个页面的资源单独一个文件夹放置吗？"
+        
+    End Sub
+    Public Sub Suggest(text As String)
+        Debug.Print Now, "Emeraldの建议：" & text
     End Sub
     Public Sub EndEmerald()
         If DebugMode Then

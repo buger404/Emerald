@@ -85,7 +85,7 @@ Public CDC As Long, ODC As Long, GG As Long, pB As Long
         
         If ECore Is Me Then
             If (Not FirstPlay) Then
-                FirstPlay = True: SysPage.OpenTime = GetTickCount: SysPage.Index = 1
+                FirstPlay = True: SysPage.OpenTime = GetTickCount: SysPage.index = 1
                 Call NewTransform
             End If
             If (Not SysPage.DoneMark) Then
@@ -126,6 +126,7 @@ skipPage:
         
         If GetTickCount - FPSt >= 1000 Then
             FPSt = GetTickCount: FPS = tFPS: tFPS = 0
+            If FPS < 20 And (Not FPSWarn) Then FPSWarn = True: Suggest "FPS过低了噢！你是想要让玩家玩PPT嘛！"
             FPSct = FPSctt: FPSctt = 0
         End If
         

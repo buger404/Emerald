@@ -151,6 +151,7 @@ Public CDC As Long, GG As Long, OutOfScroll As Boolean
             PreLoadCount = PreLoadCount + c
         Else
             Tree = GetAssetsTree(Path)
+            ReLoadCount = ReLoadCount + UBound(Tree.Files)
             For i = 1 To UBound(Tree.Files)
                 ReDim Preserve Mems(UBound(Mems) + 1)
                 Mems(UBound(Mems)) = Tree.Files(i)
