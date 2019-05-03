@@ -21,6 +21,7 @@ Form=Core\Debuginfo.frm
 Form=Core\EmeraldWindow.frm
 Class=GSysPage; Core\GSysPage.cls
 Module=Core; Core\Core.bas
+Module=AboutMe; Core\AboutMe.bas
 Startup="Sub Main"
 HelpFile=""
 Title="{app}"
