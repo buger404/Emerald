@@ -375,7 +375,7 @@ setAlpha:
     End Function
 '========================================================
 '   Writer
-    Public Sub Writes(ByVal text As String, X As Long, Y As Long, Optional size As Long = 14, Optional Color As Long, Optional w As Long = 0, Optional h As Long = 0, Optional align As StringAlignment = StringAlignmentNear, Optional style As FontStyle = FontStyleRegular, Optional animation As Integer = 0)
+    Public Sub Writes(ByVal text As String, X As Long, Y As Long, Optional size As Long = 14, Optional Color As Long, Optional w As Long = 0, Optional h As Long = 0, Optional align As StringAlignment = StringAlignmentNear, Optional Style As FontStyle = FontStyleRegular, Optional animation As Integer = 0)
         'If OutOfScroll Then Exit Sub
         If ScrollMode Then
             X = X + ScrollX + ScrollBX: Y = Y + ScrollY + ScrollBY
@@ -400,7 +400,7 @@ setAlpha:
             End If
         End If
         
-        EF.Writes text, X, Y, GG, Color, size, w, h, align, style
+        EF.Writes text, X, Y, GG, Color, size, w, h, align, Style
         With DrawF
             .Left = X
             .top = Y
@@ -415,7 +415,7 @@ setAlpha:
     End Sub
 '========================================================
 '   Shape
-    Public Sub Paint(ByVal shape As Integer, X As Long, Y As Long, w As Long, h As Long, Optional Color As Long, Optional Radius As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional Pos As PosAlign = posNormal, Optional animation As Integer = 0)
+    Public Sub Paint(ByVal shape As Integer, X As Long, Y As Long, w As Long, h As Long, Optional Color As Long, Optional Radius As Long, Optional size As Long = 1, Optional Style As Integer = 0, Optional Pos As PosAlign = posNormal, Optional animation As Integer = 0)
         'shape:0=rect,1=ellipse,2=rectr
         'style:0=fill,1=border
         'If OutOfScroll Then Exit Sub
@@ -471,16 +471,16 @@ ReShape:
         End If
         
         If Color <> 0 Then
-            If style = 0 Then GdipSetSolidFillColor brush, Color
-            If style = 1 Then
+            If Style = 0 Then GdipSetSolidFillColor brush, Color
+            If Style = 1 Then
                 GdipSetPenColor Pen, Color
                 GdipSetPenWidth Pen, size
             End If
         End If
         
         If shape = 0 Then GdipSetSmoothingMode GG, SmoothingModeDefault
-        If style = 0 Then GdipFillPath GG, brush, Path
-        If style = 1 Then GdipDrawPath GG, Pen, Path
+        If Style = 0 Then GdipFillPath GG, brush, Path
+        If Style = 1 Then GdipDrawPath GG, Pen, Path
         If shape = 0 Then GdipSetSmoothingMode GG, SmoothingModeAntiAlias
         
         With DrawF
@@ -495,7 +495,7 @@ ReShape:
             GdipDrawRectangle GG, Pen, X, Y, w - 1, h - 1
         End If
     End Sub
-    Public Sub PaintArc(X As Long, Y As Long, w As Long, h As Long, Degree As Long, Optional Start As Long = 0, Optional Color As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional Pos As PosAlign = posNormal, Optional animation As Integer = 0)
+    Public Sub PaintArc(X As Long, Y As Long, w As Long, h As Long, Degree As Long, Optional Start As Long = 0, Optional Color As Long, Optional size As Long = 1, Optional Style As Integer = 0, Optional Pos As PosAlign = posNormal, Optional animation As Integer = 0)
         'style:0=fill,1=border,2=sector
         If ScrollMode Then
             X = X + ScrollX + ScrollBX: Y = Y + ScrollY + ScrollBY
@@ -529,19 +529,19 @@ ReShape:
         If Pos = 5 Then Y = Y + h
         
         GdipAddPathArc Path, X, Y, w, h, Start, Degree
-        If style = 2 Then GdipAddPathLine Path, X + w / 2, Y + w / 2, X + w / 2, Y + w / 2
-        If style = 0 Then GdipClosePathFigure Path
+        If Style = 2 Then GdipAddPathLine Path, X + w / 2, Y + w / 2, X + w / 2, Y + w / 2
+        If Style = 0 Then GdipClosePathFigure Path
         
         If Color <> 0 Then
-            If style = 0 Or style = 2 Then GdipSetSolidFillColor brush, Color
-            If style = 1 Then
+            If Style = 0 Or Style = 2 Then GdipSetSolidFillColor brush, Color
+            If Style = 1 Then
                 GdipSetPenColor Pen, Color
                 GdipSetPenWidth Pen, size
             End If
         End If
         
-        If style = 0 Or style = 2 Then GdipFillPath GG, brush, Path
-        If style = 1 Then GdipDrawPath GG, Pen, Path
+        If Style = 0 Or Style = 2 Then GdipFillPath GG, brush, Path
+        If Style = 1 Then GdipDrawPath GG, Pen, Path
         
         With DrawF
             .Left = X
@@ -553,6 +553,31 @@ ReShape:
         If Debug_focus Then
             GdipSetPenColor Pen, argb(255, 0, 255, 255)
             GdipDrawRectangle GG, Pen, X, Y, w - 1, h - 1
+        End If
+    End Sub
+    Public Sub PaintPolygon(Color As Long, Style As Integer, ParamArray Points())
+
+        GdipResetPath Path
+        Dim p() As POINTF
+        ReDim p((UBound(Points) - 1) / 2)
+        For i = 0 To UBound(Points) Step 2
+            p(i / 2).X = Points(i): p(i / 2).Y = Points(i + 1)
+        Next
+        
+        GdipAddPathPolygon Path, p(0), UBound(p) + 1
+        
+        If Style = 0 Then GdipSetSolidFillColor brush, Color
+        If Style = 1 Then
+            GdipSetPenColor Pen, Color
+            GdipSetPenWidth Pen, size
+        End If
+        
+        If Style = 0 Then GdipFillPath GG, brush, Path
+        If Style = 1 Then GdipDrawPath GG, Pen, Path
+        
+        If Debug_focus Then
+            GdipSetPenColor Pen, argb(255, 0, 176, 240)
+            GdipDrawPath GG, Pen, Path
         End If
     End Sub
 '========================================================
