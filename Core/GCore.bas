@@ -63,7 +63,9 @@ Attribute VB_Name = "GCore"
         InitGDIPlus
         BASS_Init -1, 44100, BASS_DEVICE_3D, Hwnd, 0
         GHwnd = Hwnd: GW = w: GH = h
-        SetWindowPos Hwnd, 0, 0, 0, w + 5, h + 34, SWP_NOMOVE Or SWP_NOZORDER
+        Dim DPI As Long
+        DPI = 1440 / Screen.TwipsPerPixelX
+        SetWindowPos Hwnd, 0, 0, 0, w + 4 * (DPI / 96), h + 27 * (DPI / 96), SWP_NOMOVE Or SWP_NOZORDER
         GDC = GetDC(Hwnd)
         If App.LogMode <> 0 Then Wndproc = SetWindowLongA(Hwnd, GWL_WNDPROC, AddressOf Process)
         
