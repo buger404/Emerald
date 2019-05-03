@@ -41,6 +41,7 @@ Attribute VB_Name = "AboutMe"
 '   更新内容(ver.503)
 '   -AboutMe转移到Core
 '   -添加多边形绘制
+'   -更新优化
 '   更新内容(ver.502)
 '   -修复更新问题和代码不可用问题
 '   -Paint添加Pos参数

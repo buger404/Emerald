@@ -8,6 +8,8 @@ Attribute VB_Name = "DebugSwitch"
     Public Const HideLOGO As Boolean = False
 '   检查更新间隔时长（天）
     Public Const UpdateCheckInterval As Long = 1
+'   更新检查超时时间（毫秒）
+    Public Const UpdateTimeOut As Long = 2000
 '======================================================
 
 

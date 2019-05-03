@@ -261,11 +261,18 @@ sth:
         If Now - CDate(Data.GetData("UpdateTime")) >= UpdateCheckInterval Or Data.GetData("UpdateAble") = 1 Then
             Data.PutData "UpdateTime", Now
             
-            Dim xmlHttp As Object, Ret As String
+            Dim xmlHttp As Object, Ret As String, Start As Long
             Set xmlHttp = CreateObject("Microsoft.XMLHTTP")
             xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
             xmlHttp.send
+                         
+            Start = GetTickCount
             Do While xmlHttp.ReadyState <> 4
+                If GetTickCount - Start >= UpdateTimeOut Then
+                    Debug.Print Now, "Emerald：检查更新超时。"
+                    Exit Sub
+                End If
+                Sleep 10: DoEvents
             Loop
             Ret = xmlHttp.responseText
             Set xmlHttp = Nothing
