@@ -8,6 +8,7 @@ Form=IconLib.frm
 Form=MainWindow.frm
 UserControl=EButton.ctl
 UserControl=EEdit.ctl
+Class=aShadow; aShadow.cls
 IconForm="MainWindow"
 Startup="Sub Main"
 HelpFile=""

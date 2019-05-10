@@ -4,7 +4,7 @@ Attribute VB_Name = "Process"
 Public Const Version As Long = 19050308
 Public VBIDEPath As String, InstalledPath As String, IsUpdate As Boolean
 Public Sub CheckUpdate()
-    On Error GoTo errHandle
+    On Error GoTo ErrHandle
     
     Dim WSHShell As Object, temp As String
     Set WSHShell = CreateObject("WScript.Shell")
@@ -12,11 +12,11 @@ Public Sub CheckUpdate()
     temp = WSHShell.RegRead("HKEY_CLASSES_ROOT\Directory\shell\emerald\version")
     IsUpdate = (Val(temp) <> Version)
     
-errHandle:
+ErrHandle:
     
 End Sub
 Public Sub GetInstalledPath()
-    On Error GoTo errHandle
+    On Error GoTo ErrHandle
     
     Dim WSHShell As Object, temp As String
     Set WSHShell = CreateObject("WScript.Shell")
@@ -24,11 +24,11 @@ Public Sub GetInstalledPath()
     temp = WSHShell.RegRead("HKEY_CLASSES_ROOT\Directory\shell\emerald\icon")
     InstalledPath = Replace(temp, """", "")
     
-errHandle:
+ErrHandle:
     
 End Sub
 Public Sub GetVBIDEPath()
-    On Error GoTo errHandle
+    On Error GoTo ErrHandle
     
     Dim WSHShell As Object, temp As String, temp2() As String
     Set WSHShell = CreateObject("WScript.Shell")
@@ -37,7 +37,7 @@ Public Sub GetVBIDEPath()
     temp2 = Split(temp, "vb6.exe")
     VBIDEPath = Replace(temp2(0), """", "")
     
-errHandle:
+ErrHandle:
     If Err.Number <> 0 Then
         Dialog "迷路", "获取VB6路径失败，请确认您的电脑上已经安装VB6（非精简版）。" & vbCrLf & vbCrLf & _
                "注意：Emerald只适用于VB6", "好吧"

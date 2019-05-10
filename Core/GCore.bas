@@ -90,7 +90,12 @@ Attribute VB_Name = "GCore"
         GHwnd = Hwnd: GW = w: GH = h
         Dim DPI As Long
         DPI = 1440 / Screen.TwipsPerPixelX
-        SetWindowPos Hwnd, 0, 0, 0, w + 4 * (DPI / 96), h + 27 * (DPI / 96), SWP_NOMOVE Or SWP_NOZORDER
+        If (GetWindowLongA(Hwnd, GWL_STYLE) And WS_CAPTION) = WS_CAPTION Then
+            SetWindowPos Hwnd, 0, 0, 0, w + 3 * Int(DPI / 96), h + 26 * Int(DPI / 96), SWP_NOMOVE Or SWP_NOZORDER
+        Else
+            SetWindowPos Hwnd, 0, 0, 0, w - 1, h - 1, SWP_NOMOVE Or SWP_NOZORDER
+        End If
+        
         GDC = GetDC(Hwnd)
         If App.LogMode <> 0 Then Wndproc = SetWindowLongA(Hwnd, GWL_WNDPROC, AddressOf Process)
         
@@ -338,4 +343,3 @@ sth:
             If AssetsTrees(i).Path = Path Then GetAssetsTree = AssetsTrees(i): Exit For
         Next
     End Function
-'========================================================
