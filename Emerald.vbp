@@ -24,6 +24,7 @@ Class=MainPage; Test\MainPage.cls
 Module=Core; Core\Core.bas
 Module=AboutMe; Core\AboutMe.bas
 Class=aShadow; Core\aShadow.cls
+Class=GResource; Core\GResource.cls
 IconForm="TestWindow"
 Startup="TestWindow"
 HelpFile=""

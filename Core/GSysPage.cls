@@ -13,11 +13,11 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 'Emerald Ïà¹Ø´úÂë
 
-Public Page As GPage, Index As Integer, Win As Object
+Public Page As GPage, index As Integer, Win As Object
 Public Key As Integer
 Public OpenTime As Long, DoneMark As Boolean, DoneStep As Integer
 Public Sub Update()
-    Select Case Index
+    Select Case index
         Case 0
         Call SaveDialog
         Case 1
@@ -26,8 +26,8 @@ Public Sub Update()
 End Sub
 Public Sub LOGODialog()
     Dim w As Long, h As Long
-    w = Page.ImgSize("logo.png", imgGetWidth)
-    h = Page.ImgSize("logo.png", imgGetHeight)
+    w = Page.Res.ImgSize("logo.png", imgGetWidth)
+    h = Page.Res.ImgSize("logo.png", imgGetHeight)
     
     Page.Paint 0, 0, 0, GW, GH, argb(255, 16, 16, 35)
     
@@ -108,5 +108,5 @@ End Sub
 Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
-    Page.NewImages App.Path & "\assets\debug"
+    Page.Res.NewImages App.Path & "\assets\debug"
 End Sub

@@ -46,7 +46,7 @@ Private Sub Form_Load()
     Set Charge = New GDebug
     
     Page.Create Charge
-    Page.NewImages App.Path & "\assets\debug", 64, 64
+    Page.Res.NewImages App.Path & "\assets\debug", 64, 64
     
     Set Charge.Page = Page
     
@@ -87,8 +87,8 @@ Private Sub Form_Unload(Cancel As Integer)
     Set Sh = Nothing
 End Sub
 
-Private Sub touchArea_Click(Index As Integer)
-    Select Case Index
+Private Sub touchArea_Click(index As Integer)
+    Select Case index
         Case 1
             Debuginfo.Show
         Case 3

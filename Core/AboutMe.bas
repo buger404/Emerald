@@ -41,6 +41,7 @@ Attribute VB_Name = "AboutMe"
 '   更新内容(ver.510)
 '   -全新Builder UI
 '   -修复窗口大小错误问题
+'   -资源列表迁移到Page.Res
 '   更新内容(ver.503)
 '   -AboutMe转移到Core
 '   -添加多边形绘制

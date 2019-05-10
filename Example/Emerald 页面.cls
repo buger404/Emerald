@@ -50,7 +50,7 @@ Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
     '导入游戏资源
-    Page.NewImages App.Path & "\assets"
+    Page.Res.NewImages App.Path & "\assets"
     '创建页面
     ECore.Add Page, "[你的页面名称]"
     

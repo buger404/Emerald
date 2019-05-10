@@ -20,3 +20,4 @@ Form=Core\EmeraldWindow.frm
 Class=GSysPage; Core\GSysPage.cls
 Module=Core; Core\Core.bas
 Module=AboutMe; Core\AboutMe.bas
+Class=GResource; Core\GResource.cls
