@@ -73,7 +73,7 @@ Attribute VB_Name = "GCore"
     Public SysPage As GSysPage
     Public PreLoadCount As Long, LoadedCount As Long, ReLoadCount As Long
     Public FPSWarn As Long
-    Public Const Version As Long = 19050308
+    Public Const Version As Long = 19051004
     Dim AssetsTrees() As AssetsTree
     Dim LastKeyUpRet As Boolean
     Dim Wndproc As Long

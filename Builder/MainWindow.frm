@@ -15,7 +15,6 @@ Begin VB.Form MainWindow
    ScaleHeight     =   360
    ScaleMode       =   3  'Pixel
    ScaleWidth      =   627
-   ShowInTaskbar   =   0   'False
    StartUpPosition =   2  'ÆÁÄ»ÖÐÐÄ
    Begin VB.PictureBox PicBox 
       Appearance      =   0  'Flat

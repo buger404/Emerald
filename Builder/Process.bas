@@ -1,7 +1,7 @@
 Attribute VB_Name = "Process"
 'Emerald 相关代码
 
-Public Const Version As Long = 19050308
+Public Const Version As Long = 19051004
 Public VBIDEPath As String, InstalledPath As String, IsUpdate As Boolean
 Public Sub CheckUpdate()
     On Error GoTo ErrHandle
@@ -171,6 +171,9 @@ Sub Main()
                     Dialog "工程更新", "我们已将最新的文件复制到你的文件夹中，本次没有新增的文件。", "好的"
                 Else
                     Dialog "工程更新", "你的工程已经创建，" & vbCrLf & "我们已将最新的文件复制到你的文件夹中，你可以稍后引用它们。" & vbCrLf & vbCrLf & "注意：以下是更新Emerald后新增的文件，需要你手动引用" & vbCrLf & "（位于目录下的Core文件夹）：" & vbCrLf & nList, "收到！"
+                End If
+                If Val(info(0)) < 19051004 Then
+                    Dialog "警告", "资源加载函数已经迁移。" & vbCrLf & "Page->Page.Res" & vbCrLf & vbCrLf & "* 详情参照Emerald提供的代码模板", "哦"
                 End If
                 GoTo SkipName
             Else
