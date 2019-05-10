@@ -157,7 +157,7 @@ Public Sub NewImages(Path As String, Optional arg1, Optional arg2)
     
     Dim index As Integer, Tree As AssetsTree
     Tree.Path = Path: ReDim Tree.Files(0)
-    index = FindAssetsTree(Path)
+    index = FindAssetsTree(Path, arg1, arg2)
     
     f = Dir(Path)
     Do While f <> ""
@@ -169,12 +169,12 @@ Public Sub NewImages(Path As String, Optional arg1, Optional arg2)
         PreLoadCount = PreLoadCount + c
     Else
         Tree = GetAssetsTree(Path)
-        ReLoadCount = ReLoadCount + UBound(Tree.Files)
         For i = 1 To UBound(Tree.Files)
             ReDim Preserve Mems(UBound(Mems) + 1)
             Mems(UBound(Mems)) = Tree.Files(i)
             Mems(UBound(Mems)).copyed = True
         Next
+        ReLoadCount = ReLoadCount + UBound(Tree.Files)
         Exit Sub
     End If
     
@@ -195,6 +195,6 @@ Public Sub NewImages(Path As String, Optional arg1, Optional arg2)
         LoadedCount = LoadedCount + 1
     Loop
     
-    If index = 0 Then AddAssetsTree Tree
+    If index = 0 Then AddAssetsTree Tree, arg1, arg2
 End Sub
 

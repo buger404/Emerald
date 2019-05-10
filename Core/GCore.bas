@@ -63,6 +63,8 @@ Attribute VB_Name = "GCore"
     Public Type AssetsTree
         Files() As GMem
         Path As String
+        arg1 As Variant
+        arg2 As Variant
     End Type
     Public ECore As GMan, EF As GFont, EAni As Object, ESave As GSaving
     Public GHwnd As Long, GDC As Long, GW As Long, GH As Long
@@ -212,7 +214,7 @@ sth:
         CreateCDC = DC
     End Function
     Public Sub PaintDC(DC As Long, destDC As Long, Optional X As Long = 0, Optional Y As Long = 0, Optional cx As Long = 0, Optional cy As Long = 0, Optional cw, Optional ch, Optional Alpha)
-        Dim b As BLENDFUNCTION, Index As Integer, bl As Long
+        Dim b As BLENDFUNCTION, index As Integer, bl As Long
         
         If Not IsMissing(Alpha) Then
             If Alpha < 0 Then Alpha = 0
@@ -329,13 +331,20 @@ sth:
     End Sub
 '========================================================
 '   AssetsTree
-    Public Function AddAssetsTree(Tree As AssetsTree)
+    Public Function AddAssetsTree(Tree As AssetsTree, arg1 As Variant, arg2 As Variant)
         ReDim Preserve AssetsTrees(UBound(AssetsTrees) + 1)
         AssetsTrees(UBound(AssetsTrees)) = Tree
     End Function
-    Public Function FindAssetsTree(Path As String) As Integer
+    Public Function FindAssetsTree(Path As String, arg1 As Variant, arg2 As Variant) As Integer
+        On Error Resume Next
         For i = 1 To UBound(AssetsTrees)
-            If AssetsTrees(i).Path = Path Then FindAssetsTree = i: Exit For
+            If AssetsTrees(i).Path = Path And AssetsTrees(i).arg1 = arg1 And AssetsTrees(i).arg2 = arg2 Then
+                If Err.Number <> 0 Then
+                    Err.Clear
+                Else
+                    FindAssetsTree = i: Exit For
+                End If
+            End If
         Next
     End Function
     Public Function GetAssetsTree(Path As String) As AssetsTree
