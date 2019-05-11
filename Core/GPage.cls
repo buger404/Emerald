@@ -88,7 +88,7 @@ Public Res As GResource
     End Property
 '========================================================
 '   Images
-    Public Sub DrawImageEx(n, X As Long, Y As Long, Optional W, Optional H, Optional Pos As PosAlign = posNormal, Optional animation As Integer = 0)
+    Public Sub DrawImageEx(n, X As Long, Y As Long, Optional W, Optional H, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0)
         Dim index As Integer
         
         If animation <> 0 Then
@@ -114,17 +114,17 @@ Public Res As GResource
         If IsMissing(W) Then GdipGetImageWidth Res.ResourceImageHandle(index), W
         If IsMissing(H) Then GdipGetImageWidth Res.ResourceImageHandle(index), H
         
-        If Pos = 1 Then X = Int(X - W / 2): Y = Int(Y - H / 2)
-        If Pos = 2 Then X = X - W
-        If Pos = 3 Then Y = Y - H
-        If Pos = 4 Then X = X + W
-        If Pos = 5 Then Y = Y + H
+        If pos = 1 Then X = Int(X - W / 2): Y = Int(Y - H / 2)
+        If pos = 2 Then X = X - W
+        If pos = 3 Then Y = Y - H
+        If pos = 4 Then X = X + W
+        If pos = 5 Then Y = Y + H
         
         If ScrollMode Then
             X = X + ScrollX + ScrollBX: Y = Y + ScrollY + ScrollBY
-            Dim Ret As Long
-            GdipIsVisibleRect GG, X - 1, Y - 1, W, H, Ret
-            If Not Ret Then OutOfScroll = True: Exit Sub
+            Dim ret As Long
+            GdipIsVisibleRect GG, X - 1, Y - 1, W, H, ret
+            If Not ret Then OutOfScroll = True: Exit Sub
         End If
         
         GdipDrawImageRect GG, Res.ResourceImageHandle(index), X, Y, W, H
@@ -141,7 +141,7 @@ Public Res As GResource
             GdipDrawRectangle GG, Pen, X, Y, W - 1, H - 1
         End If
     End Sub
-    Public Sub DrawImage(n, X As Long, Y As Long, Optional cx, Optional cy, Optional cw, Optional ch, Optional Alpha, Optional Pos As PosAlign = posNormal, Optional animation As Integer = 0)
+    Public Sub DrawImage(n, X As Long, Y As Long, Optional cx, Optional cy, Optional cw, Optional ch, Optional Alpha, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0)
         'If OutOfScroll Then Exit Sub
         
         Dim b As BLENDFUNCTION, index As Integer, bl As Long
@@ -177,11 +177,11 @@ setAlpha:
         If IsMissing(cw) Then cw = Res.ImgSize(index, imgGetWidth) - cx
         If IsMissing(ch) Then ch = Res.ImgSize(index, imgGetHeight) - cy
         
-        If Pos = 1 Then X = Int(X - cw / 2): Y = Int(Y - ch / 2)
-        If Pos = 2 Then X = X - cw
-        If Pos = 3 Then Y = Y - ch
-        If Pos = 4 Then X = X + cw
-        If Pos = 5 Then Y = Y + ch
+        If pos = 1 Then X = Int(X - cw / 2): Y = Int(Y - ch / 2)
+        If pos = 2 Then X = X - cw
+        If pos = 3 Then Y = Y - ch
+        If pos = 4 Then X = X + cw
+        If pos = 5 Then Y = Y + ch
         
         If animation <> 0 Then
             If Not Anis(animation).mark Then
@@ -200,7 +200,7 @@ setAlpha:
         
         If ScrollMode Then
             X = X + ScrollX + ScrollBX: Y = Y + ScrollY + ScrollBY
-            Dim Ret As Long, Crect As RECT
+            Dim ret As Long, Crect As RECT
             With Crect
                 .Left = X: .top = Y: .Right = X + cw: .Bottom = Y + ch
             End With
@@ -239,9 +239,9 @@ setAlpha:
         'If OutOfScroll Then Exit Sub
         If ScrollMode Then
             X = X + ScrollX + ScrollBX: Y = Y + ScrollY + ScrollBY
-            Dim Ret As Long
-            GdipIsVisibleRect GG, X, Y, W, H, Ret
-            If Ret = 0 Then OutOfScroll = True: Exit Sub
+            Dim ret As Long
+            GdipIsVisibleRect GG, X, Y, W, H, ret
+            If ret = 0 Then OutOfScroll = True: Exit Sub
         End If
         
         If animation <> 0 Then
@@ -278,9 +278,9 @@ setAlpha:
     Public Sub PaintLine(X1 As Long, Y1 As Long, X2 As Long, Y2 As Long, Optional Color As Long, Optional size As Long = 1, Optional animation As Integer = 0)
         If ScrollMode Then
             X = X + ScrollX + ScrollBX: Y = Y + ScrollY + ScrollBY
-            Dim Ret As Long
-            GdipIsVisibleRect GG, IIf(X1 < X2, X1, X2), IIf(Y1 < Y2, Y1, Y2), IIf(X1 < X2, X2 - X1, X1 - X2), IIf(Y1 < Y2, Y2 - Y1, Y1 - Y2), Ret
-            If Not Ret Then OutOfScroll = True: Exit Sub
+            Dim ret As Long
+            GdipIsVisibleRect GG, IIf(X1 < X2, X1, X2), IIf(Y1 < Y2, Y1, Y2), IIf(X1 < X2, X2 - X1, X1 - X2), IIf(Y1 < Y2, Y2 - Y1, Y1 - Y2), ret
+            If Not ret Then OutOfScroll = True: Exit Sub
         End If
         
         If animation <> 0 Then
@@ -318,15 +318,15 @@ setAlpha:
             GdipDrawRectangle GG, Pen, DrawF.Left, DrawF.top, DrawF.Right + 1, DrawF.Bottom + 1
         End If
     End Sub
-    Public Sub Paint(ByVal shape As Integer, X As Long, Y As Long, W As Long, H As Long, Optional Color As Long, Optional Radius As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional Pos As PosAlign = posNormal, Optional animation As Integer = 0)
+    Public Sub Paint(ByVal shape As Integer, X As Long, Y As Long, W As Long, H As Long, Optional Color As Long, Optional Radius As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0)
         'shape:0=rect,1=ellipse,2=rectr
         'style:0=fill,1=border
         'If OutOfScroll Then Exit Sub
         If ScrollMode Then
             X = X + ScrollX + ScrollBX: Y = Y + ScrollY + ScrollBY
-            Dim Ret As Long
-            GdipIsVisibleRect GG, X - 1, Y - 1, W, H, Ret
-            If Not Ret Then OutOfScroll = True: Exit Sub
+            Dim ret As Long
+            GdipIsVisibleRect GG, X - 1, Y - 1, W, H, ret
+            If Not ret Then OutOfScroll = True: Exit Sub
         End If
         
         If animation <> 0 Then
@@ -347,11 +347,11 @@ setAlpha:
         
         GdipResetPath Path
         
-        If Pos = 1 Then X = Int(X - W / 2): Y = Int(Y - H / 2)
-        If Pos = 2 Then X = X - W
-        If Pos = 3 Then Y = Y - H
-        If Pos = 4 Then X = X + W
-        If Pos = 5 Then Y = Y + H
+        If pos = 1 Then X = Int(X - W / 2): Y = Int(Y - H / 2)
+        If pos = 2 Then X = X - W
+        If pos = 3 Then Y = Y - H
+        If pos = 4 Then X = X + W
+        If pos = 5 Then Y = Y + H
         
 ReShape:
         If shape = 0 Then GdipAddPathRectangle Path, X, Y, W - 1, H - 1
@@ -398,13 +398,13 @@ ReShape:
             GdipDrawRectangle GG, Pen, X, Y, W - 1, H - 1
         End If
     End Sub
-    Public Sub PaintArc(X As Long, Y As Long, W As Long, H As Long, Degree As Long, Optional Start As Long = 0, Optional Color As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional Pos As PosAlign = posNormal, Optional animation As Integer = 0)
+    Public Sub PaintArc(X As Long, Y As Long, W As Long, H As Long, Degree As Long, Optional Start As Long = 0, Optional Color As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0)
         'style:0=fill,1=border,2=sector
         If ScrollMode Then
             X = X + ScrollX + ScrollBX: Y = Y + ScrollY + ScrollBY
-            Dim Ret As Long
-            GdipIsVisibleRect GG, X - 1, Y - 1, W, H, Ret
-            If Not Ret Then OutOfScroll = True: Exit Sub
+            Dim ret As Long
+            GdipIsVisibleRect GG, X - 1, Y - 1, W, H, ret
+            If Not ret Then OutOfScroll = True: Exit Sub
         End If
         
         If animation <> 0 Then
@@ -425,11 +425,11 @@ ReShape:
         
         GdipResetPath Path
         
-        If Pos = 1 Then X = Int(X - W / 2): Y = Int(Y - H / 2)
-        If Pos = 2 Then X = X - W
-        If Pos = 3 Then Y = Y - H
-        If Pos = 4 Then X = X + W
-        If Pos = 5 Then Y = Y + H
+        If pos = 1 Then X = Int(X - W / 2): Y = Int(Y - H / 2)
+        If pos = 2 Then X = X - W
+        If pos = 3 Then Y = Y - H
+        If pos = 4 Then X = X + W
+        If pos = 5 Then Y = Y + H
         
         GdipAddPathArc Path, X, Y, W, H, Start, Degree
         If style = 2 Then GdipAddPathLine Path, X + W / 2, Y + W / 2, X + W / 2, Y + W / 2
@@ -584,5 +584,19 @@ ReShape:
         End If
         
         ShowHScrollBar = m
+    End Function
+    Public Function ShowVScrollBar(value, X As Long, Y As Long, W As Long, H As Long, LineColor As Long, BallColor As Long, Optional size As Long = 2) As Integer
+        Dim m As Integer
+        
+        m = CheckMouse(X, Y, W, H)
+        PaintLine X + W / 2 - size / 2, Y, X + W / 2 - size / 2, Y + H, LineColor, size
+        Paint 1, X, Y + value * (H - W), W, W, BallColor
+        If m > 0 And Mouse.button > 0 Then
+            value = (Mouse.Y - Y) / (H - W)
+            If value < 0 Then value = 0
+            If value > 1 Then value = 1
+        End If
+        
+        ShowVScrollBar = m
     End Function
 '========================================================
