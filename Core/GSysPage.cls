@@ -16,6 +16,7 @@ Attribute VB_Exposed = False
 Public Page As GPage, index As Integer, Win As Object
 Public Key As Integer
 Public OpenTime As Long, DoneMark As Boolean, DoneStep As Integer
+Dim ChangeTime As Long, LastLoadPro As Single, LastLoadPro2 As Single
 Public Sub Update()
     Select Case index
         Case 0
@@ -62,6 +63,10 @@ Public Sub LOGODialog()
             End If
             pro = LoadedCount / PreLoadCount
             If pro > 1 Then pro = 1
+            If LastLoadPro <> pro Then LastLoadPro2 = LastLoadPro: LastLoadPro = pro: ChangeTime = GetTickCount
+            If GetTickCount - ChangeTime <= 500 Then
+                pro = LastLoadPro2 + (pro - LastLoadPro2) * (GetTickCount - ChangeTime) / 500
+            End If
             Page.Paint 2, GW / 2 - GW * 0.5 / 2, GH * 0.8, GW * 0.5, 14, argb(255, 127, 127, 127), 14
             Page.Paint 2, GW / 2 - GW * 0.5 / 2, GH * 0.8, GW * 0.5 * pro, 14, argb(255, 255, 255, 255), 14
         End If

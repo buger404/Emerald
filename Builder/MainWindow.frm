@@ -33,12 +33,12 @@ Begin VB.Form MainWindow
    End
    Begin Emerald_Builder.EEdit InputBox 
       Height          =   300
-      Left            =   360
+      Left            =   312
       TabIndex        =   3
       Top             =   3048
       Visible         =   0   'False
-      Width           =   6828
-      _ExtentX        =   12044
+      Width           =   6888
+      _ExtentX        =   12150
       _ExtentY        =   529
       BackColor       =   16514043
       Content         =   "EEdit1"
@@ -118,7 +118,7 @@ Begin VB.Form MainWindow
       EndProperty
       ForeColor       =   &H00212121&
       Height          =   420
-      Left            =   456
+      Left            =   432
       TabIndex        =   0
       Top             =   312
       Width           =   648

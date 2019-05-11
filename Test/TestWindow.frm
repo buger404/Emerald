@@ -52,8 +52,6 @@ Private Sub Form_Load()
     DrawTimer.Enabled = True
     
     Set MainPage = New MainPage
-    
-    Me.Show
 End Sub
 
 Private Sub Form_MouseDown(button As Integer, Shift As Integer, X As Single, Y As Single)
