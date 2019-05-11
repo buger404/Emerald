@@ -77,9 +77,12 @@ End Sub
 
 Private Sub Form_MouseMove(button As Integer, Shift As Integer, X As Single, Y As Single)
     '发送鼠标信息
-    If Mouse.State = 0 Then UpdateMouse X, Y, 0, button
+    If Mouse.State = 0 Then
+        UpdateMouse X, Y, 0, button
+    Else
+        Mouse.X = X: Mouse.Y = Y
+    End If
 End Sub
-
 Private Sub Form_MouseUp(button As Integer, Shift As Integer, X As Single, Y As Single)
     '发送鼠标信息
     UpdateMouse X, Y, 2, button

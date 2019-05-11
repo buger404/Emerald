@@ -15,6 +15,21 @@ Attribute VB_Name = "DebugSwitch"
 
 '==============================================================================
 '   版本更新注意事项
+'==============================================================================
+'   1.鼠标点击修复
+'      请在你的游戏窗口找到如下代码
+'       Private Sub Form_MouseMove(button As Integer, Shift As Integer, X As Single, Y As Single)
+'           If Mouse.State = 0 Then UpdateMouse X, Y, 0, button
+'       End Sub
+'      *****将其修改为：
+'       Private Sub Form_MouseMove(button As Integer, Shift As Integer, X As Single, Y As Single)
+'           If Mouse.State = 0 Then
+'               UpdateMouse X, Y, 0, button
+'           Else
+'               Mouse.X = X: Mouse.Y = Y
+'           End If
+'       End Sub
+'==============================================================================
 '   1.资源加载的改变
 '     请从Page.NewImages迁移到Page.Res.NewImages
 '==============================================================================

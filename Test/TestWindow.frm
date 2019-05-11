@@ -59,7 +59,11 @@ Private Sub Form_MouseDown(button As Integer, Shift As Integer, X As Single, Y A
 End Sub
 
 Private Sub Form_MouseMove(button As Integer, Shift As Integer, X As Single, Y As Single)
-    If Mouse.State = 0 Then UpdateMouse X, Y, 0, button
+    If Mouse.State = 0 Then
+        UpdateMouse X, Y, 0, button
+    Else
+        Mouse.X = X: Mouse.Y = Y
+    End If
 End Sub
 
 Private Sub Form_MouseUp(button As Integer, Shift As Integer, X As Single, Y As Single)
