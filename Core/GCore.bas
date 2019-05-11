@@ -56,8 +56,8 @@ Attribute VB_Name = "GCore"
         ImgHwnd As Long
         name As String
         folder As String
-        w As Long
-        h As Long
+        W As Long
+        H As Long
         copyed As Boolean
     End Type
     Public Type AssetsTree
@@ -79,7 +79,7 @@ Attribute VB_Name = "GCore"
     Dim Wndproc As Long
 '========================================================
 '   Init
-    Public Sub StartEmerald(Hwnd As Long, w As Long, h As Long)
+    Public Sub StartEmerald(Hwnd As Long, W As Long, H As Long)
         
         If DebugMode Then
             If App.LogMode <> 0 Then MsgBox "错误：生成时未关闭Debug模式。": End
@@ -89,13 +89,13 @@ Attribute VB_Name = "GCore"
         
         InitGDIPlus
         BASS_Init -1, 44100, BASS_DEVICE_3D, Hwnd, 0
-        GHwnd = Hwnd: GW = w: GH = h
+        GHwnd = Hwnd: GW = W: GH = H
         Dim DPI As Long
         DPI = 1440 / Screen.TwipsPerPixelX
         If (GetWindowLongA(Hwnd, GWL_STYLE) And WS_CAPTION) = WS_CAPTION Then
-            SetWindowPos Hwnd, 0, 0, 0, w + 3 * Int(DPI / 96), h + 26 * Int(DPI / 96), SWP_NOMOVE Or SWP_NOZORDER
+            SetWindowPos Hwnd, 0, 0, 0, W + 3 * Int(DPI / 96), H + 26 * Int(DPI / 96), SWP_NOMOVE Or SWP_NOZORDER
         Else
-            SetWindowPos Hwnd, 0, 0, 0, w - 1, h - 1, SWP_NOMOVE Or SWP_NOZORDER
+            SetWindowPos Hwnd, 0, 0, 0, W - 1, H - 1, SWP_NOMOVE Or SWP_NOZORDER
         End If
         
         GDC = GetDC(Hwnd)
@@ -137,6 +137,9 @@ Attribute VB_Name = "GCore"
     End Sub
 '========================================================
 '   RunTime
+    Public Function ToTime(time) As String
+        ToTime = Int(time / 60) & ":" & format(time Mod 60, "00")
+    End Function
     Public Function Process(ByVal Hwnd As Long, ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam As Long) As Long
         On Error GoTo sth
 
@@ -165,7 +168,7 @@ sth:
         GetWinNTVersion = Left(strOSversion, 3)
     End Function
     Public Sub BlurTo(DC As Long, srcDC As Long, buffWin As Form, Optional Radius As Long = 60)
-        Dim i As Long, g As Long, e As Long, b As BlurParams, w As Long, h As Long
+        Dim i As Long, g As Long, e As Long, b As BlurParams, W As Long, H As Long
         '粘贴到缓冲窗口
         buffWin.AutoRedraw = True
         BitBlt buffWin.hdc, 0, 0, GW, GH, srcDC, 0, 0, vbSrcCopy: buffWin.Refresh
@@ -175,8 +178,8 @@ sth:
         
         '模糊操作
         GdipCreateEffect2 GdipEffectType.Blur, e: b.Radius = Radius: GdipSetEffectParameters e, b, LenB(b)
-        GdipGetImageWidth i, w: GdipGetImageHeight i, h
-        GdipBitmapApplyEffect i, e, NewRectL(0, 0, w, h), 0, 0, 0
+        GdipGetImageWidth i, W: GdipGetImageHeight i, H
+        GdipBitmapApplyEffect i, e, NewRectL(0, 0, W, H), 0, 0, 0
         
         '画~
         GdipCreateFromHDC DC, g
@@ -185,23 +188,23 @@ sth:
         buffWin.AutoRedraw = False
     End Sub
     Public Sub BlurImg(img As Long, Radius As Long)
-        Dim b As BlurParams, e As Long, w As Long, h As Long
+        Dim b As BlurParams, e As Long, W As Long, H As Long
         
         '模糊操作
         GdipCreateEffect2 GdipEffectType.Blur, e: b.Radius = Radius: GdipSetEffectParameters e, b, LenB(b)
-        GdipGetImageWidth img, w: GdipGetImageHeight img, h
-        GdipBitmapApplyEffect img, e, NewRectL(0, 0, w, h), 0, 0, 0
+        GdipGetImageWidth img, W: GdipGetImageHeight img, H
+        GdipBitmapApplyEffect img, e, NewRectL(0, 0, W, H), 0, 0, 0
         
         '画~
         GdipDeleteEffect e '垃圾处理
     End Sub
-    Public Function CreateCDC(w As Long, h As Long) As Long
+    Public Function CreateCDC(W As Long, H As Long) As Long
         Dim bm As BITMAPINFOHEADER, DC As Long, DIB As Long
     
         With bm
             .biBitCount = 32
-            .biHeight = h
-            .biWidth = w
+            .biHeight = H
+            .biWidth = W
             .biPlanes = 1
             .biSizeImage = (.biWidth * .biBitCount + 31) / 32 * 4 * .biHeight
             .biSize = Len(bm)
@@ -252,9 +255,9 @@ sth:
             .button = button
         End With
     End Sub
-    Public Function CheckMouse(X As Long, Y As Long, w As Long, h As Long) As MButtonState
+    Public Function CheckMouse(X As Long, Y As Long, W As Long, H As Long) As MButtonState
         'Return Value:0=none,1=in,2=down,3=up
-        If Mouse.X >= X And Mouse.Y >= Y And Mouse.X <= X + w And Mouse.Y <= Y + h Then
+        If Mouse.X >= X And Mouse.Y >= Y And Mouse.X <= X + W And Mouse.Y <= Y + H Then
             CheckMouse = Mouse.State + 1
             If Mouse.State = 2 Then Mouse.State = 0
         End If
@@ -279,9 +282,9 @@ sth:
     End Function
 '========================================================
 '   Screen Window
-    Public Function StartScreenDialog(w As Long, h As Long, ch As Object) As Object
+    Public Function StartScreenDialog(W As Long, H As Long, ch As Object) As Object
         Set StartScreenDialog = New EmeraldWindow
-        StartScreenDialog.NewFocusWindow w, h, ch
+        StartScreenDialog.NewFocusWindow W, H, ch
         Dim f As Object
         For Each f In VB.Forms
             If TypeName(f) <> "EmeraldWindow" Then f.Enabled = False
@@ -301,7 +304,7 @@ sth:
         If Now - CDate(Data.GetData("UpdateTime")) >= UpdateCheckInterval Or Data.GetData("UpdateAble") = 1 Then
             Data.PutData "UpdateTime", Now
             
-            Dim xmlHttp As Object, Ret As String, Start As Long
+            Dim xmlHttp As Object, ret As String, Start As Long
             Set xmlHttp = CreateObject("Microsoft.XMLHTTP")
             xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
             xmlHttp.send
@@ -314,11 +317,11 @@ sth:
                 End If
                 Sleep 10: DoEvents
             Loop
-            Ret = xmlHttp.responseText
+            ret = xmlHttp.responseText
             Set xmlHttp = Nothing
-            Debug.Print Now, "Emerald：检查版本完毕，最新版本号 " & Val(Ret)
+            Debug.Print Now, "Emerald：检查版本完毕，最新版本号 " & Val(ret)
             
-            If Val(Ret) > Version Then
+            If Val(ret) > Version Then
                 Data.PutData "UpdateAble", 1
                 If MsgBox("发现Emerald存在新版本，您希望现在前往下载吗？", vbYesNo + 48, "Emerald") = vbNo Then Exit Sub
                 
@@ -352,3 +355,4 @@ sth:
             If AssetsTrees(i).Path = Path Then GetAssetsTree = AssetsTrees(i): Exit For
         Next
     End Function
+'========================================================

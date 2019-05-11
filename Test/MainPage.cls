@@ -50,7 +50,7 @@ Public Sub Update()
     If ret = 3 Then
         Music.Position = pos * Music.length
     End If
-    Page.Writes Int(pos * Music.length) & " / " & Int(Music.length), 20, GH - 65, 16, argb(255, 27, 27, 27)
+    Page.Writes ToTime(pos * Music.length) & " / " & ToTime(Music.length), 20, GH - 65, 16, argb(255, 27, 27, 27)
     
     If Not Music.IsPlaying Then Music.Play
 End Sub
