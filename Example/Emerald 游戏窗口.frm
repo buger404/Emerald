@@ -55,9 +55,6 @@ Private Sub Form_Load()
     Set MusicList = New GMusicList
     MusicList.Create App.path & "\music"
 
-    '设置活动页面
-    EC.ActivePage = "[你的页面名称]"
-    
     '开始显示
     Me.Show
     DrawTimer.Enabled = True
@@ -68,6 +65,9 @@ Private Sub Form_Load()
     '     Set TestPage = New TestPage
     '公共部分：Dim TestPage As TestPage
     '=============================================
+
+    '设置活动页面
+    EC.ActivePage = "[你的页面名称]"
 End Sub
 
 Private Sub Form_MouseDown(button As Integer, Shift As Integer, X As Single, Y As Single)

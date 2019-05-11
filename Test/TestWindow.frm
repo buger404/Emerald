@@ -46,12 +46,12 @@ Private Sub Form_Load()
     Set MusicList = New GMusicList
     MusicList.Create App.Path & "\music"
     
-    EC.ActivePage = "MainPage"
-    
     Me.Show
     DrawTimer.Enabled = True
     
     Set MainPage = New MainPage
+    
+    EC.ActivePage = "MainPage"
 End Sub
 
 Private Sub Form_MouseDown(button As Integer, Shift As Integer, X As Single, Y As Single)

@@ -26,18 +26,18 @@ Public Sub Update()
     End Select
 End Sub
 Public Sub LOGODialog()
-    Dim w As Long, h As Long
-    w = Page.Res.ImgSize("logo.png", imgGetWidth)
-    h = Page.Res.ImgSize("logo.png", imgGetHeight)
+    Dim W As Long, H As Long
+    W = Page.Res.ImgSize("logo.png", imgGetWidth)
+    H = Page.Res.ImgSize("logo.png", imgGetHeight)
     
     Page.Paint 0, 0, 0, GW, GH, argb(255, 16, 16, 35)
     
     If GetTickCount - OpenTime >= 2000 Then
         If PreLoadCount <> LoadedCount Then
-            Page.DrawImageEx "logo.png", GW / 2, GH * 0.85 / 2, Int(GW * 0.45), Int((GW * 0.45) / w * h), 1
+            Page.DrawImageEx "logo.png", GW / 2, GH * 0.85 / 2, Int(GW * 0.45), Int((GW * 0.45) / W * H), 1
         End If
     Else
-        Page.DrawImageEx "logo.png", GW / 2, GH / 2, Int(GW * 0.45), Int((GW * 0.45) / w * h), 1
+        Page.DrawImageEx "logo.png", GW / 2, GH / 2, Int(GW * 0.45), Int((GW * 0.45) / W * H), 1
     End If
     
     Dim pro As Single
@@ -53,7 +53,7 @@ Public Sub LOGODialog()
     End If
     
     If GetTickCount - OpenTime >= 2000 Then
-        If PreLoadCount = LoadedCount Then
+        If PreLoadCount = LoadedCount And ECore.ActivePage <> "" Then
             ECore.NewTransform 1, 1000
             DoneMark = True
         Else
