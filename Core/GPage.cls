@@ -571,4 +571,18 @@ ReShape:
         
         ShowCheckBox = m
     End Function
+    Public Function ShowHScrollBar(value, X As Long, Y As Long, W As Long, H As Long, LineColor As Long, BallColor As Long, Optional size As Long = 2) As Integer
+        Dim m As Integer
+        
+        m = CheckMouse(X, Y, W, H)
+        PaintLine X, Y + H / 2 - size / 2, X + W, Y + H / 2 - size / 2, LineColor, size
+        Paint 1, X + value * (W - H), Y, H, H, BallColor
+        If m > 0 And Mouse.button > 0 Then
+            value = (Mouse.X - X) / (W - H)
+            If value < 0 Then value = 0
+            If value > 1 Then value = 1
+        End If
+        
+        ShowHScrollBar = m
+    End Function
 '========================================================

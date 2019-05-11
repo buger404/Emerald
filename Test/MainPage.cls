@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 '======================================
 '   Ò³Ãæ»æÖÆÆ÷
     Dim Page As GPage, Music As GMusic
-    Dim test As Boolean, test2 As Single
+    Dim test As Boolean, pos As Single
 '======================================
 
 Public Sub Update()
@@ -42,10 +42,15 @@ Public Sub Update()
         Page.PaintLine GW / 2 + Int(GW / 30) * i + 148, GH / 2 - GH * pro / 2, GW / 2 + Int(GW / 30) * i + 148, GH / 2 + GH * pro / 2, argb(255, 0, 176, 240), 4
         Page.PaintLine GW / 2 - Int(GW / 30) * i - 148, GH / 2 - GH * pro / 2, GW / 2 - Int(GW / 30) * i - 148, GH / 2 + GH * pro / 2, argb(255, 0, 176, 240), 4
     Next
-    Page.DrawImage "music.png", GW / 2, GH / 2, Alpha:=1, Pos:=1
+    Page.DrawImage "music.png", GW / 2, GH / 2, Alpha:=1, pos:=1
     
-    'Page.ShowHScrollBar test2, 20, 20, 300, 20, argb(255, 222, 222, 222), argb(255, 0, 176, 240)
-    Page.Writes test2 & " - " & Mouse.State & " - " & Mouse.button, 20, 70, 16, argb(255, 0, 176, 240)
+    Dim ret As Integer
+    ret = Page.ShowHScrollBar(pos, 20, GH - 40, GW - 40, 20, argb(255, 222, 222, 222), argb(255, 0, 183, 195))
+    If ret <= 1 Then pos = Music.Position / Music.length
+    If ret = 3 Then
+        Music.Position = pos * Music.length
+    End If
+    Page.Writes Int(pos * Music.length) & " / " & Int(Music.length), 20, GH - 65, 16, argb(255, 27, 27, 27)
     
     If Not Music.IsPlaying Then Music.Play
 End Sub

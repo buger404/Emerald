@@ -27,10 +27,10 @@ Dim Hwnd As Long, mRate As Long, mVolume As Single
         IsPlaying = (BASS_ChannelIsActive(Hwnd) <> 0)
     End Property
     Public Property Get length() As Double
-        length = BASS_ChannelBytes2Seconds(Hwnd, BASS_ChannelGetLength(SongHandle, BASS_POS_BYTE))
+        length = BASS_ChannelBytes2Seconds(Hwnd, BASS_ChannelGetLength(Hwnd, BASS_POS_BYTE))
     End Property
     Public Property Get Position() As Double
-        Position = BASS_ChannelBytes2Seconds(Hwnd, BASS_ChannelGetPosition(SongHandle, BASS_POS_BYTE))
+        Position = BASS_ChannelBytes2Seconds(Hwnd, BASS_ChannelGetPosition(Hwnd, BASS_POS_BYTE))
     End Property
     Public Property Let Position(p As Double)
         BASS_ChannelSetPosition Hwnd, BASS_ChannelSeconds2Bytes(Hwnd, p), BASS_POS_BYTE
