@@ -1,7 +1,7 @@
 Attribute VB_Name = "Process"
 'Emerald Ïà¹Ø´úÂë
 
-Public Const Version As Long = 19051110
+Public Const Version As Long = 19051111
 Public VBIDEPath As String, InstalledPath As String, IsUpdate As Boolean
 Public Sub CheckUpdate()
     On Error GoTo ErrHandle
@@ -270,17 +270,16 @@ Function Dialog(t As String, c As String, ParamArray b()) As Integer
     Unload w
 End Function
 Sub CopyInto(Src As String, Dst As String)
-    Dim f As String
+    Dim f As String, p As Boolean
+    p = Dir(Dst & "\Core.bas") <> ""
     f = Dir(Src & "\")
     Do While f <> ""
         If f = "Core.bas" Then
-            If FileLen(Dst & "\" & f) <> 0 Then
-                GoTo skip
-            End If
+            If p Then GoTo skip
         End If
         FileCopy Src & "\" & f, Dst & "\" & f
-        f = Dir()
 skip:
+        f = Dir()
     Loop
 End Sub
 Function CompareFolder(Src As String, Dst As String) As String

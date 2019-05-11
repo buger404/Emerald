@@ -173,7 +173,7 @@ Private Sub Form_Load()
         If .Shadow(Me) Then
             .Color = RGB(0, 0, 0)
             .Depth = 30
-            .Transparency = 9
+            .Transparency = 14
         End If
     End With
 End Sub
