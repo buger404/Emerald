@@ -1,7 +1,7 @@
 Attribute VB_Name = "Process"
 'Emerald 相关代码
 
-Public Const Version As Long = 19051004
+Public Const Version As Long = 19051109
 Public VBIDEPath As String, InstalledPath As String, IsUpdate As Boolean
 Public Sub CheckUpdate()
     On Error GoTo ErrHandle
@@ -175,6 +175,9 @@ Sub Main()
                 If Val(info(0)) < 19051004 Then
                     Dialog "警告", "资源加载函数已经迁移。" & vbCrLf & "Page->Page.Res" & vbCrLf & vbCrLf & "* 详情参照Emerald提供的代码模板", "哦"
                 End If
+                If Val(info(0)) < 19051109 Then
+                    Dialog "警告", "窗口鼠标检测出现问题" & vbCrLf & "请参照DebugSwitch模块里的注释修改代码！" & vbCrLf & vbCrLf & "* 详情参照Emerald提供的代码模板", "哦"
+                End If
                 GoTo SkipName
             Else
                 Dialog "无操作", "你的工程已经在使用最新的Emerald了。", "手滑"
@@ -269,8 +272,14 @@ Sub CopyInto(Src As String, Dst As String)
     Dim f As String
     f = Dir(Src & "\")
     Do While f <> ""
+        If f = "Core.bas" Then
+            If FileLen(Dst & "\" & f) <> 0 Then
+                GoTo skip
+            End If
+        End If
         FileCopy Src & "\" & f, Dst & "\" & f
         f = Dir()
+skip:
     Loop
 End Sub
 Function CompareFolder(Src As String, Dst As String) As String
