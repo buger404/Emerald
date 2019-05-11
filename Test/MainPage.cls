@@ -21,6 +21,8 @@ Public Sub Update()
     '»æÖÆÊÂ¼þ
     Dim Map() As Single, MapTotal As Long, W As Long, H As Long
     
+    Page.Clear
+    
     On Error Resume Next
     Map = Music.GetMusicMap
     For i = 0 To UBound(Map)

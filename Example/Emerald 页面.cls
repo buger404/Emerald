@@ -19,6 +19,8 @@ Attribute VB_Exposed = False
 Public Sub Update()
     '绘制事件
     
+    Page.Clear '清空画布
+
     '================================================================
     '   示例：绘制文字
     '   Page.Writes "我是文字", 20,20, Color:=argb(255, 0, 0, 0)

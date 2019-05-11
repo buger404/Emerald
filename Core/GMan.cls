@@ -89,7 +89,6 @@ Public CDC As Long, ODC As Long, GG As Long, pB As Long
                 Call NewTransform
             End If
             If (Not SysPage.DoneMark) Then
-                SysPage.Page.Clear
                 SysPage.Page.Update
                 SysPage.Page.Display CDC
                 played = True
@@ -99,7 +98,7 @@ Public CDC As Long, ODC As Long, GG As Long, pB As Long
 
         For i = 1 To UBound(Pages)
             If ActivePage = Pages(i).name Then
-                Pages(i).p.Clear: Pages(i).p.Update: Pages(i).p.Display (CDC)
+                Pages(i).p.Update: Pages(i).p.Display (CDC)
                 played = True
                 o = (GetActiveWindow = 0)
                 If o <> OutOfWindow Then

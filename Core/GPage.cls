@@ -56,8 +56,8 @@ Public Res As GResource
     End Sub
 '========================================================
 '   Print
-    Public Sub Clear()
-        GdipGraphicsClear GG, argb(255, 255, 255, 255)
+    Public Sub Clear(Optional Color As Long = -1)
+        GdipGraphicsClear GG, Color
     End Sub
     Public Sub Update()
         Dim i As Integer

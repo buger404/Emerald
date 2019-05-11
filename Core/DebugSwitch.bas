@@ -29,6 +29,9 @@ Attribute VB_Name = "DebugSwitch"
 '               Mouse.X = X: Mouse.Y = Y
 '           End If
 '       End Sub
+'   2.画布清空机制修改
+'     请在你的绘图过程加入：
+'       Page.Clear
 '==============================================================================
 '   1.资源加载的改变
 '     请从Page.NewImages迁移到Page.Res.NewImages

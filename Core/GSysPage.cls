@@ -18,6 +18,7 @@ Public Key As Integer
 Public OpenTime As Long, DoneMark As Boolean, DoneStep As Integer
 Dim ChangeTime As Long, LastLoadPro As Single, LastLoadPro2 As Single
 Public Sub Update()
+    Page.Clear
     Select Case index
         Case 0
         Call SaveDialog

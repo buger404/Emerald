@@ -1,7 +1,7 @@
 Attribute VB_Name = "Process"
 'Emerald 相关代码
 
-Public Const Version As Long = 19051109
+Public Const Version As Long = 19051110
 Public VBIDEPath As String, InstalledPath As String, IsUpdate As Boolean
 Public Sub CheckUpdate()
     On Error GoTo ErrHandle
@@ -175,8 +175,9 @@ Sub Main()
                 If Val(info(0)) < 19051004 Then
                     Dialog "警告", "资源加载函数已经迁移。" & vbCrLf & "Page->Page.Res" & vbCrLf & vbCrLf & "* 详情参照Emerald提供的代码模板", "哦"
                 End If
-                If Val(info(0)) < 19051109 Then
+                If Val(info(0)) < 19051110 Then
                     Dialog "警告", "窗口鼠标检测出现问题" & vbCrLf & "请参照DebugSwitch模块里的注释修改代码！" & vbCrLf & vbCrLf & "* 详情参照Emerald提供的代码模板", "哦"
+                    Dialog "警告", "画布清空机制修改" & vbCrLf & "请在你的绘图过程加上Page.Clear！" & vbCrLf & vbCrLf & "* 详情参照Emerald提供的代码模板", "哦"
                 End If
                 GoTo SkipName
             Else
