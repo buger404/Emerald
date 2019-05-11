@@ -14,12 +14,12 @@ Attribute VB_Exposed = False
 '======================================
 '   页面绘制器
     Dim Page As GPage, Music As GMusic
-    Dim test As Boolean
+    Dim test As Boolean, test2 As Long
 '======================================
 
 Public Sub Update()
     '绘制事件
-    Dim Map() As Single, MapTotal As Long, w As Long, h As Long
+    Dim Map() As Single, MapTotal As Long, W As Long, H As Long
     
     On Error Resume Next
     Map = Music.GetMusicMap
@@ -39,8 +39,8 @@ Public Sub Update()
     For i = 0 To 20
         pro = Map(i) / 3000
         If pro > 1 Then pro = 1
-        Page.Paint 0, GW / 2 + Int(GW / 30) * i + 148, GH / 2 - GH * pro / 2, 5, GH * pro, argb(255, 0, 176, 240)
-        Page.Paint 0, GW / 2 - Int(GW / 30) * i - 148, GH / 2 - GH * pro / 2, 5, GH * pro, argb(255, 0, 176, 240)
+        Page.PaintLine GW / 2 + Int(GW / 30) * i + 148, GH / 2 - GH * pro / 2, GW / 2 + Int(GW / 30) * i + 148, GH / 2 + GH * pro / 2, argb(255, 0, 176, 240), 4
+        Page.PaintLine GW / 2 - Int(GW / 30) * i - 148, GH / 2 - GH * pro / 2, GW / 2 - Int(GW / 30) * i - 148, GH / 2 + GH * pro / 2, argb(255, 0, 176, 240), 4
     Next
     Page.DrawImage "music.png", GW / 2, GH / 2, Alpha:=1, Pos:=1
     
