@@ -23,7 +23,7 @@ Private Type AniTask
     delay As Long
     mark As Boolean
 End Type
-Private Const GTick As Long = 1000 / 30
+Dim GTick As Long
 Dim Anis() As AniTask
 Dim DrawBox As Object, brush As Long, Path As Long, Pen As Long
 Dim ScrollMode As Boolean, ScrollX As Long, ScrollY As Long, ScrollBX As Long, ScrollBY As Long, CRgn As Long
@@ -35,6 +35,7 @@ Public Res As GResource
         ReDim Anis(0)
         Set Res = New GResource
         
+        GTick = 1000 / 30
         CDC = CreateCDC(GW, GH)
         Res.Add CDC, 0, ""
         GdipCreateFromHDC CDC, GG
@@ -78,6 +79,12 @@ Public Res As GResource
 '   RunTime
     Public Property Get SrcClass() As Object
         Set SrcClass = DrawBox
+    End Property
+    Public Property Get GIFTick() As Long
+        GIFTick = GTick
+    End Property
+    Public Property Let GIFTick(nGIFTick As Long)
+        GTick = nGIFTick
     End Property
 '========================================================
 '   Images
