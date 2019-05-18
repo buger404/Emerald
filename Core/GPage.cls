@@ -514,20 +514,20 @@ ReShape:
         
         NewAnimation = UBound(Anis)
     End Function
-    Public Sub StartAnimation(id As Integer, Optional delay As Long = 0)
-        Anis(id).Start = GetTickCount
-        Anis(id).delay = delay
-        Anis(id).mark = False
+    Public Sub StartAnimation(ID As Integer, Optional delay As Long = 0)
+        Anis(ID).Start = GetTickCount
+        Anis(ID).delay = delay
+        Anis(ID).mark = False
     End Sub
-    Public Function AnimationDone(id As Integer) As Boolean
-        AnimationDone = Anis(id).mark
+    Public Function AnimationDone(ID As Integer) As Boolean
+        AnimationDone = Anis(ID).mark
     End Function
 '========================================================
     'Control
     Public Function ShowButton(pic As String, X As Long, Y As Long, text As String, Color As Long, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
         Dim w As Long, h As Long, i As Integer, m As Integer
-        i = GetImage(pic)
-        w = Mems(i).w: h = Mems(i).h
+        i = Res.GetImage(pic)
+        w = Res.ImgSize(i, imgGetWidth): h = Res.ImgSize(i, imgGetHeight)
         
         m = CheckMouse(X, Y, w, Int(h / 2))
         DrawImage i, X, Y, cy:=IIf(m <> 0, Int(h / 2), 0), ch:=Int(h / 2), Alpha:=1
@@ -538,8 +538,8 @@ ReShape:
     End Function
     Public Function ShowSimpleButton(pic As String, X As Long, Y As Long, text As String, Color As Long, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
         Dim w As Long, h As Long, i As Integer, m As Integer
-        i = GetImage(pic)
-        w = Mems(i).w: h = Mems(i).h
+        i = Res.GetImage(pic)
+        w = Res.ImgSize(i, imgGetWidth): h = Res.ImgSize(i, imgGetHeight)
         
         m = CheckMouse(X, Y, w, h)
         DrawImage i, X, Y, Alpha:=IIf(m, 1, 0.8)
@@ -560,8 +560,8 @@ ReShape:
     End Function
     Public Function ShowCheckBox(value, pic As String, X As Long, Y As Long, text As String, Color As Long, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
         Dim w As Long, h As Long, i As Integer, m As Integer
-        i = GetImage(pic)
-        w = Mems(i).w: h = Mems(i).h
+        i = Res.GetImage(pic)
+        w = Res.ImgSize(i, imgGetWidth): h = Res.ImgSize(i, imgGetHeight)
         
         m = CheckMouse(X, Y, w, Int(h / 2))
         DrawImage i, X, Y, cy:=IIf(value = True, Int(h / 2), 0), ch:=Int(h / 2), Alpha:=1
