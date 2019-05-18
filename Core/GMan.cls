@@ -27,6 +27,7 @@ Dim mPage As String, aPage As Object
 Dim OutOfWindow As Boolean
 Dim FirstPlay As Boolean
 Public CDC As Long, ODC As Long, GG As Long, pB As Long
+Dim IsLayered As Boolean
 '========================================================
 '   Init
     Private Sub Class_Initialize()
@@ -38,6 +39,11 @@ Public CDC As Long, ODC As Long, GG As Long, pB As Long
         GdipSetSmoothingMode GG, SmoothingModeAntiAlias
         GdipSetTextRenderingHint GG, TextRenderingHintAntiAlias
         GdipCreateSolidFill argb(255, 255, 255, 255), pB
+    End Sub
+    Public Sub Layered(Optional WithAero As Boolean = False)
+        SetWindowLongA GHwnd, GWL_EXSTYLE, GetWindowLongA(GHwnd, GWL_EXSTYLE) Or WS_EX_LAYERED
+        If WithAero Then BlurWindow GHwnd
+        IsLayered = True
     End Sub
     Public Sub Dispose()
         GdipDeleteGraphics GG
@@ -120,7 +126,22 @@ skipPage:
         End If
         
         If GetTickCount - Transform.time <= Transform.during Then Call Translation
-        BitBlt GDC, 0, 0, GW, GH, CDC, 0, 0, vbSrcCopy
+        
+        If IsLayered Then
+            Dim Bs As BLENDFUNCTION, Sz As size
+            'Dim SrcPoint As POINTAPI
+            With Bs
+                .AlphaFormat = AC_SRC_ALPHA
+                .BlendFlags = 0
+                .BlendOp = AC_SRC_OVER
+                .SourceConstantAlpha = 255
+            End With
+            Sz.cx = GW: Sz.cy = GH
+            'UpdateLayeredWindow GHwnd, 0, ByVal 0, Sz, CDC, ByVal 0, 0, Bs, ULW_ALPHA
+            UpdateLayeredWindow GHwnd, GDC, ByVal 0&, Sz, CDC, 0, 0, Bs, &H2
+        Else
+            BitBlt GDC, 0, 0, GW, GH, CDC, 0, 0, vbSrcCopy
+        End If
         tFPS = tFPS + 1: FPSctt = FPSctt + (Timer * 1000 - t)
         
         If GetTickCount - FPSt >= 1000 Then
@@ -134,7 +155,7 @@ skipPage:
             FPSct = FPSctt: FPSctt = 0
         End If
         
-        If Mouse.State = 2 Then Mouse.State = 0
+        If Mouse.state = 2 Then Mouse.state = 0
     End Sub
 '========================================================
 '   Transform

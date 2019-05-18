@@ -2,11 +2,11 @@ VERSION 5.00
 Begin VB.Form TestWindow 
    Appearance      =   0  'Flat
    BackColor       =   &H80000005&
-   BorderStyle     =   1  'Fixed Single
+   BorderStyle     =   0  'None
    Caption         =   "Õœ»Î“Ù¿÷Enjoy"
    ClientHeight    =   6672
-   ClientLeft      =   48
-   ClientTop       =   396
+   ClientLeft      =   12
+   ClientTop       =   12
    ClientWidth     =   9660
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
@@ -38,6 +38,7 @@ Private Sub Form_Load()
     MakeFont "Œ¢»Ì—≈∫⁄"
     
     Set EC = New GMan
+    EC.Layered True
     
     Set ESave = New GSaving
     ESave.Create "emerald.test", "Emerald.test"
@@ -59,7 +60,7 @@ Private Sub Form_MouseDown(button As Integer, Shift As Integer, X As Single, Y A
 End Sub
 
 Private Sub Form_MouseMove(button As Integer, Shift As Integer, X As Single, Y As Single)
-    If Mouse.State = 0 Then
+    If Mouse.state = 0 Then
         UpdateMouse X, Y, 0, button
     Else
         Mouse.X = X: Mouse.Y = Y
@@ -70,8 +71,8 @@ Private Sub Form_MouseUp(button As Integer, Shift As Integer, X As Single, Y As 
     UpdateMouse X, Y, 2, button
 End Sub
 
-Private Sub Form_OLEDragDrop(Data As DataObject, Effect As Long, button As Integer, Shift As Integer, X As Single, Y As Single)
-    MainPage.PlayNew Data.Files(1)
+Private Sub Form_OLEDragDrop(data As DataObject, Effect As Long, button As Integer, Shift As Integer, X As Single, Y As Single)
+    MainPage.PlayNew data.Files(1)
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)

@@ -23,6 +23,7 @@ Class=GSysPage; Core\GSysPage.cls
 Module=Core; Core\Core.bas
 Module=AboutMe; Core\AboutMe.bas
 Class=GResource; Core\GResource.cls
+Module=AeroEffect; Core\AeroEffect.bas
 Startup="Sub Main"
 HelpFile=""
 Title="{app}"

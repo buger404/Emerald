@@ -19,9 +19,9 @@ Attribute VB_Exposed = False
 
 Public Sub Update()
     '»æÖÆÊÂ¼þ
-    Dim Map() As Single, MapTotal As Long, W As Long, H As Long
+    Dim Map() As Single, MapTotal As Long, w As Long, h As Long
     
-    Page.Clear
+    Page.Clear argb(170, 255, 255, 255)
     
     On Error Resume Next
     Map = Music.GetMusicMap

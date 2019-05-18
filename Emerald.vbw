@@ -20,5 +20,5 @@ GSysPage = 224, 224, 912, 701,
 MainPage = 64, 64, 720, 595, 
 Core = 128, 128, 784, 659, 
 AboutMe = 0, 0, 656, 531, 
-aShadow = 0, 0, 0, 0, C
+aShadow = 96, 96, 848, 472, Z
 GResource = 160, 160, 880, 590, 

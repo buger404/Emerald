@@ -33,12 +33,15 @@ Attribute VB_Name = "AboutMe"
 '       ┗━━━━*Gdiplus.bas：vIstaswx GDI+ 声明模块
 '   ┗━━━━其他
 '       ┗━━━━*aShadow.cls：网上复制的窗口阴影类模块
+'       ┗━━━━AeroEffect.bas：Aero效果
 '       ┗━━━━GCore.bas：Emerald部分核心功能
 '       ┗━━━━GSysPage.cls：Emerald页面的绘制
 '       ┗━━━━EmeraldWindow.frm：显示Emerald信息使用的窗口
 '========================================================
 '   更新日志
 '========================================================
+'   更新内容(ver.518)
+'   -添加分层绘制和亚克力效果
 '   更新内容(ver.511)
 '   -修复代码更新问题
 '   -画布清空机制修改
