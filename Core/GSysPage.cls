@@ -27,18 +27,23 @@ Public Sub Update()
     End Select
 End Sub
 Public Sub LOGODialog()
-    Dim W As Long, H As Long
-    W = Page.Res.ImgSize("logo.png", imgGetWidth)
-    H = Page.Res.ImgSize("logo.png", imgGetHeight)
+    If DisableLOGO Then
+        DoneMark = True
+        Exit Sub
+    End If
     
-    Page.Paint 0, 0, 0, GW, GH, argb(255, 16, 16, 35)
+    Dim w As Long, h As Long
+    w = Page.Res.ImgSize("logo.png", imgGetWidth)
+    h = Page.Res.ImgSize("logo.png", imgGetHeight)
+    
+    Page.Clear argb(255, 16, 16, 35)
     
     If GetTickCount - OpenTime >= 2000 Then
         If PreLoadCount <> LoadedCount Then
-            Page.DrawImageEx "logo.png", GW / 2, GH * 0.85 / 2, Int(GW * 0.45), Int((GW * 0.45) / W * H), 1
+            Page.DrawImageEx "logo.png", GW / 2, GH * 0.85 / 2, Int(GW * 0.45), Int((GW * 0.45) / w * h), 1
         End If
     Else
-        Page.DrawImageEx "logo.png", GW / 2, GH / 2, Int(GW * 0.45), Int((GW * 0.45) / W * H), 1
+        Page.DrawImageEx "logo.png", GW / 2, GH / 2, Int(GW * 0.45), Int((GW * 0.45) / w * h), 1
     End If
     
     Dim pro As Single
@@ -108,7 +113,7 @@ End Sub
 Public Sub Lostfocus()
 
 End Sub
-Public Sub AnimationDone(id As Integer)
+Public Sub AnimationDone(ID As Integer)
 
 End Sub
 Private Sub Class_Initialize()

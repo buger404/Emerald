@@ -2,11 +2,11 @@ VERSION 5.00
 Begin VB.Form TestWindow 
    Appearance      =   0  'Flat
    BackColor       =   &H80000005&
-   BorderStyle     =   0  'None
+   BorderStyle     =   1  'Fixed Single
    Caption         =   "Õœ»Î“Ù¿÷Enjoy"
    ClientHeight    =   6672
-   ClientLeft      =   12
-   ClientTop       =   12
+   ClientLeft      =   48
+   ClientTop       =   396
    ClientWidth     =   9660
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
@@ -38,7 +38,7 @@ Private Sub Form_Load()
     MakeFont "Œ¢»Ì—≈∫⁄"
     
     Set EC = New GMan
-    EC.Layered True
+    'EC.Layered True
     
     Set ESave = New GSaving
     ESave.Create "emerald.test", "Emerald.test"

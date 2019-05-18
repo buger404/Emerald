@@ -5,7 +5,7 @@ Attribute VB_Name = "GCore"
 '=========================================================================
     Private Declare Sub AlphaBlend Lib "msimg32.dll" (ByVal hdcDest As Long, ByVal nXOriginDest As Long, ByVal nYOriginDest As Long, ByVal nWidthDest As Long, ByVal hHeightDest As Long, ByVal hdcSrc As Long, ByVal nXOriginSrc As Long, ByVal nYOriginSrc As Long, ByVal nWidthSrc As Long, ByVal nHeightSrc As Long, ByVal BLENDFUNCTION As Long) ' As Long
     Public Type MState
-        State As Integer
+        state As Integer
         button As Integer
         X As Single
         Y As Single
@@ -247,26 +247,26 @@ sth:
     End Function
 '========================================================
 '   Mouse
-    Public Sub UpdateMouse(X As Single, Y As Single, State As Long, button As Integer)
+    Public Sub UpdateMouse(X As Single, Y As Single, state As Long, button As Integer)
         With Mouse
             .X = X
             .Y = Y
-            .State = State
+            .state = state
             .button = button
         End With
     End Sub
     Public Function CheckMouse(X As Long, Y As Long, w As Long, h As Long) As MButtonState
         'Return Value:0=none,1=in,2=down,3=up
         If Mouse.X >= X And Mouse.Y >= Y And Mouse.X <= X + w And Mouse.Y <= Y + h Then
-            CheckMouse = Mouse.State + 1
-            If Mouse.State = 2 Then Mouse.State = 0
+            CheckMouse = Mouse.state + 1
+            If Mouse.state = 2 Then Mouse.state = 0
         End If
     End Function
     Public Function CheckMouse2() As MButtonState
         'Return Value:0=none,1=in,2=down,3=up
         If Mouse.X >= DrawF.Left And Mouse.Y >= DrawF.top And Mouse.X <= DrawF.Left + DrawF.Right And Mouse.Y <= DrawF.top + DrawF.Bottom Then
-            CheckMouse2 = Mouse.State + 1
-            If Mouse.State = 2 Then Mouse.State = 0
+            CheckMouse2 = Mouse.state + 1
+            If Mouse.state = 2 Then Mouse.state = 0
         End If
     End Function
 '========================================================
@@ -299,10 +299,10 @@ sth:
             Exit Sub
         End If
         
-        Dim Data As New GSaving
-        Data.Create "Emerald.Core", "Emerald.Core"
-        If Now - CDate(Data.GetData("UpdateTime")) >= UpdateCheckInterval Or Data.GetData("UpdateAble") = 1 Then
-            Data.PutData "UpdateTime", Now
+        Dim data As New GSaving
+        data.Create "Emerald.Core", "Emerald.Core"
+        If Now - CDate(data.GetData("UpdateTime")) >= UpdateCheckInterval Or data.GetData("UpdateAble") = 1 Then
+            data.PutData "UpdateTime", Now
             
             Dim xmlHttp As Object, ret As String, Start As Long
             Set xmlHttp = CreateObject("Microsoft.XMLHTTP")
@@ -322,14 +322,14 @@ sth:
             Debug.Print Now, "Emerald：检查版本完毕，最新版本号 " & Val(ret)
             
             If Val(ret) > Version Then
-                Data.PutData "UpdateAble", 1
+                data.PutData "UpdateAble", 1
                 If MsgBox("发现Emerald存在新版本，您希望现在前往下载吗？", vbYesNo + 48, "Emerald") = vbNo Then Exit Sub
                 
                 ShellExecuteA 0, "open", "https://github.com/Red-Error404/Emerald", "", "", SW_SHOW
-                Data.PutData "UpdateAble", 0
+                data.PutData "UpdateAble", 0
             End If
         Else
-            Debug.Print Now, "Emerald：上次检查更新时间 " & CDate(Data.GetData("UpdateTime"))
+            Debug.Print Now, "Emerald：上次检查更新时间 " & CDate(data.GetData("UpdateTime"))
         End If
     End Sub
 '========================================================
