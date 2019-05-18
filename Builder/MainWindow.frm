@@ -1,127 +1,25 @@
 VERSION 5.00
 Begin VB.Form MainWindow 
    Appearance      =   0  'Flat
-   BackColor       =   &H00FBFBFB&
+   BackColor       =   &H80000005&
    BorderStyle     =   0  'None
-   Caption         =   "Emerald Builder"
-   ClientHeight    =   4320
-   ClientLeft      =   0
-   ClientTop       =   0
-   ClientWidth     =   7524
-   ForeColor       =   &H00E6DCDC&
-   Icon            =   "MainWindow.frx":0000
+   Caption         =   "窗口名称"
+   ClientHeight    =   6672
+   ClientLeft      =   12
+   ClientTop       =   12
+   ClientWidth     =   9660
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
-   ScaleHeight     =   360
+   MinButton       =   0   'False
+   ScaleHeight     =   556
    ScaleMode       =   3  'Pixel
-   ScaleWidth      =   627
+   ScaleWidth      =   805
    StartUpPosition =   2  '屏幕中心
-   Begin VB.PictureBox PicBox 
-      Appearance      =   0  'Flat
-      AutoRedraw      =   -1  'True
-      BackColor       =   &H80000005&
-      BorderStyle     =   0  'None
-      ForeColor       =   &H80000008&
-      Height          =   1440
-      Left            =   5664
-      ScaleHeight     =   1440
-      ScaleWidth      =   1440
-      TabIndex        =   4
-      Top             =   1296
-      Visible         =   0   'False
-      Width           =   1440
-   End
-   Begin Emerald_Builder.EEdit InputBox 
-      Height          =   300
-      Left            =   312
-      TabIndex        =   3
-      Top             =   3048
-      Visible         =   0   'False
-      Width           =   6888
-      _ExtentX        =   12150
-      _ExtentY        =   529
-      BackColor       =   16514043
-      Content         =   "EEdit1"
-      ForeColor       =   8158332
-      BorderColor     =   13556250
-      Alignment       =   0
-      LockInput       =   0   'False
-   End
-   Begin Emerald_Builder.EButton Buttons 
-      Height          =   420
-      Index           =   0
-      Left            =   6312
-      TabIndex        =   2
-      Top             =   3600
-      Visible         =   0   'False
-      Width           =   948
-      _ExtentX        =   1672
-      _ExtentY        =   741
-      DefaultColor    =   14342874
-      HoverColor      =   13556250
-      ForeColor       =   8158332
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "微软雅黑"
-         Size            =   9.6
-         Charset         =   134
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      Content         =   "OK"
-      Align           =   0
-   End
-   Begin VB.Line Line1 
-      BorderColor     =   &H00DADADA&
-      X1              =   26
-      X2              =   600
-      Y1              =   84
-      Y2              =   84
-   End
-   Begin VB.Label Content 
-      Appearance      =   0  'Flat
-      AutoSize        =   -1  'True
-      BackColor       =   &H80000005&
-      BackStyle       =   0  'Transparent
-      Caption         =   "Content"
-      BeginProperty Font 
-         Name            =   "微软雅黑"
-         Size            =   10.2
-         Charset         =   134
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      ForeColor       =   &H007C7C7C&
-      Height          =   276
-      Left            =   432
-      TabIndex        =   1
-      Top             =   1200
-      Width           =   768
-   End
-   Begin VB.Label Title 
-      Appearance      =   0  'Flat
-      AutoSize        =   -1  'True
-      BackColor       =   &H80000005&
-      BackStyle       =   0  'Transparent
-      Caption         =   "Title"
-      BeginProperty Font 
-         Name            =   "微软雅黑"
-         Size            =   16.2
-         Charset         =   134
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      ForeColor       =   &H00212121&
-      Height          =   420
-      Left            =   432
-      TabIndex        =   0
-      Top             =   312
-      Width           =   648
+   Begin VB.Timer DrawTimer 
+      Enabled         =   0   'False
+      Interval        =   5
+      Left            =   9000
+      Top             =   240
    End
 End
 Attribute VB_Name = "MainWindow"
@@ -129,51 +27,82 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-'Emerald 相关代码
+'==================================================
+'   页面管理器
+    Dim EC As GMan
+    Dim oShadow As New aShadow
+'==================================================
+'   在此处放置你的页面类模块声明
+    Dim WelcomePage As New WelcomePage, TitleBar As New TitleBar
+'==================================================
 
-Dim o As New aShadow
-Public Key As Integer
-Public Sub NewDialog(t As String, c As String, Pic As String, InputMode As Boolean, b())
-    Key = 0
-    PicBox.Visible = (Pic <> "")
-    
-    For i = 1 To Buttons.UBound
-        Unload Buttons(i)
-    Next
-    
-    Title.Caption = t
-    Content.Caption = c
-    
-    If Pic <> "" Then PicBox.Picture = LoadPicture(Pic)
-    
-    InputBox.Visible = InputMode
-    
-    For i = 0 To UBound(b)
-        Load Buttons(Buttons.UBound + 1)
-        With Buttons(Buttons.UBound)
-            .Content = b(i)
-            .top = Buttons(0).top
-            .Left = Me.ScaleWidth - (20 + Buttons(0).Width) * (UBound(b) - i + 1) - 10
-            .Width = Buttons(0).Width
-            .Height = Buttons(0).Height
-            .Visible = True
-        End With
-    Next
-    
-    InputBox.Content = ""
-End Sub
-
-Private Sub Buttons_Click(Index As Integer)
-    Key = Index
-    Me.Hide
+Private Sub DrawTimer_Timer()
+    '绘制
+    EC.Display
 End Sub
 
 Private Sub Form_Load()
-    With o
+    '初始化Emerald
+    StartEmerald Me.Hwnd, Me.ScaleWidth, Me.ScaleHeight
+    '创建字体
+    MakeFont "微软雅黑"
+    '创建页面管理器
+    Set EC = New GMan
+    EC.Layered True
+    
+    '创建存档（可选）
+    Set ESave = New GSaving
+    ESave.Create "Emerald.builder", "Emerald.builder"
+    
+    '创建音乐列表
+    Set MusicList = New GMusicList
+    MusicList.Create App.Path & "\music"
+
+    '开始显示
+    With oShadow
         If .Shadow(Me) Then
-            .Color = RGB(0, 0, 0)
-            .Depth = 30
-            .Transparency = 14
+            .Depth = 20
+            .Transparency = 16
         End If
     End With
+    
+    '在此处初始化你的页面
+    Set WelcomePage = New WelcomePage
+    
+    Set TitleBar = New TitleBar
+
+    '设置活动页面
+    EC.ActivePage = "WelcomePage"
+    If InstalledPath = "" Then
+        WelcomePage.Page.StartAnimation 1
+        WelcomePage.Page.StartAnimation 2, 200
+    End If
+    
+    Me.Show
+    DrawTimer.Enabled = True
+End Sub
+
+Private Sub Form_MouseDown(button As Integer, Shift As Integer, X As Single, Y As Single)
+    '发送鼠标信息
+    UpdateMouse X, Y, 1, button
+End Sub
+
+Private Sub Form_MouseMove(button As Integer, Shift As Integer, X As Single, Y As Single)
+    '发送鼠标信息
+    If Mouse.state = 0 Then
+        UpdateMouse X, Y, 0, button
+    Else
+        Mouse.X = X: Mouse.Y = Y
+    End If
+End Sub
+Private Sub Form_MouseUp(button As Integer, Shift As Integer, X As Single, Y As Single)
+    '发送鼠标信息
+    UpdateMouse X, Y, 2, button
+End Sub
+
+Private Sub Form_Unload(Cancel As Integer)
+    '终止绘制
+    DrawTimer.Enabled = False
+    '释放Emerald资源
+    EndEmerald
 End Sub

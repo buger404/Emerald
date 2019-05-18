@@ -103,7 +103,7 @@ Dim IsLayered As Boolean
         End If
 
         For i = 1 To UBound(Pages)
-            If ActivePage = Pages(i).name Then
+            If ActivePage = Pages(i).name Or Pages(i).p.TopPage Then
                 Pages(i).p.Update: Pages(i).p.Display (CDC)
                 played = True
                 o = (GetActiveWindow = 0)
@@ -115,7 +115,6 @@ Dim IsLayered As Boolean
                         CallByName Pages(i).p.SrcClass, "Gotfocus", VbMethod
                     End If
                 End If
-                Exit For
             End If
         Next
         
@@ -128,17 +127,17 @@ skipPage:
         If GetTickCount - Transform.time <= Transform.during Then Call Translation
         
         If IsLayered Then
-            Dim Bs As BLENDFUNCTION, Sz As size
+            Dim bs As BLENDFUNCTION, sz As size
             'Dim SrcPoint As POINTAPI
-            With Bs
+            With bs
                 .AlphaFormat = AC_SRC_ALPHA
                 .BlendFlags = 0
                 .BlendOp = AC_SRC_OVER
                 .SourceConstantAlpha = 255
             End With
-            Sz.cx = GW: Sz.cy = GH
+            sz.cx = GW: sz.cy = GH
             'UpdateLayeredWindow GHwnd, 0, ByVal 0, Sz, CDC, ByVal 0, 0, Bs, ULW_ALPHA
-            UpdateLayeredWindow GHwnd, GDC, ByVal 0&, Sz, CDC, 0, 0, Bs, &H2
+            UpdateLayeredWindow GHwnd, GDC, ByVal 0&, sz, CDC, 0, 0, bs, &H2
         Else
             BitBlt GDC, 0, 0, GW, GH, CDC, 0, 0, vbSrcCopy
         End If

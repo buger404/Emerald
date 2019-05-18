@@ -29,6 +29,7 @@ Dim DrawBox As Object, brush As Long, Path As Long, Pen As Long
 Dim ScrollMode As Boolean, ScrollX As Long, ScrollY As Long, ScrollBX As Long, ScrollBY As Long, CRgn As Long
 Public CDC As Long, GG As Long, OutOfScroll As Boolean
 Public Res As GResource
+Public TopPage As Boolean
 '========================================================
 '   Init
     Public Sub Create(dBox As Object)
@@ -73,7 +74,11 @@ Public Res As GResource
         CallByName DrawBox, "Update", VbMethod
     End Sub
     Public Sub Display(DC As Long)
-        BitBlt DC, 0, 0, GW, GH, CDC, 0, 0, vbSrcCopy
+        If TopPage Then
+            PaintDC CDC, DC, Alpha:=1
+        Else
+            BitBlt DC, 0, 0, GW, GH, CDC, 0, 0, vbSrcCopy
+        End If
     End Sub
 '========================================================
 '   RunTime
@@ -514,13 +519,13 @@ ReShape:
         
         NewAnimation = UBound(Anis)
     End Function
-    Public Sub StartAnimation(ID As Integer, Optional delay As Long = 0)
-        Anis(ID).Start = GetTickCount
-        Anis(ID).delay = delay
-        Anis(ID).mark = False
+    Public Sub StartAnimation(id As Integer, Optional delay As Long = 0)
+        Anis(id).Start = GetTickCount
+        Anis(id).delay = delay
+        Anis(id).mark = False
     End Sub
-    Public Function AnimationDone(ID As Integer) As Boolean
-        AnimationDone = Anis(ID).mark
+    Public Function AnimationDone(id As Integer) As Boolean
+        AnimationDone = Anis(id).mark
     End Function
 '========================================================
     'Control
