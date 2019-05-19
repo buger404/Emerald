@@ -25,9 +25,14 @@ Public Sub Update()
     
     Dim m As Integer
     m = CheckMouse(GW - 60, 0, 60, 30 + 16 / 0.75)
-    If Page.ShowColorButton(0, GW - 60, 0, 61, 30 + 16 / 0.75, "×", IIf(m = 0, argb(255, 128, 128, 128), argb(255, 255, 255, 255)), argb(0, 254, 84, 57), argb(255, 254, 84, 57), size:=18) = 2 Then
-        Unload MainWindow
-        Exit Sub
+    If ECore.ActivePage <> "SetupPage" Then
+        If Page.ShowColorButton(0, GW - 60, 0, 61, 30 + 16 / 0.75, "×", IIf(m = 0, argb(255, 128, 128, 128), argb(255, 255, 255, 255)), argb(0, 254, 84, 57), argb(255, 254, 84, 57), size:=18) = 2 Then
+            Unload MainWindow
+            Exit Sub
+        End If
+    Else
+        Page.ShowColorButton 0, GW - 60, 0, 61, 30 + 16 / 0.75, "×", argb(255, 168, 168, 168), argb(0, 254, 84, 57), argb(50, 128, 128, 128), size:=18
+        If m = 3 Then MsgBox "安装过程中不允许暂停，非常抱歉。", 48, "安装程序"
     End If
     m = CheckMouse(GW - 120, 0, 60, 30 + 16 / 0.75)
     If Page.ShowColorButton(0, GW - 120, 0, 61, 30 + 16 / 0.75, "-", IIf(m = 0, argb(255, 128, 128, 128), argb(255, 255, 255, 255)), argb(0, 128, 128, 128), argb(100, 128, 128, 128), size:=18) = 2 Then

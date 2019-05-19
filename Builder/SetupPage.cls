@@ -14,18 +14,48 @@ Attribute VB_Exposed = False
 '======================================
 '   页面绘制器
     Dim Page As GPage
+    Public Progress As Single, SetupInfo As String
+    Dim DisplayProgress As Single, ChangeTime As Long, DoneMark As Boolean
 '======================================
-
+Public Sub UpdateDone()
+    Page.Clear argb(255 * 0.85, 242, 242, 249) '清空画布
+    
+    If SetupErr = 0 Then
+        Page.Writes "Emerald Builder 安装成功", GW / 2, 100, 30, argb(255, 27, 27, 27), align:=StringAlignmentCenter
+        Page.Writes "在资源管理器中右键创建你的工程吧！", GW / 2, 140, 16, argb(150, 27, 27, 27), align:=StringAlignmentCenter, animation:=1
+        
+        Page.Paint 0, GW / 2, 160 + (GH - 160 - 80) / 2, GW + 1, 270, argb(255, 255, 255, 255), Pos:=posOnCenter
+        Page.DrawImage "tip.png", GW / 2, 160 + (GH - 160 - 80) / 2, Alpha:=1, Pos:=posOnCenter, animation:=1
+    Else
+        Page.Writes "安装已经完成，但是发生了一些错误。", GW / 2, 200, 20, argb(255, 254, 84, 57), align:=StringAlignmentCenter
+    End If
+    
+    If Page.ShowColorButton(0, GW / 2 - 130 / 2, GH - 80, 130, 40, "OK", argb(255, 255, 255, 255), argb(255, 85, 219, 211), argb(255, 55, 189, 181), size:=16) = 3 Then
+        ECore.NewTransform transFadeIn, 700, "WelcomePage"
+    End If
+End Sub
 Public Sub Update()
     '绘制事件
+    If DoneMark Then Call UpdateDone: Exit Sub
     
-    Page.Clear '清空画布
+    If Progress <> DisplayProgress Then
+        If GetTickCount - ChangeTime >= 10 Then
+            ChangeTime = GetTickCount
+            DisplayProgress = DisplayProgress + (Progress - DisplayProgress) / 30
+        End If
+        If DisplayProgress > Progress Or (Progress - DisplayProgress) < 0.001 Then DisplayProgress = Progress
+    End If
+        
+    
+    Page.Clear argb(255 * 0.85, 242, 242, 249) '清空画布
+    
+    Page.PaintArc GW / 2, GH / 2 - 20, 200, 200, 360, -90, argb(255, 230, 230, 230), 2, 1, posOnCenter
+    Page.PaintArc GW / 2, GH / 2 - 20, 200, 200, DisplayProgress * 360, -90, argb(255, 95, 229, 221), 3, 1, posOnCenter
+    Page.Writes Int(DisplayProgress * 100), GW / 2, GH / 2 - 52, 50, argb(255, 27, 27, 27), align:=StringAlignmentCenter, style:=FontStyleBold
 
-    '================================================================
-    '   示例：绘制文字
-    '   Page.Writes "我是文字", 20,20, Color:=argb(255, 0, 0, 0)
-    '================================================================
+    Page.Writes SetupInfo, GW / 2, GH - 110, 18, argb(255, 64, 64, 64), align:=StringAlignmentCenter
     
+    If DisplayProgress >= 0.9999 Then Page.StartAnimation 1, 1000: ECore.NewTransform , 400: DoneMark = True
 End Sub
 Public Sub Wheel(Direction As Integer, Depth As Single)
     '鼠标滚轮事件
@@ -33,6 +63,7 @@ Public Sub Wheel(Direction As Integer, Depth As Single)
 End Sub
 Public Sub Enter()
     '页面进入事件
+    DisplayProgress = 0: Progress = 0: SetupInfo = "准备中": DoneMark = False
 End Sub
 Public Sub Leave()
     '页面离开事件
@@ -52,12 +83,12 @@ Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
     '导入游戏资源
-    Page.Res.NewImages App.Path & "\assets"
+    Page.Res.NewImages App.Path & "\assets", 0.7
     '创建页面
-    ECore.Add Page, "[你的页面名称]"
+    ECore.Add Page, "SetupPage"
     
     '===============================================
     '   如果需要添加动画，请放置在此处
-    
+        Page.NewAnimation False, "FadeIn", 2, 400
     '===============================================
 End Sub

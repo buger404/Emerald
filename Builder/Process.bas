@@ -3,6 +3,9 @@ Attribute VB_Name = "Process"
 
 Public Const Version As Long = 19051111
 Public VBIDEPath As String, InstalledPath As String, IsUpdate As Boolean
+Public WelcomePage As New WelcomePage, TitleBar As New TitleBar, SetupPage As SetupPage, Repaired As Boolean
+Public Tasks() As String
+Public CmdMark As String, SetupErr As Long
 Public Sub CheckUpdate()
     On Error GoTo ErrHandle
     
@@ -51,10 +54,16 @@ Public Function CheckFileName(name As String) As Boolean
 End Function
 Sub Uninstall()
     If Dialog("卸载", "Emerald Builder 已经安装，你希望删除它吗？", "卸载", "手滑") <> 1 Then End
-
-    On Error Resume Next
+    
+    SetupPage.SetupInfo = "正在创建：WScript.Shell对象"
+    SetupPage.Progress = 0.1
+    Call FakeSleep
     
     Set WSHShell = CreateObject("WScript.Shell")
+    
+    SetupPage.SetupInfo = "正在删除：资源管理器背景菜单项"
+    SetupPage.Progress = 0.4
+    Call FakeSleep
     
     WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\shell\emerald\icon"
     WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\shell\emerald\version"
@@ -65,6 +74,10 @@ Sub Uninstall()
     WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\command\"
     WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\"
     
+    SetupPage.SetupInfo = "正在删除：软件信息"
+    SetupPage.Progress = 0.7
+    Call FakeSleep
+    
     WSHShell.RegDelete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\DisplayIcon"
     WSHShell.RegDelete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\DisplayName"
     WSHShell.RegDelete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\DisplayVersion"
@@ -74,22 +87,41 @@ Sub Uninstall()
     WSHShell.RegDelete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\InstallLocation"
     WSHShell.RegDelete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\"
     
+    SetupPage.SetupInfo = "正在删除：Visual Basic 6 模板文件 (1/2)"
+    SetupPage.Progress = 0.8
+    Call FakeSleep
+    
     Kill VBIDEPath & "Template\Forms\Emerald 游戏窗口.frm"
+    
+    SetupPage.SetupInfo = "正在删除：Visual Basic 6 模板文件 (2/2)"
+    SetupPage.Progress = 0.9
+    Call FakeSleep
+    
     Kill VBIDEPath & "Template\Classes\Emerald 页面.cls"
     
-    If Err.Number <> 0 Then
-        MsgBox "卸载过程中部分步骤出现错误，可能需要您手动确认删除。", 64, "再见"
-    End If
-    
-    Dialog "再见", "Emerald Builder 已经从你的电脑上删除。", "再见"
-    
-    End
+    SetupPage.SetupInfo = "收尾"
+    SetupPage.Progress = 1
+End Sub
+Sub FakeSleep()
+    For i = 1 To 10
+        Sleep 10: DoEvents
+        ECore.Display
+    Next
 End Sub
 Sub Setup()
+    On Error Resume Next
+
     Dim exeP As String
     exeP = """" & App.Path & "\Builder.exe" & """"
-    Set WSHShell = CreateObject("WScript.Shell")
     
+    SetupPage.SetupInfo = "正在创建：WScript.Shell对象"
+    SetupPage.Progress = 0.1
+    Set WSHShell = CreateObject("WScript.Shell")
+
+    Call FakeSleep
+
+    SetupPage.SetupInfo = "正在注册：资源管理器背景菜单项"
+    SetupPage.Progress = 0.3
     WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\shell\emerald\", "在此处创建/更新Emerald工程"
     WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\shell\emerald\icon", exeP
     
@@ -102,6 +134,10 @@ Sub Setup()
     
     WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\command\", exeP & " ""%v"""
     
+    Call FakeSleep
+    
+    SetupPage.SetupInfo = "正在注册：软件信息"
+    SetupPage.Progress = 0.6
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\DisplayIcon", exeP
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\DisplayName", "Emerald"
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\DisplayVersion", "Indev " & Version
@@ -110,9 +146,22 @@ Sub Setup()
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\URLInfoAbout", "http://red-error404.github.io/233"
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\UninstallString", exeP & " ""-uninstall"""
     
+    Call FakeSleep
+    
+    SetupPage.SetupInfo = "正在复制：Visual Basic 6 模板文件（1/2）"
+    SetupPage.Progress = 0.8
     FileCopy App.Path & "\Example\Emerald 游戏窗口.frm", VBIDEPath & "Template\Forms\Emerald 游戏窗口.frm"
+    
+    Call FakeSleep
+    
+    SetupPage.SetupInfo = "正在复制：Visual Basic 6 模板文件（2/2）"
+    SetupPage.Progress = 0.9
     FileCopy App.Path & "\Example\Emerald 页面.cls", VBIDEPath & "Template\Classes\Emerald 页面.cls"
     
+    Call FakeSleep
+    
+    SetupPage.SetupInfo = "收尾"
+    SetupPage.Progress = 1
 End Sub
 Sub CheckVersion()
     On Error Resume Next
@@ -135,16 +184,17 @@ Sub Repair()
     If InstalledPath = "" Then Exit Sub
     
     If Dir(InstalledPath) = "" Then
-        If Dialog("修复", "发现旧的Emerald已经被删除，重新安装吗？", "好的", "不要！") <> 1 Then End
-        Call Setup
-        End
+        ECore.NewTransform , 400, "WelcomePage": Repaired = True
     End If
 End Sub
 Sub Main()
+    MainWindow.Show
+
     Call CheckUpdate
     Call GetVBIDEPath
     Call GetInstalledPath
     Call Repair
+    If Repaired Then Exit Sub
     
     If Command$ <> "" Then
         Dim appn As String, f As String, t As String, p As String
@@ -222,51 +272,33 @@ SkipName:
         
         If InstalledPath <> "" Then
             If (Not IsUpdate) Then
-                Call Uninstall
-                End
+                ECore.NewTransform , 400, "WelcomePage": Exit Sub
             Else
-                If Dialog("更新可用", "按下确定后更新你的 Emerald Builder .", "确定", "取消") <> 1 Then Exit Sub
+                ECore.NewTransform , 400, "WelcomePage": Exit Sub
             End If
         End If
         
         If InstalledPath = "" Then
-            If Dialog("我来啦~", "现在安装 Emerald Builder 吗？", "是的", "我手残而已") <> 1 Then Exit Sub
+            ECore.NewTransform , 400, "WelcomePage": Exit Sub
         End If
         
-        Call Setup
-        
-        Dialog "成功", "Emerald Builder 成功安装在你的电脑上。", "好"
-        
-FailOper:
-        If Err.Number <> 0 Then Dialog "错误", "出了一些意外，无法完成部分操作。" & vbCrLf & Err.Description & "(" & Err.Number & ")", "好吧"
     End If
 End Sub
 Function InputAsk(t As String, c As String, ParamArray b()) As String
-    Dim w As New MainWindow, b2()
-    b2 = b
-    
-    w.NewDialog t, c, "", True, b2
-    w.Show
-    
-    Do While w.Visible
-        DoEvents
-    Loop
-    
-    If w.Key = 1 Then InputAsk = w.InputBox.Content
-    Unload w
+    InputAsk = InputBox(c, t)
 End Function
 Function Dialog(t As String, c As String, ParamArray b()) As Integer
     Dim w As New MainWindow, b2()
     b2 = b
     
-    w.NewDialog t, c, "", False, b2
+    'w.NewDialog t, c, "", False, b2
     w.Show
     
     Do While w.Visible
         DoEvents
     Loop
     
-    Dialog = w.Key
+    'Dialog = w.Key
     Unload w
 End Function
 Sub CopyInto(Src As String, Dst As String)

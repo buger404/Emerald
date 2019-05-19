@@ -3,11 +3,12 @@ Begin VB.Form MainWindow
    Appearance      =   0  'Flat
    BackColor       =   &H80000005&
    BorderStyle     =   0  'None
-   Caption         =   "窗口名称"
+   Caption         =   "Emerald Builder"
    ClientHeight    =   6672
    ClientLeft      =   12
    ClientTop       =   12
    ClientWidth     =   9660
+   Icon            =   "MainWindow.frx":0000
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
@@ -32,10 +33,6 @@ Attribute VB_Exposed = False
     Dim EC As GMan
     Dim oShadow As New aShadow
 '==================================================
-'   在此处放置你的页面类模块声明
-    Dim WelcomePage As New WelcomePage, TitleBar As New TitleBar
-'==================================================
-
 Private Sub DrawTimer_Timer()
     '绘制
     EC.Display
@@ -43,7 +40,7 @@ End Sub
 
 Private Sub Form_Load()
     '初始化Emerald
-    StartEmerald Me.Hwnd, Me.ScaleWidth, Me.ScaleHeight
+    StartEmerald Me.Hwnd, 805, 556
     '创建字体
     MakeFont "微软雅黑"
     '创建页面管理器
@@ -68,6 +65,7 @@ Private Sub Form_Load()
     
     '在此处初始化你的页面
     Set WelcomePage = New WelcomePage
+    Set SetupPage = New SetupPage
     
     Set TitleBar = New TitleBar
 

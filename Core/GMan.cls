@@ -128,7 +128,7 @@ skipPage:
         
         If IsLayered Then
             Dim bs As BLENDFUNCTION, sz As size
-            'Dim SrcPoint As POINTAPI
+            Dim SrcPoint As POINTAPI
             With bs
                 .AlphaFormat = AC_SRC_ALPHA
                 .BlendFlags = 0
@@ -137,7 +137,7 @@ skipPage:
             End With
             sz.cx = GW: sz.cy = GH
             'UpdateLayeredWindow GHwnd, 0, ByVal 0, Sz, CDC, ByVal 0, 0, Bs, ULW_ALPHA
-            UpdateLayeredWindow GHwnd, GDC, ByVal 0&, sz, CDC, 0, 0, bs, &H2
+            UpdateLayeredWindow GHwnd, GDC, ByVal 0&, sz, CDC, SrcPoint, 0, bs, &H2
         Else
             BitBlt GDC, 0, 0, GW, GH, CDC, 0, 0, vbSrcCopy
         End If

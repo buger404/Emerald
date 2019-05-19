@@ -95,7 +95,7 @@ Attribute VB_Name = "GCore"
         If (GetWindowLongA(Hwnd, GWL_STYLE) And WS_CAPTION) = WS_CAPTION Then
             SetWindowPos Hwnd, 0, 0, 0, w + 3 * Int(DPI / 96), h + 26 * Int(DPI / 96), SWP_NOMOVE Or SWP_NOZORDER
         Else
-            SetWindowPos Hwnd, 0, 0, 0, w - 1, h - 1, SWP_NOMOVE Or SWP_NOZORDER
+            SetWindowPos Hwnd, 0, 0, 0, w - 2 * Int(DPI / 96), h - 2 * Int(DPI / 96), SWP_NOMOVE Or SWP_NOZORDER
         End If
         
         GDC = GetDC(Hwnd)
@@ -304,7 +304,7 @@ sth:
         If Now - CDate(data.GetData("UpdateTime")) >= UpdateCheckInterval Or data.GetData("UpdateAble") = 1 Then
             data.PutData "UpdateTime", Now
             
-            Dim xmlHttp As Object, ret As String, Start As Long
+            Dim xmlHttp As Object, Ret As String, Start As Long
             Set xmlHttp = CreateObject("Microsoft.XMLHTTP")
             xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
             xmlHttp.send
@@ -317,11 +317,11 @@ sth:
                 End If
                 Sleep 10: DoEvents
             Loop
-            ret = xmlHttp.responseText
+            Ret = xmlHttp.responseText
             Set xmlHttp = Nothing
-            Debug.Print Now, "Emerald：检查版本完毕，最新版本号 " & Val(ret)
+            Debug.Print Now, "Emerald：检查版本完毕，最新版本号 " & Val(Ret)
             
-            If Val(ret) > Version Then
+            If Val(Ret) > Version Then
                 data.PutData "UpdateAble", 1
                 If MsgBox("发现Emerald存在新版本，您希望现在前往下载吗？", vbYesNo + 48, "Emerald") = vbNo Then Exit Sub
                 

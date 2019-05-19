@@ -40,8 +40,8 @@ Private Sub DrawTimer_Timer()
 End Sub
 
 Private Sub Form_Load()
-    '初始化Emerald
-    StartEmerald Me.hWnd, Me.ScaleWidth, Me.ScaleHeight
+    '初始化Emerald（在此处可以修改窗口大小哟~）
+    StartEmerald Me.hWnd, 805, 556
     '创建字体
     MakeFont "微软雅黑"
     '创建页面管理器
