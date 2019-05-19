@@ -59,7 +59,6 @@ Draw:
         Else
             Call Setup
         End If
-        SetupErr = Err.Number
     End If
 
     Exit Sub

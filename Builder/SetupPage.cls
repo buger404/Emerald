@@ -24,8 +24,8 @@ Public Sub UpdateDone()
         Page.Writes "Emerald Builder 安装成功", GW / 2, 100, 30, argb(255, 27, 27, 27), align:=StringAlignmentCenter
         Page.Writes "在资源管理器中右键创建你的工程吧！", GW / 2, 140, 16, argb(150, 27, 27, 27), align:=StringAlignmentCenter, animation:=1
         
-        Page.Paint 0, GW / 2, 160 + (GH - 160 - 80) / 2, GW + 1, 270, argb(255, 255, 255, 255), Pos:=posOnCenter
-        Page.DrawImage "tip.png", GW / 2, 160 + (GH - 160 - 80) / 2, Alpha:=1, Pos:=posOnCenter, animation:=1
+        Page.Paint 0, GW / 2, 160 + (GH - 160 - 80) / 2, GW + 1, 270, argb(255, 255, 255, 255), Pos:=posOnCenter, animation:=2
+        Page.DrawImage "tip.png", GW / 2, 160 + (GH - 160 - 80) / 2, Alpha:=1, Pos:=posOnCenter, animation:=2
     Else
         Page.Writes "安装已经完成，但是发生了一些错误。", GW / 2, 200, 20, argb(255, 254, 84, 57), align:=StringAlignmentCenter
     End If
@@ -55,7 +55,7 @@ Public Sub Update()
 
     Page.Writes SetupInfo, GW / 2, GH - 110, 18, argb(255, 64, 64, 64), align:=StringAlignmentCenter
     
-    If DisplayProgress >= 0.9999 Then Page.StartAnimation 1, 1000: ECore.NewTransform , 400: DoneMark = True
+    If DisplayProgress >= 0.9999 Then Page.StartAnimation 1, 1000: Page.StartAnimation 2, 2000: ECore.NewTransform , 400: DoneMark = True
 End Sub
 Public Sub Wheel(Direction As Integer, Depth As Single)
     '鼠标滚轮事件
@@ -89,6 +89,7 @@ Private Sub Class_Initialize()
     
     '===============================================
     '   如果需要添加动画，请放置在此处
+        Page.NewAnimation False, "FadeIn", 2, 400
         Page.NewAnimation False, "FadeIn", 2, 400
     '===============================================
 End Sub

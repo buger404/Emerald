@@ -54,6 +54,7 @@ Public Function CheckFileName(name As String) As Boolean
 End Function
 Sub Uninstall()
     If Dialog("卸载", "Emerald Builder 已经安装，你希望删除它吗？", "卸载", "手滑") <> 1 Then End
+    On Error Resume Next
     
     SetupPage.SetupInfo = "正在创建：WScript.Shell对象"
     SetupPage.Progress = 0.1
@@ -101,6 +102,8 @@ Sub Uninstall()
     
     SetupPage.SetupInfo = "收尾"
     SetupPage.Progress = 1
+    
+    SetupErr = Err.Number
 End Sub
 Sub FakeSleep()
     For i = 1 To 10
@@ -110,7 +113,7 @@ Sub FakeSleep()
 End Sub
 Sub Setup()
     On Error Resume Next
-
+    
     Dim exeP As String
     exeP = """" & App.Path & "\Builder.exe" & """"
     
@@ -162,6 +165,8 @@ Sub Setup()
     
     SetupPage.SetupInfo = "收尾"
     SetupPage.Progress = 1
+    
+    SetupErr = Err.Number
 End Sub
 Sub CheckVersion()
     On Error Resume Next
