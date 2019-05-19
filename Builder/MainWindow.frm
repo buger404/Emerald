@@ -66,17 +66,14 @@ Private Sub Form_Load()
     '在此处初始化你的页面
     Set WelcomePage = New WelcomePage
     Set SetupPage = New SetupPage
+    Set WaitPage = New WaitPage
+    Set DialogPage = New DialogPage
     
     Set TitleBar = New TitleBar
 
     '设置活动页面
-    EC.ActivePage = "WelcomePage"
-    If InstalledPath = "" Then
-        WelcomePage.Page.StartAnimation 1
-        WelcomePage.Page.StartAnimation 2, 200
-    End If
+    EC.ActivePage = "WaitPage"
     
-    Me.Show
     DrawTimer.Enabled = True
 End Sub
 

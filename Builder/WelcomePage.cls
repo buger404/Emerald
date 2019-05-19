@@ -19,8 +19,6 @@ Attribute VB_Exposed = False
 Public Sub Update()
     '绘制事件
     
-    If InstalledPath <> "" Then GoTo OtherPage
-    
     Dim BtnStr As String
     
     Page.Clear argb(255 * 0.85, 242, 242, 249) '清空画布
@@ -38,7 +36,7 @@ Public Sub Update()
             Page.Writes "Are you really going to uninstall me ?", GW / 2, 260, Color:=argb(150, 27, 27, 27), size:=18, align:=StringAlignmentCenter, animation:=2
             BtnStr = "Uninstall"
         Else
-            Page.Writes "New Emerald Builder!", GW / 2, 200, Color:=argb(255, 27, 27, 27), size:=36, align:=StringAlignmentCenter, animation:=1
+            Page.Writes "New Version : " & Version, GW / 2, 200, Color:=argb(255, 27, 27, 27), size:=36, align:=StringAlignmentCenter, animation:=1
             Page.Writes "Make everything better .", GW / 2, 260, Color:=argb(150, 27, 27, 27), size:=18, align:=StringAlignmentCenter, animation:=2
             BtnStr = "Update"
         End If
@@ -55,15 +53,12 @@ Draw:
         ECore.NewTransform transFadeIn, 700, "SetupPage"
         CmdMark = BtnStr
         If BtnStr = "Uninstall" Then
+            If Dialog("卸载", "你确定要卸载Emerald Builder？", "是的", "手滑") <> 1 Then Exit Sub
             Call Uninstall
         Else
             Call Setup
         End If
     End If
-
-    Exit Sub
-    
-OtherPage:
 End Sub
 Public Sub Wheel(Direction As Integer, Depth As Single)
     '鼠标滚轮事件
@@ -71,6 +66,8 @@ Public Sub Wheel(Direction As Integer, Depth As Single)
 End Sub
 Public Sub Enter()
     '页面进入事件
+    Page.StartAnimation 1
+    Page.StartAnimation 2, 200
 End Sub
 Public Sub Leave()
     '页面离开事件

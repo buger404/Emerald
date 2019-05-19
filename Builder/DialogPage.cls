@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "TitleBar"
+Attribute VB_Name = "DialogPage"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
@@ -14,30 +14,30 @@ Attribute VB_Exposed = False
 '======================================
 '   页面绘制器
     Dim Page As GPage
+    Public Key As Integer, Title As String, Context As String
+    Dim buttons()
 '======================================
 
 Public Sub Update()
     '绘制事件
     
-    Page.Clear 0 '清空画布
+    Page.Clear argb(255 * 0.85, 242, 242, 249) '清空画布
 
-    Page.Writes "Emerald Builder", 20, 20, Color:=argb(255, 128, 128, 128), size:=16
+    Page.Paint 0, GW / 2, GH / 2, 600, 250, argb(128, 255, 255, 255), pos:=posOnCenter
+    Page.Writes Title, GW / 2 - 600 / 2 + 20, GH / 2 - 250 / 2 + 20, 30, argb(255, 27, 27, 27), style:=FontStyleBold
+    Page.Writes Context, GW / 2 - 600 / 2 + 23, GH / 2 - 250 / 2 + 70, 18, argb(150, 27, 27, 27)
     
-    Dim m As Integer
-    m = CheckMouse(GW - 60, 0, 60, 30 + 16 / 0.75)
-    If ECore.ActivePage <> "SetupPage" Or SetupPage.DoneMark = True Then
-        If Page.ShowColorButton(0, GW - 60, 0, 61, 30 + 16 / 0.75, "×", IIf(m = 0, argb(255, 128, 128, 128), argb(255, 255, 255, 255)), argb(0, 254, 84, 57), argb(255, 254, 84, 57), size:=18) = 2 Then
-            Unload MainWindow
-            End
+    For i = 0 To UBound(buttons)
+        If Page.ShowColorButton(0, GW / 2 - 600 / 2 + 600 - 120 * (UBound(buttons) + 1) + i * 120, GH / 2 - 250 / 2 + 250 - 40 - 20, 100, 40, CStr(buttons(i)), argb(255, 255, 255, 255), argb(255, 85, 219, 211), argb(255, 55, 189, 181), size:=16) = 3 Then
+            Key = i + 1
         End If
-    Else
-        Page.ShowColorButton 0, GW - 60, 0, 61, 30 + 16 / 0.75, "×", argb(255, 168, 168, 168), argb(0, 254, 84, 57), argb(50, 128, 128, 128), size:=18
-        If m = 3 Then MsgBox "安装过程中不允许暂停，非常抱歉。", 48, "安装程序"
-    End If
-    m = CheckMouse(GW - 120, 0, 60, 30 + 16 / 0.75)
-    If Page.ShowColorButton(0, GW - 120, 0, 61, 30 + 16 / 0.75, "-", IIf(m = 0, argb(255, 128, 128, 128), argb(255, 255, 255, 255)), argb(0, 128, 128, 128), argb(100, 128, 128, 128), size:=18) = 2 Then
-        MainWindow.WindowState = 1
-    End If
+    Next
+    
+    '================================================================
+    '   示例：绘制文字
+    '   Page.Writes "我是文字", 20,20, Color:=argb(255, 0, 0, 0)
+    '================================================================
+    
 End Sub
 Public Sub Wheel(Direction As Integer, Depth As Single)
     '鼠标滚轮事件
@@ -59,15 +59,21 @@ Public Sub AnimationDone(id As Integer)
     '动画播放结束事件
     'id：结束的动画ID
 End Sub
+Public Sub NewDialog(t As String, c As String, btn())
+    buttons = btn
+    Title = t
+    Context = c
+    Key = 0
+    ECore.NewTransform transFadeIn, 700, "DialogPage"
+End Sub
 Private Sub Class_Initialize()
     '创建页面绘制器
     Set Page = New GPage
     Page.Create Me
     '导入游戏资源
     Page.Res.NewImages App.Path & "\assets"
-    Page.TopPage = True '置顶页面
     '创建页面
-    ECore.Add Page, "TitleBar"
+    ECore.Add Page, "DialogPage"
     
     '===============================================
     '   如果需要添加动画，请放置在此处

@@ -43,6 +43,7 @@ Attribute VB_Name = "AboutMe"
 '   更新内容(ver.519)
 '   -修复编译后分层窗口不可显示的问题
 '   -修复DrawImage的动画问题
+'   -全新Builder
 '   更新内容(ver.518)
 '   -添加分层绘制和亚克力效果
 '   -修复无法编译的问题

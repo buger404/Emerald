@@ -14,24 +14,43 @@ Attribute VB_Exposed = False
 '======================================
 '   页面绘制器
     Dim Page As GPage
-    Public Progress As Single, SetupInfo As String
-    Dim DisplayProgress As Single, ChangeTime As Long, DoneMark As Boolean
+    Public Progress As Single, SetupInfo As String, DoneMark As Boolean
+    Dim DisplayProgress As Single, ChangeTime As Long
 '======================================
 Public Sub UpdateDone()
     Page.Clear argb(255 * 0.85, 242, 242, 249) '清空画布
+    
+    If CmdMark = "Uninstall" Then GoTo uninpage
     
     If SetupErr = 0 Then
         Page.Writes "Emerald Builder 安装成功", GW / 2, 100, 30, argb(255, 27, 27, 27), align:=StringAlignmentCenter
         Page.Writes "在资源管理器中右键创建你的工程吧！", GW / 2, 140, 16, argb(150, 27, 27, 27), align:=StringAlignmentCenter, animation:=1
         
-        Page.Paint 0, GW / 2, 160 + (GH - 160 - 80) / 2, GW + 1, 270, argb(255, 255, 255, 255), Pos:=posOnCenter, animation:=2
-        Page.DrawImage "tip.png", GW / 2, 160 + (GH - 160 - 80) / 2, Alpha:=1, Pos:=posOnCenter, animation:=2
+        Page.Paint 0, GW / 2, 160 + (GH - 160 - 80) / 2, GW + 1, 270, argb(255, 255, 255, 255), pos:=posOnCenter, animation:=2
+        Page.DrawImage "tip.png", GW / 2, 160 + (GH - 160 - 80) / 2, Alpha:=1, pos:=posOnCenter, animation:=2
     Else
         Page.Writes "安装已经完成，但是发生了一些错误。", GW / 2, 200, 20, argb(255, 254, 84, 57), align:=StringAlignmentCenter
+        Page.Writes "错误代码：0x" & format(Hex(SetupErr), "000000"), GW / 2, 230, 16, argb(150, 254, 84, 57), align:=StringAlignmentCenter
+        Page.Writes Error(SetupErr), GW / 2, 250, 16, argb(150, 254, 84, 57), align:=StringAlignmentCenter
+        
+        Page.Writes "请联系QQ 1361778219 或者在Github上提交Issue", GW / 2, 400, 16, argb(150, 27, 27, 27), align:=StringAlignmentCenter
     End If
     
     If Page.ShowColorButton(0, GW / 2 - 130 / 2, GH - 80, 130, 40, "OK", argb(255, 255, 255, 255), argb(255, 85, 219, 211), argb(255, 55, 189, 181), size:=16) = 3 Then
-        ECore.NewTransform transFadeIn, 700, "WelcomePage"
+        Unload MainWindow: End
+    End If
+    
+    Exit Sub
+    
+uninpage:
+    If SetupErr = 0 Then
+        Page.Writes "Emerald Builder 卸载完成", GW / 2, GH / 2, 30, argb(255, 27, 27, 27), align:=StringAlignmentCenter
+    Else
+        Page.Writes "卸载已经完成，但是发生了一些错误。", GW / 2, 200, 20, argb(255, 254, 84, 57), align:=StringAlignmentCenter
+        Page.Writes "错误代码：0x" & format(Hex(SetupErr), "000000"), GW / 2, 230, 16, argb(150, 254, 84, 57), align:=StringAlignmentCenter
+        Page.Writes Error(SetupErr), GW / 2, 250, 16, argb(150, 254, 84, 57), align:=StringAlignmentCenter
+        
+        Page.Writes "请联系QQ 1361778219 或者在Github上提交Issue", GW / 2, 400, 16, argb(150, 27, 27, 27), align:=StringAlignmentCenter
     End If
 End Sub
 Public Sub Update()
@@ -55,7 +74,7 @@ Public Sub Update()
 
     Page.Writes SetupInfo, GW / 2, GH - 110, 18, argb(255, 64, 64, 64), align:=StringAlignmentCenter
     
-    If DisplayProgress >= 0.9999 Then Page.StartAnimation 1, 1000: Page.StartAnimation 2, 2000: ECore.NewTransform , 400: DoneMark = True
+    If DisplayProgress >= 0.9999 Then Page.StartAnimation 1, 500: Page.StartAnimation 2, 700: ECore.NewTransform , 400: DoneMark = True
 End Sub
 Public Sub Wheel(Direction As Integer, Depth As Single)
     '鼠标滚轮事件

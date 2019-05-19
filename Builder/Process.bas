@@ -1,11 +1,10 @@
 Attribute VB_Name = "Process"
 'Emerald 相关代码
 
-Public Const Version As Long = 19051111
 Public VBIDEPath As String, InstalledPath As String, IsUpdate As Boolean
-Public WelcomePage As New WelcomePage, TitleBar As New TitleBar, SetupPage As SetupPage, Repaired As Boolean
+Public WelcomePage As New WelcomePage, TitleBar As New TitleBar, SetupPage As SetupPage, WaitPage As WaitPage, DialogPage As DialogPage
 Public Tasks() As String
-Public CmdMark As String, SetupErr As Long
+Public CmdMark As String, SetupErr As Long, Repaired As Boolean
 Public Sub CheckUpdate()
     On Error GoTo ErrHandle
     
@@ -53,7 +52,7 @@ Public Function CheckFileName(name As String) As Boolean
     CheckFileName = CheckFileName And (Trim(Str(Val(t))) <> t)
 End Function
 Sub Uninstall()
-    If Dialog("卸载", "Emerald Builder 已经安装，你希望删除它吗？", "卸载", "手滑") <> 1 Then End
+    'If Dialog("卸载", "Emerald Builder 已经安装，你希望删除它吗？", "卸载", "手滑") <> 1 Then End
     On Error Resume Next
     
     SetupPage.SetupInfo = "正在创建：WScript.Shell对象"
@@ -189,12 +188,12 @@ Sub Repair()
     If InstalledPath = "" Then Exit Sub
     
     If Dir(InstalledPath) = "" Then
-        ECore.NewTransform , 400, "WelcomePage": Repaired = True
+        EECore.NewTransform transFadeIn, 700, "WelcomePage": Repaired = True
     End If
 End Sub
 Sub Main()
     MainWindow.Show
-
+    
     Call CheckUpdate
     Call GetVBIDEPath
     Call GetInstalledPath
@@ -273,18 +272,16 @@ SkipName:
         
     Else
         
-        On Error GoTo FailOper
-        
         If InstalledPath <> "" Then
             If (Not IsUpdate) Then
-                ECore.NewTransform , 400, "WelcomePage": Exit Sub
+                ECore.NewTransform transFadeIn, 700, "WelcomePage": Exit Sub
             Else
-                ECore.NewTransform , 400, "WelcomePage": Exit Sub
+                ECore.NewTransform transFadeIn, 700, "WelcomePage": Exit Sub
             End If
         End If
         
         If InstalledPath = "" Then
-            ECore.NewTransform , 400, "WelcomePage": Exit Sub
+            ECore.NewTransform transFadeIn, 700, "WelcomePage": Exit Sub
         End If
         
     End If
@@ -293,18 +290,19 @@ Function InputAsk(t As String, c As String, ParamArray b()) As String
     InputAsk = InputBox(c, t)
 End Function
 Function Dialog(t As String, c As String, ParamArray b()) As Integer
-    Dim w As New MainWindow, b2()
+    Dim b2(), last As String
     b2 = b
     
-    'w.NewDialog t, c, "", False, b2
-    w.Show
+    last = ECore.ActivePage
+    DialogPage.NewDialog t, c, b2
     
-    Do While w.Visible
-        DoEvents
+    Do While DialogPage.Key = 0
+        ECore.Display
+        Sleep 10: DoEvents
     Loop
     
-    'Dialog = w.Key
-    Unload w
+    Dialog = DialogPage.Key
+    ECore.NewTransform transFadeIn, 700, last
 End Function
 Sub CopyInto(Src As String, Dst As String)
     Dim f As String, p As Boolean
