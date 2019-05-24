@@ -154,7 +154,7 @@ Public Sub Update2()
         CopyInto App.path & "\assets\debug", Cmd & "\assets\debug"
         CopyInto App.path & "\framework", Cmd
         
-        Open p & "\.emerald" For Output As #1
+        Open Cmd & "\.emerald" For Output As #1
         Print #1, Version 'version
         Print #1, Now 'Update Time
         Print #1, NoUpdate
