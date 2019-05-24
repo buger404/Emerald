@@ -4,6 +4,7 @@ Attribute VB_Name = "Process"
 Public VBIDEPath As String, InstalledPath As String, IsUpdate As Boolean
 Public WelcomePage As New WelcomePage, TitleBar As New TitleBar, SetupPage As SetupPage, WaitPage As WaitPage, DialogPage As DialogPage
 Public Tasks() As String
+Public NewVersion As Long
 Public CmdMark As String, SetupErr As Long, Repaired As Boolean
 Public Sub CheckUpdate()
     On Error GoTo ErrHandle
@@ -104,8 +105,8 @@ Sub Uninstall()
     
     SetupErr = Err.Number
 End Sub
-Sub FakeSleep()
-    For i = 1 To 10
+Sub FakeSleep(Optional Counts As Long = 10)
+    For i = 1 To Counts
         Sleep 10: DoEvents
         ECore.Display
     Next
@@ -177,10 +178,10 @@ Sub CheckVersion()
     
     If sh <> "" Then
         If Val(sh) <> Version Then
-            If Dialog("更新可用", "使用前需要更新你的Emerald。", "更新", "稍后") <> 1 Then End
+            If Dialog("更新可用", "使用前需要更新你的Emerald。", "更新", "稍后") <> 1 Then Unload MainWindow: End
             Call Setup
             Dialog "更新", "更新成功，请重新启动本程序。", "好的"
-            End
+            Unload MainWindow: End
         End If
     End If
 End Sub
@@ -188,7 +189,45 @@ Sub Repair()
     If InstalledPath = "" Then Exit Sub
     
     If Dir(InstalledPath) = "" Then
-        EECore.NewTransform transFadeIn, 700, "WelcomePage": Repaired = True
+        ECore.NewTransform transFadeIn, 700, "WelcomePage": Repaired = True
+    End If
+End Sub
+Public Sub CheckOnLineUpdate()
+    On Error Resume Next
+    If InternetGetConnectedState(0&, 0&) = 0 Then
+        Exit Sub
+    End If
+    
+    Dim data As New GSaving
+    data.Create "Emerald.Core", "Emerald.Core"
+    If Now - CDate(data.GetData("UpdateTime")) >= UpdateCheckInterval Or data.GetData("UpdateAble") = 1 Then
+        data.PutData "UpdateTime", Now
+        
+        Dim xmlHttp As Object, Ret As String, Start As Long
+        Set xmlHttp = CreateObject("Microsoft.XMLHTTP")
+        xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
+        xmlHttp.send
+        
+        Call FakeSleep(300)
+        
+        Start = GetTickCount
+        Do While xmlHttp.ReadyState <> 4
+            If GetTickCount - Start >= UpdateTimeOut Then
+                Exit Sub
+            End If
+            ECore.Display
+            Sleep 10: DoEvents
+        Loop
+        Ret = xmlHttp.responseText
+        Set xmlHttp = Nothing
+
+        NewVersion = Val(Ret)
+        data.PutData "UpdateAble", 1
+
+    Else
+    
+        NewVersion = Version
+        
     End If
 End Sub
 Sub Main()
@@ -198,6 +237,7 @@ Sub Main()
     Call GetVBIDEPath
     Call GetInstalledPath
     Call Repair
+    
     If Repaired Then Exit Sub
     
     If Command$ <> "" Then
@@ -285,6 +325,8 @@ SkipName:
         End If
         
     End If
+    
+    Unload MainWindow: End
 End Sub
 Function InputAsk(t As String, c As String, ParamArray b()) As String
     InputAsk = InputBox(c, t)

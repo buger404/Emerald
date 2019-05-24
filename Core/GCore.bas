@@ -7,8 +7,8 @@ Attribute VB_Name = "GCore"
     Public Type MState
         state As Integer
         button As Integer
-        X As Single
-        Y As Single
+        x As Single
+        y As Single
     End Type
     Public Enum imgIndex
         imgGetWidth = 0
@@ -216,7 +216,7 @@ sth:
         
         CreateCDC = DC
     End Function
-    Public Sub PaintDC(DC As Long, destDC As Long, Optional X As Long = 0, Optional Y As Long = 0, Optional cx As Long = 0, Optional cy As Long = 0, Optional cw, Optional ch, Optional Alpha)
+    Public Sub PaintDC(DC As Long, destDC As Long, Optional x As Long = 0, Optional y As Long = 0, Optional cx As Long = 0, Optional cy As Long = 0, Optional cw, Optional ch, Optional Alpha)
         Dim b As BLENDFUNCTION, index As Integer, bl As Long
         
         If Not IsMissing(Alpha) Then
@@ -235,9 +235,9 @@ sth:
         If IsMissing(ch) Then ch = GH - cy
         
         If IsMissing(Alpha) Then
-            BitBlt destDC, X, Y, cw, ch, DC, cx, cy, vbSrcCopy
+            BitBlt destDC, x, y, cw, ch, DC, cx, cy, vbSrcCopy
         Else
-            AlphaBlend destDC, X, Y, cw, ch, DC, cx, cy, cw, ch, bl
+            AlphaBlend destDC, x, y, cw, ch, DC, cx, cy, cw, ch, bl
         End If
     End Sub
     Function Cubic(t As Single, arg0 As Single, arg1 As Single, arg2 As Single, arg3 As Single) As Single
@@ -247,24 +247,24 @@ sth:
     End Function
 '========================================================
 '   Mouse
-    Public Sub UpdateMouse(X As Single, Y As Single, state As Long, button As Integer)
+    Public Sub UpdateMouse(x As Single, y As Single, state As Long, button As Integer)
         With Mouse
-            .X = X
-            .Y = Y
+            .x = x
+            .y = y
             .state = state
             .button = button
         End With
     End Sub
-    Public Function CheckMouse(X As Long, Y As Long, w As Long, h As Long) As MButtonState
+    Public Function CheckMouse(x As Long, y As Long, w As Long, h As Long) As MButtonState
         'Return Value:0=none,1=in,2=down,3=up
-        If Mouse.X >= X And Mouse.Y >= Y And Mouse.X <= X + w And Mouse.Y <= Y + h Then
+        If Mouse.x >= x And Mouse.y >= y And Mouse.x <= x + w And Mouse.y <= y + h Then
             CheckMouse = Mouse.state + 1
             If Mouse.state = 2 Then Mouse.state = 0
         End If
     End Function
     Public Function CheckMouse2() As MButtonState
         'Return Value:0=none,1=in,2=down,3=up
-        If Mouse.X >= DrawF.Left And Mouse.Y >= DrawF.top And Mouse.X <= DrawF.Left + DrawF.Right And Mouse.Y <= DrawF.top + DrawF.Bottom Then
+        If Mouse.x >= DrawF.Left And Mouse.y >= DrawF.top And Mouse.x <= DrawF.Left + DrawF.Right And Mouse.y <= DrawF.top + DrawF.Bottom Then
             CheckMouse2 = Mouse.state + 1
             If Mouse.state = 2 Then Mouse.state = 0
         End If
@@ -321,7 +321,7 @@ sth:
             Set xmlHttp = Nothing
             Debug.Print Now, "Emerald：检查版本完毕，最新版本号 " & Val(Ret)
             
-            If Val(Ret) > Version Then
+            If Val(Ret) > Version And App.LogMode = 0 Then
                 data.PutData "UpdateAble", 1
                 If MsgBox("发现Emerald存在新版本，您希望现在前往下载吗？", vbYesNo + 48, "Emerald") = vbNo Then Exit Sub
                 

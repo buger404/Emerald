@@ -15,6 +15,7 @@ Attribute VB_Exposed = False
 '   页面绘制器
     Public Page As GPage
 '======================================
+    Dim HideTime As Long
 
 Public Sub Update()
     '绘制事件
@@ -32,9 +33,44 @@ Public Sub Update()
     
     If InstalledPath <> "" Then
         If (Not IsUpdate) Then
-            Page.Writes "Say Goodbye to Emerald Builder", GW / 2, 200, Color:=argb(255, 27, 27, 27), size:=36, align:=StringAlignmentCenter, animation:=1
-            Page.Writes "Are you really going to uninstall me ?", GW / 2, 260, Color:=argb(150, 27, 27, 27), size:=18, align:=StringAlignmentCenter, animation:=2
-            BtnStr = "Uninstall"
+            If Command$ = "-Uninstall" Then
+                Page.Writes "Say Goodbye to Emerald Builder", GW / 2, 200, Color:=argb(255, 27, 27, 27), size:=36, align:=StringAlignmentCenter, animation:=1
+                Page.Writes "Are you really going to uninstall me ?", GW / 2, 260, Color:=argb(150, 27, 27, 27), size:=18, align:=StringAlignmentCenter, animation:=2
+                BtnStr = "Uninstall"
+            Else
+            
+                Dim pro As Single
+                If HideTime <> 0 Then pro = Cubic((GetTickCount - 3000 - HideTime) / 1000, 0, 1, 1, 1)
+                If pro > 1 Then pro = 1
+                If pro < 0 Then pro = 0
+            
+                Page.DrawImage "404.png", 165, GH / 2, Alpha:=1 - pro, pos:=posOnCenter, animation:=1
+            
+                Page.Writes "关于", 350 + pro * 22, 170 + pro * 36, Color:=argb(255, 27, 27, 27), size:=18 + pro * 4, animation:=1, style:=FontStyleBold
+                Page.Writes "制作： Error 404（QQ 1361778219）" & vbCrLf & "邮箱： ris_vb@126.com", 350 - pro * 110, 220 + pro * 40, Color:=argb(150, 27, 27, 27), size:=18, animation:=2
+                Page.Writes "版本： " & Version, 350 - pro * 50, 270 + pro * 40, Color:=argb(150 - pro * 150, 27, 27, 27), size:=18, animation:=2
+                Page.Writes "感谢Inter.net和Redstone群的支持。", 350 - pro * 90, 340 + pro * 180, Color:=argb(150 - pro * 60, 27, 27, 27), size:=18 - pro * 2, animation:=2
+                If NewVersion = 0 Then
+                    NewVersion = 1
+                    Call CheckOnLineUpdate
+                End If
+                
+                If NewVersion = 1 Then
+                    Page.ShowLoading 30, GH - 30 - 24, 24, 24, 3, argb(255, 242, 195, 17), argb(255, 240, 127, 34), argb(255, 232, 76, 61)
+                    Page.Writes "正在检查更新...", 80, GH - 30 - 24, Color:=argb(150, 27, 27, 27), size:=18, animation:=2
+                ElseIf NewVersion > Version Then
+                    If HideTime = 0 Then HideTime = GetTickCount
+                    Page.Paint 1, 30, GH - 30 - 24, 24, 24, argb(255, 255, 206, 69)
+                    Page.Writes "有更新可用（" & NewVersion & "），点击此处下载。", 80, GH - 30 - 24, w:=GW, h:=25, Color:=argb(255, 232, 76, 61), size:=18, animation:=2
+                    If CheckMouse2 = mMouseUp Then ShellExecuteA 0, "open", "https://github.com/Red-Error404/Emerald", "", "", SW_SHOW
+                Else
+                    If HideTime = 0 Then HideTime = GetTickCount
+                    Page.Paint 1, 30, GH - 30 - 24, 24, 24, argb(255 - pro * 255, 95, 229, 221)
+                    Page.Writes "已经是最新版本", 80, GH - 30 - 24, Color:=argb(150 - pro * 150, 27, 27, 27), size:=18, animation:=2
+                End If
+                
+                Exit Sub
+            End If
         Else
             Page.Writes "New Version : " & Version, GW / 2, 200, Color:=argb(255, 27, 27, 27), size:=36, align:=StringAlignmentCenter, animation:=1
             Page.Writes "Make everything better .", GW / 2, 260, Color:=argb(150, 27, 27, 27), size:=18, align:=StringAlignmentCenter, animation:=2
@@ -87,7 +123,7 @@ Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
     '导入游戏资源
-    Page.Res.NewImages App.Path & "\assets"
+    Page.Res.NewImages App.Path & "\assets", 0.5
     '创建页面
     ECore.Add Page, "WelcomePage"
     
