@@ -277,6 +277,7 @@ Sub Main()
                 Exit Sub
             Else
                 Dialog "无操作", "你的工程已经在使用最新的Emerald了。", "手滑"
+                Unload MainWindow: End
             End If
         End If
 
