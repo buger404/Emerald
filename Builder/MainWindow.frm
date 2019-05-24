@@ -68,6 +68,7 @@ Private Sub Form_Load()
     Set SetupPage = New SetupPage
     Set WaitPage = New WaitPage
     Set DialogPage = New DialogPage
+    Set UpdatePage = New UpdatePage
     
     Set TitleBar = New TitleBar
 
@@ -77,22 +78,22 @@ Private Sub Form_Load()
     DrawTimer.Enabled = True
 End Sub
 
-Private Sub Form_MouseDown(button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseDown(button As Integer, Shift As Integer, x As Single, y As Single)
     '发送鼠标信息
-    UpdateMouse X, Y, 1, button
+    UpdateMouse x, y, 1, button
 End Sub
 
-Private Sub Form_MouseMove(button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseMove(button As Integer, Shift As Integer, x As Single, y As Single)
     '发送鼠标信息
     If Mouse.state = 0 Then
-        UpdateMouse X, Y, 0, button
+        UpdateMouse x, y, 0, button
     Else
-        Mouse.X = X: Mouse.Y = Y
+        Mouse.x = x: Mouse.y = y
     End If
 End Sub
-Private Sub Form_MouseUp(button As Integer, Shift As Integer, X As Single, Y As Single)
+Private Sub Form_MouseUp(button As Integer, Shift As Integer, x As Single, y As Single)
     '发送鼠标信息
-    UpdateMouse X, Y, 2, button
+    UpdateMouse x, y, 2, button
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)

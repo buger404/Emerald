@@ -25,7 +25,7 @@ Private Type AniTask
 End Type
 Dim GTick As Long
 Dim Anis() As AniTask
-Dim DrawBox As Object, brush As Long, Path As Long, Pen As Long
+Dim DrawBox As Object, brush As Long, path As Long, Pen As Long
 Dim ScrollMode As Boolean, ScrollX As Long, ScrollY As Long, ScrollBX As Long, ScrollBY As Long, CRgn As Long
 Public CDC As Long, GG As Long, OutOfScroll As Boolean
 Public Res As GResource
@@ -47,12 +47,12 @@ Public TopPage As Boolean
         
         GdipCreateSolidFill 0, brush
         GdipCreatePen1 0, 1, UnitPixel, Pen
-        GdipCreatePath FillModeWinding, Path
+        GdipCreatePath FillModeWinding, path
     End Sub
     Public Sub Dispose()
         GdipDeleteBrush brush
         GdipDeletePen Pen
-        GdipDeletePath Path
+        GdipDeletePath path
         Res.Dispose
     End Sub
 '========================================================
@@ -266,11 +266,11 @@ Public TopPage As Boolean
     End Sub
 '========================================================
 '   Shape
-    Public Sub PaintLine(X1 As Long, Y1 As Long, X2 As Long, Y2 As Long, Optional Color As Long, Optional size As Long = 1, Optional animation As Integer = 0)
+    Public Sub PaintLine(X1 As Long, Y1 As Long, x2 As Long, y2 As Long, Optional Color As Long, Optional size As Long = 1, Optional animation As Integer = 0)
         If ScrollMode Then
             x = x + ScrollX + ScrollBX: y = y + ScrollY + ScrollBY
             Dim Ret As Long
-            GdipIsVisibleRect GG, IIf(X1 < X2, X1, X2), IIf(Y1 < Y2, Y1, Y2), IIf(X1 < X2, X2 - X1, X1 - X2), IIf(Y1 < Y2, Y2 - Y1, Y1 - Y2), Ret
+            GdipIsVisibleRect GG, IIf(X1 < x2, X1, x2), IIf(Y1 < y2, Y1, y2), IIf(X1 < x2, x2 - X1, X1 - x2), IIf(Y1 < y2, y2 - Y1, Y1 - y2), Ret
             If Not Ret Then OutOfScroll = True: Exit Sub
         End If
         
@@ -295,13 +295,13 @@ Public TopPage As Boolean
             GdipSetPenWidth Pen, size
         End If
         
-        GdipDrawLine GG, Pen, X1, Y1, X2, Y2
+        GdipDrawLine GG, Pen, X1, Y1, x2, y2
         
         With DrawF
-            .Left = IIf(X1 < X2, X1, X2)
-            .top = IIf(Y1 < Y2, Y1, Y2)
-            .Right = IIf(X1 < X2, X2 - X1, X1 - X2)
-            .Bottom = IIf(Y1 < Y2, Y2 - Y1, Y1 - Y2)
+            .Left = IIf(X1 < x2, X1, x2)
+            .top = IIf(Y1 < y2, Y1, y2)
+            .Right = IIf(X1 < x2, x2 - X1, X1 - x2)
+            .Bottom = IIf(Y1 < y2, y2 - Y1, Y1 - y2)
         End With
         
         If Debug_focus Then
@@ -336,7 +336,7 @@ Public TopPage As Boolean
             End If
         End If
         
-        GdipResetPath Path
+        GdipResetPath path
         
         If pos = 1 Then x = Int(x - w / 2): y = Int(y - h / 2)
         If pos = 2 Then x = x - w
@@ -345,8 +345,8 @@ Public TopPage As Boolean
         If pos = 5 Then y = y + h
         
 ReShape:
-        If shape = 0 Then GdipAddPathRectangle Path, x, y, w - 1, h - 1
-        If shape = 1 Then GdipAddPathEllipse Path, x, y, w - 1, h - 1
+        If shape = 0 Then GdipAddPathRectangle path, x, y, w - 1, h - 1
+        If shape = 1 Then GdipAddPathEllipse path, x, y, w - 1, h - 1
         If shape = 2 Then
         
             If Radius = 0 Then
@@ -356,11 +356,11 @@ ReShape:
             If Radius > w Then Radius = w
             If Radius > h Then Radius = h
             
-            GdipAddPathArc Path, x, y, Radius, Radius, 180, 90
-            GdipAddPathArc Path, x + w - Radius, y, Radius, Radius, 270, 90
-            GdipAddPathArc Path, x + w - Radius, y + h - Radius, Radius, Radius, 0, 90
-            GdipAddPathArc Path, x, y + h - Radius, Radius, Radius, 90, 90
-            GdipClosePathFigure Path
+            GdipAddPathArc path, x, y, Radius, Radius, 180, 90
+            GdipAddPathArc path, x + w - Radius, y, Radius, Radius, 270, 90
+            GdipAddPathArc path, x + w - Radius, y + h - Radius, Radius, Radius, 0, 90
+            GdipAddPathArc path, x, y + h - Radius, Radius, Radius, 90, 90
+            GdipClosePathFigure path
             
         End If
         
@@ -373,8 +373,8 @@ ReShape:
         End If
         
         If shape = 0 Then GdipSetSmoothingMode GG, SmoothingModeDefault
-        If style = 0 Then GdipFillPath GG, brush, Path
-        If style = 1 Then GdipDrawPath GG, Pen, Path
+        If style = 0 Then GdipFillPath GG, brush, path
+        If style = 1 Then GdipDrawPath GG, Pen, path
         If shape = 0 Then GdipSetSmoothingMode GG, SmoothingModeAntiAlias
         
         With DrawF
@@ -414,7 +414,7 @@ ReShape:
             End If
         End If
         
-        GdipResetPath Path
+        GdipResetPath path
         
         If pos = 1 Then x = Int(x - w / 2): y = Int(y - h / 2)
         If pos = 2 Then x = x - w
@@ -422,9 +422,9 @@ ReShape:
         If pos = 4 Then x = x + w
         If pos = 5 Then y = y + h
         
-        GdipAddPathArc Path, x, y, w, h, Start, degree
-        If style = 2 Then GdipAddPathLine Path, x + w / 2, y + w / 2, x + w / 2, y + w / 2
-        If style = 0 Then GdipClosePathFigure Path
+        GdipAddPathArc path, x, y, w, h, Start, degree
+        If style = 2 Then GdipAddPathLine path, x + w / 2, y + w / 2, x + w / 2, y + w / 2
+        If style = 0 Then GdipClosePathFigure path
         
         If Color <> 0 Then
             If style = 0 Or style = 2 Then GdipSetSolidFillColor brush, Color
@@ -434,8 +434,8 @@ ReShape:
             End If
         End If
         
-        If style = 0 Or style = 2 Then GdipFillPath GG, brush, Path
-        If style = 1 Then GdipDrawPath GG, Pen, Path
+        If style = 0 Or style = 2 Then GdipFillPath GG, brush, path
+        If style = 1 Then GdipDrawPath GG, Pen, path
         
         With DrawF
             .Left = x
@@ -451,14 +451,14 @@ ReShape:
     End Sub
     Public Sub PaintPolygon(Color As Long, style As Integer, ParamArray Points())
 
-        GdipResetPath Path
+        GdipResetPath path
         Dim p() As POINTF
         ReDim p((UBound(Points) - 1) / 2)
         For i = 0 To UBound(Points) Step 2
             p(i / 2).x = Points(i): p(i / 2).y = Points(i + 1)
         Next
         
-        GdipAddPathPolygon Path, p(0), UBound(p) + 1
+        GdipAddPathPolygon path, p(0), UBound(p) + 1
         
         If style = 0 Then GdipSetSolidFillColor brush, Color
         If style = 1 Then
@@ -466,12 +466,12 @@ ReShape:
             GdipSetPenWidth Pen, size
         End If
         
-        If style = 0 Then GdipFillPath GG, brush, Path
-        If style = 1 Then GdipDrawPath GG, Pen, Path
+        If style = 0 Then GdipFillPath GG, brush, path
+        If style = 1 Then GdipDrawPath GG, Pen, path
         
         If Debug_focus Then
             GdipSetPenColor Pen, argb(255, 0, 176, 240)
-            GdipDrawPath GG, Pen, Path
+            GdipDrawPath GG, Pen, path
         End If
     End Sub
 '========================================================
@@ -558,6 +558,9 @@ ReShape:
     End Function
     Public Function ShowCheckBox(value, pic As String, x As Long, y As Long, text As String, Color As Long, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
         Dim w As Long, h As Long, i As Integer, m As Integer
+        Dim x2 As Long, y2 As Long
+        x2 = x: y2 = y
+        
         i = Res.GetImage(pic)
         w = Res.ImgSize(i, imgGetWidth): h = Res.ImgSize(i, imgGetHeight)
         
@@ -565,7 +568,7 @@ ReShape:
         DrawImage i, x, y, cy:=IIf(value = True, Int(h / 2), 0), ch:=Int(h / 2), Alpha:=1
         If m = 3 Then value = IIf(value = True, False, True)
         
-        Writes text, x + w + size / 0.75 / 2, y + h / 2 / 2 - size / 0.75 / 2, size, Color, GW, size / 0.75, StringAlignmentNear, style
+        Writes text, x2 + w + size / 0.75 / 2, y2 + h / 2 / 2 - size / 0.75 / 2, size, Color, GW, size / 0.75, StringAlignmentNear, style
         
         ShowCheckBox = m
     End Function

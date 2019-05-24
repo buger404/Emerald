@@ -2,10 +2,12 @@ Attribute VB_Name = "Process"
 'Emerald 相关代码
 
 Public VBIDEPath As String, InstalledPath As String, IsUpdate As Boolean
-Public WelcomePage As New WelcomePage, TitleBar As New TitleBar, SetupPage As SetupPage, WaitPage As WaitPage, DialogPage As DialogPage
+Public WelcomePage As New WelcomePage, TitleBar As New TitleBar, SetupPage As SetupPage, WaitPage As WaitPage, DialogPage As DialogPage, UpdatePage As UpdatePage
 Public Tasks() As String
 Public NewVersion As Long
 Public CmdMark As String, SetupErr As Long, Repaired As Boolean
+Public AppInfo() As String
+Public Cmd As String
 Public Sub CheckUpdate()
     On Error GoTo ErrHandle
     
@@ -115,7 +117,7 @@ Sub Setup()
     On Error Resume Next
     
     Dim exeP As String
-    exeP = """" & App.Path & "\Builder.exe" & """"
+    exeP = """" & App.path & "\Builder.exe" & """"
     
     SetupPage.SetupInfo = "正在创建：WScript.Shell对象"
     SetupPage.Progress = 0.1
@@ -145,7 +147,7 @@ Sub Setup()
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\DisplayName", "Emerald"
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\DisplayVersion", "Indev " & Version
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\Publisher", "Error 404"
-    WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\InstallLocation", App.Path
+    WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\InstallLocation", App.path
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\URLInfoAbout", "http://red-error404.github.io/233"
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\UninstallString", exeP & " ""-uninstall"""
     
@@ -153,13 +155,13 @@ Sub Setup()
     
     SetupPage.SetupInfo = "正在复制：Visual Basic 6 模板文件（1/2）"
     SetupPage.Progress = 0.8
-    FileCopy App.Path & "\Example\Emerald 游戏窗口.frm", VBIDEPath & "Template\Forms\Emerald 游戏窗口.frm"
+    FileCopy App.path & "\Example\Emerald 游戏窗口.frm", VBIDEPath & "Template\Forms\Emerald 游戏窗口.frm"
     
     Call FakeSleep
     
     SetupPage.SetupInfo = "正在复制：Visual Basic 6 模板文件（2/2）"
     SetupPage.Progress = 0.9
-    FileCopy App.Path & "\Example\Emerald 页面.cls", VBIDEPath & "Template\Classes\Emerald 页面.cls"
+    FileCopy App.path & "\Example\Emerald 页面.cls", VBIDEPath & "Template\Classes\Emerald 页面.cls"
     
     Call FakeSleep
     
@@ -171,7 +173,7 @@ End Sub
 Sub CheckVersion()
     On Error Resume Next
     Dim exeP As String, sh As String
-    exeP = """" & App.Path & "\Builder.exe" & """"
+    exeP = """" & App.path & "\Builder.exe" & """"
     Set WSHShell = CreateObject("WScript.Shell")
     
     sh = WSHShell.RegRead("HKEY_CLASSES_ROOT\Directory\shell\emerald\version")
@@ -240,10 +242,12 @@ Sub Main()
     
     If Repaired Then Exit Sub
     
-    If Command$ <> "" Then
+    Cmd = Replace(Command$, """", "")
+    
+    If Cmd <> "" Then
         Dim appn As String, f As String, t As String, p As String
         Dim nList As String, xinfo As String, info() As String
-        p = Replace(Command$, """", "")
+        p = Cmd
 
         If p = "-uninstall" Then Call Uninstall
         Call CheckVersion
@@ -255,35 +259,31 @@ Sub Main()
             xinfo = xinfo & t & vbCrLf
             Loop
             Close #1
+            If Dir(p & "\core", vbDirectory) = "" Then MkDir p & "\core"
+            If Dir(p & "\.emr", vbDirectory) = "" Then MkDir p & "\.emr"
+            If Dir(p & "\.emr\backup", vbDirectory) = "" Then MkDir p & "\.emr\backup"
+            If Dir(p & "\.emr\cache", vbDirectory) = "" Then MkDir p & "\.emr\cache"
+            If Dir(p & "\assets\debug", vbDirectory) = "" Then MkDir p & "\assets\debug"
+            If Dir(p & "\music", vbDirectory) = "" Then MkDir p & "\music"
             info = Split(xinfo, vbCrLf)
         End If
         
         If Dir(p & "\core\GCore.bas") <> "" Then
-            If Val(info(0)) < Version Then
-                nList = nList & CompareFolder(App.Path & "\core", p & "\core") & vbCrLf
-                If nList = vbCrLf Then
-                    Dialog "工程更新", "我们已将最新的文件复制到你的文件夹中，本次没有新增的文件。", "好的"
-                Else
-                    Dialog "工程更新", "你的工程已经创建，" & vbCrLf & "我们已将最新的文件复制到你的文件夹中，你可以稍后引用它们。" & vbCrLf & vbCrLf & "注意：以下是更新Emerald后新增的文件，需要你手动引用" & vbCrLf & "（位于目录下的Core文件夹）：" & vbCrLf & nList, "收到！"
-                End If
-                If Val(info(0)) < 19051004 Then
-                    Dialog "警告", "资源加载函数已经迁移。" & vbCrLf & "Page->Page.Res" & vbCrLf & vbCrLf & "* 详情参照Emerald提供的代码模板", "哦"
-                End If
-                If Val(info(0)) < 19051110 Then
-                    Dialog "警告", "窗口鼠标检测出现问题" & vbCrLf & "请参照DebugSwitch模块里的注释修改代码！" & vbCrLf & vbCrLf & "* 详情参照Emerald提供的代码模板", "哦"
-                    Dialog "警告", "画布清空机制修改" & vbCrLf & "请在你的绘图过程加上Page.Clear！" & vbCrLf & vbCrLf & "* 详情参照Emerald提供的代码模板", "哦"
-                End If
-                GoTo SkipName
+            Dim sw2 As Boolean
+            If UBound(info) >= 2 Then sw2 = Val(info(2))
+            If Val(info(0)) < Version Or sw2 Then
+                ECore.NewTransform , 700, "UpdatePage"
+                AppInfo = info
+                Exit Sub
             Else
                 Dialog "无操作", "你的工程已经在使用最新的Emerald了。", "手滑"
-                Exit Sub
             End If
         End If
 
         appn = InputAsk("创建工程", "输入你的可爱的工程名称(*^▽^*)~", "完成", "取消")
-        If CheckFileName(appn) = False Or appn = "" Then Dialog "愤怒", "错误的工程名称。", "诶？": Exit Sub
+        If CheckFileName(appn) = False Or appn = "" Then Dialog "愤怒", "错误的工程名称。", "诶？": Unload MainWindow: End
         
-        Open App.Path & "\example.vbp" For Input As #1
+        Open App.path & "\example.vbp" For Input As #1
         Do While Not EOF(1)
         Line Input #1, t
         f = f & t & vbCrLf
@@ -298,12 +298,15 @@ Sub Main()
             
 SkipName:
         If Dir(p & "\core", vbDirectory) = "" Then MkDir p & "\core"
-        CopyInto App.Path & "\core", p & "\core"
-        If Dir(p & "\assets", vbDirectory) = "" Then MkDir p & "\assets"
+        If Dir(p & "\.emr", vbDirectory) = "" Then MkDir p & "\.emr"
+        If Dir(p & "\.emr\backup", vbDirectory) = "" Then MkDir p & "\.emr\backup"
+        If Dir(p & "\.emr\cache", vbDirectory) = "" Then MkDir p & "\.emr\cache"
         If Dir(p & "\assets\debug", vbDirectory) = "" Then MkDir p & "\assets\debug"
-        CopyInto App.Path & "\assets\debug", p & "\assets\debug"
-        CopyInto App.Path & "\framework", p
         If Dir(p & "\music", vbDirectory) = "" Then MkDir p & "\music"
+        
+        CopyInto App.path & "\core", p & "\core"
+        CopyInto App.path & "\assets\debug", p & "\assets\debug"
+        CopyInto App.path & "\framework", p
         
         Open p & "\.emerald" For Output As #1
         Print #1, Version 'version

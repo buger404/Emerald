@@ -31,6 +31,7 @@ Class=TitleBar; Builder\TitleBar.cls
 Class=SetupPage; Builder\SetupPage.cls
 Class=WaitPage; Builder\WaitPage.cls
 Class=DialogPage; Builder\DialogPage.cls
+Class=UpdatePage; Builder\UpdatePage.cls
 IconForm="MainWindow"
 Startup="Sub Main"
 HelpFile=""

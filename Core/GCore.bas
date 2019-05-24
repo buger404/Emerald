@@ -62,7 +62,7 @@ Attribute VB_Name = "GCore"
     End Type
     Public Type AssetsTree
         Files() As GMem
-        Path As String
+        path As String
         arg1 As Variant
         arg2 As Variant
     End Type
@@ -73,7 +73,7 @@ Attribute VB_Name = "GCore"
     Public SysPage As GSysPage
     Public PreLoadCount As Long, LoadedCount As Long, ReLoadCount As Long
     Public FPSWarn As Long
-    Public Const Version As Long = 19051901
+    Public Const Version As Long = 19052405
     Dim AssetsTrees() As AssetsTree
     Dim LastKeyUpRet As Boolean
     Dim Wndproc As Long
@@ -338,10 +338,10 @@ sth:
         ReDim Preserve AssetsTrees(UBound(AssetsTrees) + 1)
         AssetsTrees(UBound(AssetsTrees)) = Tree
     End Function
-    Public Function FindAssetsTree(Path As String, arg1 As Variant, arg2 As Variant) As Integer
+    Public Function FindAssetsTree(path As String, arg1 As Variant, arg2 As Variant) As Integer
         On Error Resume Next
         For i = 1 To UBound(AssetsTrees)
-            If AssetsTrees(i).Path = Path And AssetsTrees(i).arg1 = arg1 And AssetsTrees(i).arg2 = arg2 Then
+            If AssetsTrees(i).path = path And AssetsTrees(i).arg1 = arg1 And AssetsTrees(i).arg2 = arg2 Then
                 If Err.Number <> 0 Then
                     Err.Clear
                 Else
@@ -350,9 +350,9 @@ sth:
             End If
         Next
     End Function
-    Public Function GetAssetsTree(Path As String) As AssetsTree
+    Public Function GetAssetsTree(path As String) As AssetsTree
         For i = 1 To UBound(AssetsTrees)
-            If AssetsTrees(i).Path = Path Then GetAssetsTree = AssetsTrees(i): Exit For
+            If AssetsTrees(i).path = path Then GetAssetsTree = AssetsTrees(i): Exit For
         Next
     End Function
 '========================================================
