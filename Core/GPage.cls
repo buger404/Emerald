@@ -146,7 +146,7 @@ Public TopPage As Boolean
             GdipDrawRectangle GG, Pen, x, y, w - 1, h - 1
         End If
     End Sub
-    Public Sub DrawImage(n, x As Long, y As Long, Optional cx, Optional cy, Optional cw, Optional ch, Optional Alpha, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0)
+    Public Sub DrawImage(n, x As Long, y As Long, Optional cx, Optional cy, Optional cw, Optional ch, Optional Alpha, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0, Optional Direction As ImgDirection = DirNormal)
         'If OutOfScroll Then Exit Sub
         
         Dim b As BLENDFUNCTION, index As Integer, bl As Long
@@ -200,7 +200,7 @@ Public TopPage As Boolean
         
         Dim srcDC As Long
         If Res.ResourceGIFCount(index) = 0 Then
-            srcDC = Res.ResourceHandle(index)
+            srcDC = Res.ResourceHandle2(index, Direction)
         Else
             If GetTickCount - Res.ResourceGIFTime(index) >= GTick Then Res.GIFTick index
             srcDC = Res.ResourceGIFCurrentHandle(index)
@@ -266,11 +266,11 @@ Public TopPage As Boolean
     End Sub
 '========================================================
 '   Shape
-    Public Sub PaintLine(X1 As Long, Y1 As Long, x2 As Long, y2 As Long, Optional Color As Long, Optional size As Long = 1, Optional animation As Integer = 0)
+    Public Sub PaintLine(X1 As Long, Y1 As Long, X2 As Long, Y2 As Long, Optional Color As Long, Optional size As Long = 1, Optional animation As Integer = 0)
         If ScrollMode Then
             x = x + ScrollX + ScrollBX: y = y + ScrollY + ScrollBY
             Dim Ret As Long
-            GdipIsVisibleRect GG, IIf(X1 < x2, X1, x2), IIf(Y1 < y2, Y1, y2), IIf(X1 < x2, x2 - X1, X1 - x2), IIf(Y1 < y2, y2 - Y1, Y1 - y2), Ret
+            GdipIsVisibleRect GG, IIf(X1 < X2, X1, X2), IIf(Y1 < Y2, Y1, Y2), IIf(X1 < X2, X2 - X1, X1 - X2), IIf(Y1 < Y2, Y2 - Y1, Y1 - Y2), Ret
             If Not Ret Then OutOfScroll = True: Exit Sub
         End If
         
@@ -295,13 +295,13 @@ Public TopPage As Boolean
             GdipSetPenWidth Pen, size
         End If
         
-        GdipDrawLine GG, Pen, X1, Y1, x2, y2
+        GdipDrawLine GG, Pen, X1, Y1, X2, Y2
         
         With DrawF
-            .Left = IIf(X1 < x2, X1, x2)
-            .top = IIf(Y1 < y2, Y1, y2)
-            .Right = IIf(X1 < x2, x2 - X1, X1 - x2)
-            .Bottom = IIf(Y1 < y2, y2 - Y1, Y1 - y2)
+            .Left = IIf(X1 < X2, X1, X2)
+            .top = IIf(Y1 < Y2, Y1, Y2)
+            .Right = IIf(X1 < X2, X2 - X1, X1 - X2)
+            .Bottom = IIf(Y1 < Y2, Y2 - Y1, Y1 - Y2)
         End With
         
         If Debug_focus Then
@@ -558,8 +558,8 @@ ReShape:
     End Function
     Public Function ShowCheckBox(value, pic As String, x As Long, y As Long, text As String, Color As Long, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
         Dim w As Long, h As Long, i As Integer, m As Integer
-        Dim x2 As Long, y2 As Long
-        x2 = x: y2 = y
+        Dim X2 As Long, Y2 As Long
+        X2 = x: Y2 = y
         
         i = Res.GetImage(pic)
         w = Res.ImgSize(i, imgGetWidth): h = Res.ImgSize(i, imgGetHeight)
@@ -568,7 +568,7 @@ ReShape:
         DrawImage i, x, y, cy:=IIf(value = True, Int(h / 2), 0), ch:=Int(h / 2), Alpha:=1
         If m = 3 Then value = IIf(value = True, False, True)
         
-        Writes text, x2 + w + size / 0.75 / 2, y2 + h / 2 / 2 - size / 0.75 / 2, size, Color, GW, size / 0.75, StringAlignmentNear, style
+        Writes text, X2 + w + size / 0.75 / 2, Y2 + h / 2 / 2 - size / 0.75 / 2, size, Color, GW, size / 0.75, StringAlignmentNear, style
         
         ShowCheckBox = m
     End Function

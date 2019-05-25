@@ -47,7 +47,7 @@ Public Sub Update()
                 Page.Clear argb(255 * 0.85, 64, 64, 73) '清空画布
             
                 Page.DrawImage "404.png", 165, GH / 2, Alpha:=1 - pro, pos:=posOnCenter, animation:=1
-            
+                
                 Page.Writes "关于", 350 + pro * 22, 170 + pro * 36, Color:=argb(255, 242, 242, 242), size:=18 + pro * 4, animation:=1, style:=FontStyleBold
                 Page.Writes "制作： Error 404（QQ 1361778219）" & vbCrLf & "邮箱： ris_vb@126.com", 350 - pro * 110, 220 + pro * 40, Color:=argb(150, 242, 242, 242), size:=18, animation:=2
                 Page.Writes "版本： " & Version, 350 - pro * 50, 270 + pro * 40, Color:=argb(150 - pro * 150, 242, 242, 242), size:=18, animation:=2

@@ -246,7 +246,7 @@ Sub Main()
     If Repaired Then Exit Sub
     
     Cmd = Replace(Command$, """", "")
-    Cmd = "E:\Error 404\Ä§ÊÞ»ìÕ½3"
+    'Cmd = "E:\Error 404\Ä§ÊÞ»ìÕ½3"
     
     If Cmd <> "" Then
         Dim appn As String, f As String, t As String, p As String

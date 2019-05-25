@@ -55,8 +55,11 @@ Public Sub Dispose()
         If Not Mems(i).copyed Then
             Select Case Mems(i).kind
                 Case 0 'DC
-                    DeleteObject Mems(i).Hwnd
-                    GdipDisposeImage Mems(i).ImgHwnd
+                    If Mems(i).Hwnd <> 0 Then DeleteObject Mems(i).Hwnd
+                    If Mems(i).ImgHwnd <> 0 Then GdipDisposeImage Mems(i).ImgHwnd
+                    For s = 0 To 3
+                        If Mems(i).Imgs(s) <> 0 Then DeleteObject Mems(i).Imgs(s)
+                    Next
                 Case 1 'Graphics
                     GdipDeleteGraphics Mems(i).Hwnd
             End Select
@@ -93,6 +96,9 @@ End Property
 Public Property Get ResourceHandle(index As Integer) As Long
     ResourceHandle = Mems(index).Hwnd
 End Property
+Public Property Get ResourceHandle2(index As Integer, Direction As ImgDirection) As Long
+    ResourceHandle2 = Mems(index).Imgs(Direction)
+End Property
 Public Property Get ResourceImageHandle(index As Integer) As Long
     ResourceImageHandle = Mems(index).ImgHwnd
 End Property
@@ -103,7 +109,7 @@ Public Function GetImage(ByVal name As String) As Integer
         End If
     Next
 End Function
-Public Sub newImage(Path As String, Optional arg1, Optional arg2)
+Public Sub newImage(path As String, Optional arg1, Optional arg2)
     'when arg1 is missing ; i.w = i.w
     'when arg2 is missing but arg1 has content ; i.w = i.w * arg1
     'other ; i.w = arg1
@@ -112,7 +118,7 @@ Public Sub newImage(Path As String, Optional arg1, Optional arg2)
     If IsMissing(arg2) And (Not IsMissing(arg1)) Then si = 1
     If (Not IsMissing(arg2)) And (Not IsMissing(arg1)) Then si = 2
     
-    GdipCreateBitmapFromFile StrPtr(Path), i
+    GdipCreateBitmapFromFile StrPtr(path), i
     GdipGetImageWidth i, w: GdipGetImageHeight i, h
     
     If si = 1 Then w = Round(w * arg1): h = Round(h * arg1)
@@ -122,7 +128,7 @@ Public Sub newImage(Path As String, Optional arg1, Optional arg2)
     CLSIDFromString StrPtr("{6AEDBD6D-3FB5-418A-83A6-7F45229DC872}"), gC
     GdipImageGetFrameCount i, gC, gL
     If gL > 0 Then  '¶¯Ì¬GIFÖ§³Ö
-        temp = Split(Path, "\")
+        temp = Split(path, "\")
         Add 0, 0, temp(UBound(temp)), w, h, temp(UBound(temp) - 1)
         With Mems(UBound(Mems))
             .GIF.Count = gL
@@ -141,25 +147,33 @@ Public Sub newImage(Path As String, Optional arg1, Optional arg2)
         Exit Sub
     End If
     
-    DC = CreateCDC(w, h)
-    GdipCreateFromHDC DC, g
-    GdipDrawImageRect g, i, 0, 0, w, h
+    temp = Split(path, "\")
+    ReDim Preserve Mems(UBound(Mems) + 1)
+    With Mems(UBound(Mems))
+        .name = temp(UBound(temp))
+        .folder = temp(UBound(temp) - 1)
+        .w = w
+        .h = h
+        .ImgHwnd = i
+    End With
     
-    GdipDeleteGraphics g
-    
-    temp = Split(Path, "\")
-    Add DC, 0, temp(UBound(temp)), w, h, temp(UBound(temp) - 1)
-    Mems(UBound(Mems)).ImgHwnd = i
+    For s = 0 To 3
+        DC = CreateCDC(w, h)
+        GdipCreateFromHDC DC, g
+        GdipDrawImageRect g, i, IIf(s = 1 Or s = 3, w, 0), IIf(s = 2 Or s = 3, h, 0), w * IIf(s = 1 Or s = 3, -1, 1), h * IIf(s = 2 Or s = 3, -1, 1)
+        GdipDeleteGraphics g
+        Mems(UBound(Mems)).Imgs(s) = DC
+    Next
 End Sub
-Public Sub NewImages(Path As String, Optional arg1, Optional arg2)
+Public Sub NewImages(path As String, Optional arg1, Optional arg2)
     Dim f As String, c As Long
-    If Right(Path, 1) <> "\" Then Path = Path & "\"
+    If Right(path, 1) <> "\" Then path = path & "\"
     
     Dim index As Integer, Tree As AssetsTree
-    Tree.Path = Path: ReDim Tree.Files(0)
-    index = FindAssetsTree(Path, arg1, arg2)
+    Tree.path = path: ReDim Tree.Files(0)
+    index = FindAssetsTree(path, arg1, arg2)
     
-    f = Dir(Path)
+    f = Dir(path)
     Do While f <> ""
         c = c + 1
         ReDim Preserve Tree.Files(UBound(Tree.Files) + 1)
@@ -168,7 +182,7 @@ Public Sub NewImages(Path As String, Optional arg1, Optional arg2)
     If index = 0 Then
         PreLoadCount = PreLoadCount + c
     Else
-        Tree = GetAssetsTree(Path)
+        Tree = GetAssetsTree(path)
         For i = 1 To UBound(Tree.Files)
             ReDim Preserve Mems(UBound(Mems) + 1)
             Mems(UBound(Mems)) = Tree.Files(i)
@@ -178,15 +192,15 @@ Public Sub NewImages(Path As String, Optional arg1, Optional arg2)
         Exit Sub
     End If
     
-    f = Dir(Path)
+    f = Dir(path)
     i = 1
     Do While f <> ""
         If IsMissing(arg1) Then
-            newImage Path & f
+            newImage path & f
         ElseIf IsMissing(arg2) Then
-            newImage Path & f, arg1
+            newImage path & f, arg1
         Else
-            newImage Path & f, arg1, arg2
+            newImage path & f, arg1, arg2
         End If
         Tree.Files(i) = Mems(UBound(Mems))
         i = i + 1

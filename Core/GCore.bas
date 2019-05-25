@@ -54,6 +54,7 @@ Attribute VB_Name = "GCore"
         kind As Integer
         Hwnd As Long
         ImgHwnd As Long
+        Imgs(3) As Long
         name As String
         folder As String
         w As Long
@@ -66,6 +67,12 @@ Attribute VB_Name = "GCore"
         arg1 As Variant
         arg2 As Variant
     End Type
+    Public Enum ImgDirection
+        DirNormal = 0
+        DirHorizontal = 1
+        DirVertical = 2
+        DirHorizontalVertical = 3
+    End Enum
     Public ECore As GMan, EF As GFont, EAni As Object, ESave As GSaving
     Public GHwnd As Long, GDC As Long, GW As Long, GH As Long
     Public Mouse As MState, DrawF As RECT
