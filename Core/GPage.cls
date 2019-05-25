@@ -572,6 +572,16 @@ ReShape:
         
         ShowCheckBox = m
     End Function
+    Public Function ShowColorCheckBox(value, x As Long, y As Long, w As Long, h As Long, text As String, DefaultColor As Long, ChooseColor As Long, ForeColor As Long, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
+        m = CheckMouse(x, y, w, h)
+        
+        Paint 1, x, y, h, h, IIf(value = True, ChooseColor, DefaultColor)
+        If m = 3 Then value = IIf(value = True, False, True)
+        
+        Writes text, x + h + size / 0.75 / 2, y + h / 2 - size / 0.75 / 2, size, ForeColor, GW, size / 0.75, StringAlignmentNear, style
+        
+        ShowColorCheckBox = m
+    End Function
     Public Function ShowHScrollBar(value, x As Long, y As Long, w As Long, h As Long, LineColor As Long, BallColor As Long, Optional size As Long = 2) As Integer
         Dim m As Integer
         
