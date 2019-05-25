@@ -196,7 +196,11 @@ Sub Repair()
 End Sub
 Public Sub CheckOnLineUpdate()
     On Error Resume Next
+    
+    Call FakeSleep(300)
+    
     If InternetGetConnectedState(0&, 0&) = 0 Then
+        NewVersion = 3
         Exit Sub
     End If
     
@@ -210,11 +214,10 @@ Public Sub CheckOnLineUpdate()
         xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
         xmlHttp.send
         
-        Call FakeSleep(300)
-        
         Start = GetTickCount
         Do While xmlHttp.ReadyState <> 4
             If GetTickCount - Start >= UpdateTimeOut Then
+                NewVersion = 3
                 Exit Sub
             End If
             ECore.Display

@@ -57,19 +57,24 @@ Public Sub Update()
                     Call CheckOnLineUpdate
                 End If
                 
-                If NewVersion = 1 Then
-                    Page.ShowLoading 30, GH - 30 - 24, 24, 24, 3, argb(255, 242, 195, 17), argb(255, 240, 127, 34), argb(255, 232, 76, 61)
-                    Page.Writes "正在检查更新...", 80, GH - 30 - 24, Color:=argb(150, 242, 242, 242), size:=18, animation:=2
-                ElseIf NewVersion > Version Then
-                    If HideTime = 0 Then HideTime = GetTickCount
-                    Page.Paint 1, 30, GH - 30 - 24, 24, 24, argb(255, 255, 206, 69)
-                    Page.Writes "有更新可用（" & NewVersion & "），点击此处下载。", 80, GH - 30 - 24, w:=GW, h:=25, Color:=argb(255, 232, 76, 61), size:=18, animation:=2
-                    If CheckMouse2 = mMouseUp Then ShellExecuteA 0, "open", "https://github.com/Red-Error404/Emerald", "", "", SW_SHOW
-                Else
-                    If HideTime = 0 Then HideTime = GetTickCount
-                    Page.Paint 1, 30, GH - 30 - 24, 24, 24, argb(255 - pro * 255, 95, 229, 221)
-                    Page.Writes "已经是最新版本", 80, GH - 30 - 24, Color:=argb(150 - pro * 150, 242, 242, 242), size:=18, animation:=2
-                End If
+                Select Case NewVersion
+                    Case 1
+                        Page.ShowLoading 30, GH - 30 - 24, 24, 24, 3, argb(255, 242, 195, 17), argb(255, 240, 127, 34), argb(255, 232, 76, 61)
+                        Page.Writes "正在检查更新...", 80, GH - 30 - 24, Color:=argb(150, 242, 242, 242), size:=18, animation:=2
+                    Case Is > Version
+                        If HideTime = 0 Then HideTime = GetTickCount
+                        Page.Paint 1, 30, GH - 30 - 24, 24, 24, argb(255, 255, 206, 69)
+                        Page.Writes "有更新可用（" & NewVersion & "），点击此处下载。", 80, GH - 30 - 24, w:=GW, h:=25, Color:=argb(255, 232, 76, 61), size:=18, animation:=2
+                        If CheckMouse2 = mMouseUp Then ShellExecuteA 0, "open", "https://github.com/Red-Error404/Emerald", "", "", SW_SHOW
+                    Case Is = Version
+                        If HideTime = 0 Then HideTime = GetTickCount
+                        Page.Paint 1, 30, GH - 30 - 24, 24, 24, argb(255 - pro * 255, 95, 229, 221)
+                        Page.Writes "已经是最新版本", 80, GH - 30 - 24, Color:=argb(150 - pro * 150, 242, 242, 242), size:=18, animation:=2
+                    Case 3
+                        If HideTime = 0 Then HideTime = GetTickCount
+                        Page.Paint 1, 30, GH - 30 - 24, 24, 24, argb(255 - pro * 255, 254, 84, 57)
+                        Page.Writes "连接超时", 80, GH - 30 - 24, Color:=argb(150 - pro * 150, 242, 242, 242), size:=18, animation:=2
+                End Select
                 
                 Exit Sub
             End If

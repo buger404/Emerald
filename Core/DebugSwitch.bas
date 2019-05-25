@@ -5,7 +5,7 @@ Attribute VB_Name = "DebugSwitch"
 '   是否开启Debug
     Public Const DebugMode As Boolean = False
 '   禁用开场LOGO
-    Public Const DisableLOGO As Boolean = False
+    Public Const DisableLOGO As Boolean = True
 '   是否跳过多余的开场LOGO（如果资源已经加载完毕）
     Public Const HideLOGO As Boolean = False
 '   检查更新间隔时长（天）
