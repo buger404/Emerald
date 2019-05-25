@@ -81,7 +81,7 @@ Attribute VB_Name = "GCore"
     Public PreLoadCount As Long, LoadedCount As Long, ReLoadCount As Long
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
-    Public Const Version As Long = 19052407
+    Public Const Version As Long = 19052507
     Dim AssetsTrees() As AssetsTree
     Dim LastKeyUpRet As Boolean
     Dim Wndproc As Long
