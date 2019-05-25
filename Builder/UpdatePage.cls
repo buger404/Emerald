@@ -149,7 +149,7 @@ Public Sub Update2()
             Else
                 NoUpdate = True
             End If
-            Call FakeSleep(100)
+            Call FakeSleep(30)
         Next
         CopyInto App.path & "\assets\debug", Cmd & "\assets\debug"
         CopyInto App.path & "\framework", Cmd
