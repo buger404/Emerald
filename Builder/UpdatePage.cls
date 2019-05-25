@@ -131,7 +131,7 @@ Public Sub Update2()
     End If
     
     If Page.ShowColorButton(0, GW - 120 - 50, GH - 80, 120, 40, "替换", argb(150, 27, 27, 27), argb(255, 222, 222, 222), argb(130, 95, 229, 221), size:=18) = 3 Then
-        If Dialog("警告", "即将替换所选文件。", "好", "等等！") <> 1 Then Exit Sub
+        If Dialog("警告", "即将替换所选文件。" & IIf(BackupSwitch, "并创建备份。", ""), "好", "等等！") <> 1 Then Exit Sub
         If Val(AppInfo(0)) < 19051004 Then
             Dialog "警告", "资源加载函数已经迁移。" & vbCrLf & "Page->Page.Res" & vbCrLf & vbCrLf & "* 详情参照Emerald提供的代码模板", "哦"
         End If
@@ -148,15 +148,23 @@ Public Sub Update2()
             CopyInto Cmd & "\core", Cmd & "\.emr\backup\" & Backstr
             If Dir(Cmd & "\.emr\backup\" & Backstr & "\cache", vbDirectory) = "" Then MkDir Cmd & "\.emr\backup\" & Backstr & "\cache"
             CopyInto Cmd & "\.emr\cache", Cmd & "\.emr\backup\" & Backstr & "\cache"
+            If Dir(Cmd & "\.emr\backup\" & Backstr & "\project", vbDirectory) = "" Then MkDir Cmd & "\.emr\backup\" & Backstr & "\project"
+            FileCopy Cmd & "\" & Dir(Cmd & "\*.vbp"), Cmd & "\.emr\backup\" & Backstr & "\project\" & Dir(Cmd & "\*.vbp")
         End If
         
-        Dim NoUpdate As Boolean
+        Dim NoUpdate As Boolean, AddList As String, FileMark As String
         For i = 1 To UBound(FileList)
             If FileList(i).Rep Then
                 FileCopy App.path & "\core\" & FileList(i).path, Cmd & "\core\" & FileList(i).path
                 Open Cmd & "\.emr\cache\" & FileList(i).path For Output As #1
                 Print #1, FileLen(Cmd & "\core\" & FileList(i).path)
                 Close #1
+                If FileList(i).mark = 0 Then
+                    If LCase(FileList(i).path) Like "*.bas" Then FileMark = "Module"
+                    If LCase(FileList(i).path) Like "*.cls" Then FileMark = "Class"
+                    If LCase(FileList(i).path) Like "*.frm" Then FileMark = "Form"
+                    AddList = AddList & FileMark & "=" & Split(FileList(i).path, ".")(0) & "; Core\" & FileList(i).path & vbCrLf
+                End If
             Else
                 NoUpdate = True
             End If
@@ -164,6 +172,23 @@ Public Sub Update2()
         Next
         CopyInto App.path & "\assets\debug", Cmd & "\assets\debug"
         CopyInto App.path & "\framework", Cmd
+        
+        If AddList <> "" Then
+            Dim tempVbp As String, tempRead As String
+            Open Cmd & "\" & Dir(Cmd & "\*.vbp") For Input As #1
+            Do While Not EOF(1)
+                Line Input #1, tempRead
+                If Left(tempRead, 7) = "Startup" Then
+                    tempVbp = tempVbp & AddList & tempRead
+                Else
+                    tempVbp = tempVbp & tempRead & vbCrLf
+                End If
+            Loop
+            Close #1
+            Open Cmd & "\" & Dir(Cmd & "\*.vbp") For Output As #1
+            Print #1, tempVbp
+            Close #1
+        End If
         
         Open Cmd & "\.emerald" For Output As #1
         Print #1, Version 'version
