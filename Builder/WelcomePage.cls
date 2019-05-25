@@ -51,7 +51,7 @@ Public Sub Update()
                 Page.Writes "关于", 350 + pro * 22, 170 + pro * 36, Color:=argb(255, 242, 242, 242), size:=18 + pro * 4, animation:=1, style:=FontStyleBold
                 Page.Writes "制作： Error 404（QQ 1361778219）" & vbCrLf & "邮箱： ris_vb@126.com", 350 - pro * 110, 220 + pro * 40, Color:=argb(150, 242, 242, 242), size:=18, animation:=2
                 Page.Writes "版本： " & Version, 350 - pro * 50, 270 + pro * 40, Color:=argb(150 - pro * 150, 242, 242, 242), size:=18, animation:=2
-                Page.Writes "感谢Inter.net和Redstone群的支持。", 350 - pro * 90, 340 + pro * 180, Color:=argb(150 - pro * 60, 242, 242, 242), size:=18 - pro * 2, animation:=2
+                Page.Writes "感谢Inter.net群，Redstone群和南笙的支持。", 350 - pro * 90, 340 + pro * 180, Color:=argb(150 - pro * 60, 242, 242, 242), size:=18 - pro * 2, animation:=2
                 If NewVersion = 0 Then
                     NewVersion = 1
                     Call CheckOnLineUpdate

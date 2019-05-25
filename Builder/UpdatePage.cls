@@ -140,6 +140,16 @@ Public Sub Update2()
             Dialog "警告", "画布清空机制修改" & vbCrLf & "请在你的绘图过程加上Page.Clear！" & vbCrLf & vbCrLf & "* 详情参照Emerald提供的代码模板", "哦"
         End If
         ECore.NewTransform transFadeIn, 700, "WaitPage"
+        
+        Dim Backstr As String
+        If BackupSwitch Then
+            Backstr = year(Now) & "年" & Month(Now) & "月" & Day(Now) & "日" & Hour(Now) & "时" & Minute(Now) & "分" & Second(Now) & "秒"
+            If Dir(Cmd & "\.emr\backup\" & Backstr, vbDirectory) = "" Then MkDir Cmd & "\.emr\backup\" & Backstr
+            CopyInto Cmd & "\core", Cmd & "\.emr\backup\" & Backstr
+            If Dir(Cmd & "\.emr\backup\" & Backstr & "\cache", vbDirectory) = "" Then MkDir Cmd & "\.emr\backup\" & Backstr & "\cache"
+            CopyInto Cmd & "\.emr\cache", Cmd & "\.emr\backup\" & Backstr & "\cache"
+        End If
+        
         Dim NoUpdate As Boolean
         For i = 1 To UBound(FileList)
             If FileList(i).Rep Then

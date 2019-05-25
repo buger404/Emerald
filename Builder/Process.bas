@@ -363,6 +363,7 @@ Sub CopyInto(Src As String, Dst As String)
             If p Then GoTo skip
         End If
         FileCopy Src & "\" & f, Dst & "\" & f
+        DoEvents
 skip:
         f = Dir()
     Loop
