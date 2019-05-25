@@ -73,6 +73,7 @@ Attribute VB_Name = "GCore"
     Public SysPage As GSysPage
     Public PreLoadCount As Long, LoadedCount As Long, ReLoadCount As Long
     Public FPSWarn As Long
+    Public EmeraldInstalled As Boolean
     Public Const Version As Long = 19052407
     Dim AssetsTrees() As AssetsTree
     Dim LastKeyUpRet As Boolean
@@ -134,6 +135,7 @@ Attribute VB_Name = "GCore"
     Public Sub MakeFont(ByVal name As String)
         Set EF = New GFont
         EF.MakeFont name
+        EmeraldInstalled = True
     End Sub
 '========================================================
 '   RunTime

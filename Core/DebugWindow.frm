@@ -40,20 +40,20 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 'Emerald Ïà¹Ø´úÂë
-Dim Page As GPage, Charge As GDebug, Sh As New aShadow
+Dim Page As GPage, Charge As GDebug, sh As New aShadow
 Private Sub Form_Load()
     Set Page = New GPage
     Set Charge = New GDebug
     
     Page.Create Charge
-    Page.Res.NewImages App.Path & "\assets\debug", 64, 64
+    Page.Res.NewImages App.path & "\assets\debug", 64, 64
     
     Set Charge.Page = Page
     
     Me.Width = 586 * Screen.TwipsPerPixelX: Me.Height = 78 * Screen.TwipsPerPixelY
     Charge.GW = Me.ScaleWidth: Charge.GH = Me.ScaleHeight
     
-    With Sh
+    With sh
         If .Shadow(Me) Then
             .Color = RGB(0, 0, 0)
             .Depth = 12
@@ -84,7 +84,7 @@ Private Sub Form_Load()
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
-    Set Sh = Nothing
+    Set sh = Nothing
 End Sub
 
 Private Sub touchArea_Click(index As Integer)
@@ -97,6 +97,7 @@ Private Sub touchArea_Click(index As Integer)
 End Sub
 
 Private Sub UpdateTimer_Timer()
+    If EmeraldInstalled = False Then Exit Sub
     Page.Clear
     Page.Update
     Page.Display Me.hdc

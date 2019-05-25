@@ -22,6 +22,7 @@ Attribute VB_Exposed = False
         Rep As Boolean
     End Type
     Dim FileList() As CopyList
+    Dim BackupSwitch As Boolean
 '======================================
 Public Sub CheckFiles()
     Dim f As String, fl() As String
@@ -199,6 +200,10 @@ Public Sub Update()
         Step = 1
     End If
     
+    Page.Paint 1, 50, GH - 30 - 40 - 40, 24, 24, IIf(BackupSwitch, argb(255, 95, 229, 221), argb(255, 222, 222, 222))
+    If CheckMouse2 = mMouseUp Then BackupSwitch = Not BackupSwitch
+    Page.Writes "创建备份", 50 + 35, GH - 30 - 40 - 40 + 1, 16, argb(150, 27, 27, 27)
+    
     Page.Writes "我希望了解更新内容", 50, GH - 30 - 40, 16, argb(150, 27, 27, 27), 200, 20, style:=FontStyleUnderline
     If CheckMouse2 = mMouseUp Then ShellExecuteA 0, "open", "https://github.com/Red-Error404/Emerald/commits/master", "", "", SW_SHOW
 End Sub
@@ -208,7 +213,7 @@ Public Sub Wheel(Direction As Integer, Depth As Single)
 End Sub
 Public Sub Enter()
     '页面进入事件
-    Step = 0
+    Step = 0: BackupSwitch = True
 End Sub
 Public Sub Leave()
     '页面离开事件
