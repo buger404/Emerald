@@ -253,7 +253,11 @@ Sub Main()
         Dim nList As String, xinfo As String, info() As String
         p = Cmd
 
-        If p = "-uninstall" Then Call Uninstall
+        If p = "-uninstall" Then
+            ECore.NewTransform transFadeIn, 700, "WelcomePage"
+            Exit Sub
+        End If
+        
         Call CheckVersion
         
         If Dir(p & "\.emerald") <> "" Then
@@ -273,9 +277,9 @@ Sub Main()
         End If
         
         If Dir(p & "\core\GCore.bas") <> "" Then
-            Dim sw2 As Boolean
-            If UBound(info) >= 2 Then sw2 = Val(info(2))
-            If Val(info(0)) < Version Or sw2 Then
+            Dim sw2 As String
+            If UBound(info) >= 2 Then sw2 = Trim(info(2))
+            If Val(info(0)) < Version Or sw2 = "True" Then
                 ECore.NewTransform , 700, "UpdatePage"
                 AppInfo = info
                 Exit Sub
@@ -288,7 +292,7 @@ Sub Main()
         appn = InputAsk("创建工程", "输入你的可爱的工程名称(*^▽^*)~", "完成", "取消")
         If CheckFileName(appn) = False Or appn = "" Then Dialog "愤怒", "错误的工程名称。", "诶？": Unload MainWindow: End
         
-        Open App.path & "\example.vbp" For Input As #1
+        Open App.path & "\Example\example.vbp" For Input As #1
         Do While Not EOF(1)
         Line Input #1, t
         f = f & t & vbCrLf
@@ -306,6 +310,7 @@ SkipName:
         If Dir(p & "\.emr", vbDirectory) = "" Then MkDir p & "\.emr"
         If Dir(p & "\.emr\backup", vbDirectory) = "" Then MkDir p & "\.emr\backup"
         If Dir(p & "\.emr\cache", vbDirectory) = "" Then MkDir p & "\.emr\cache"
+        If Dir(p & "\assets", vbDirectory) = "" Then MkDir p & "\assets"
         If Dir(p & "\assets\debug", vbDirectory) = "" Then MkDir p & "\assets\debug"
         If Dir(p & "\music", vbDirectory) = "" Then MkDir p & "\music"
         
@@ -316,6 +321,7 @@ SkipName:
         Open p & "\.emerald" For Output As #1
         Print #1, Version 'version
         Print #1, Now 'Update Time
+        Print #1, False
         Close #1
         
     Else
