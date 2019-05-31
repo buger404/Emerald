@@ -88,7 +88,22 @@ Attribute VB_Name = "GCore"
 '========================================================
 '   Init
     Public Sub StartEmerald(Hwnd As Long, w As Long, h As Long)
+    
+        Dim strComputer, objWMIService, colItems, objItem, strOSversion As String
+        strComputer = "."
+        Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\cimv2")
+        Set colItems = objWMIService.ExecQuery("Select * from Win32_OperatingSystem")
         
+        For Each objItem In colItems
+            strOSversion = objItem.Version
+        Next
+    
+        Select Case Val(Split(strOSversion, ".")(0))
+        Case Is <= "5"
+            MsgBox "非常抱歉，Emerald不再支持运行在Windows 7以下版本的操作系统。" & vbCrLf & vbCrLf & "如果您有方法提供支持，请联系QQ 1361778219。", 48, "Emerald：不兼容的操作系统"
+            End
+        End Select
+    
         If DebugMode Then
             If App.LogMode <> 0 Then MsgBox "错误：生成时未关闭Debug模式。": End
         End If
@@ -200,6 +215,7 @@ sth:
         Dim b As BlurParams, e As Long, w As Long, h As Long
         
         '模糊操作
+
         GdipCreateEffect2 GdipEffectType.Blur, e: b.Radius = Radius: GdipSetEffectParameters e, b, LenB(b)
         GdipGetImageWidth img, w: GdipGetImageHeight img, h
         GdipBitmapApplyEffect img, e, NewRectL(0, 0, w, h), 0, 0, 0

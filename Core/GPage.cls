@@ -96,15 +96,18 @@ Public TopPage As Boolean
     Public Sub DrawImageEx(n, x As Long, y As Long, Optional w, Optional h, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0)
         Dim index As Integer
         
+        Dim ox As Long, oy As Long, ow As Long, oh As Long
+        ox = x: oy = y: ow = w: oh = h
+        
         If animation <> 0 Then
             If Not Anis(animation).mark Then
                 Dim pro As Single
                 pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).Start - Anis(animation).delay) / Anis(animation).during)
                 
                 If Anis(animation).custom Then
-                    CallByName DrawBox, Anis(animation).func, VbMethod, x, y, w, h, 0, pro
+                    CallByName DrawBox, Anis(animation).func, VbMethod, ox, oy, ow, oh, 0, pro
                 Else
-                    CallByName EAni, Anis(animation).func, VbMethod, x, y, w, h, 0, pro
+                    CallByName EAni, Anis(animation).func, VbMethod, ox, oy, ow, oh, 0, pro
                 End If
 
             End If
@@ -116,40 +119,49 @@ Public TopPage As Boolean
             index = n
         End If
         
-        If IsMissing(w) Then GdipGetImageWidth Res.ResourceImageHandle(index), w
-        If IsMissing(h) Then GdipGetImageWidth Res.ResourceImageHandle(index), h
+        If IsMissing(ow) Then GdipGetImageWidth Res.ResourceImageHandle(index), ow
+        If IsMissing(oh) Then GdipGetImageWidth Res.ResourceImageHandle(index), oh
         
-        If pos = 1 Then x = Int(x - w / 2): y = Int(y - h / 2)
-        If pos = 2 Then x = x - w
-        If pos = 3 Then y = y - h
-        If pos = 4 Then x = x + w
-        If pos = 5 Then y = y + h
+        If pos = 1 Then ox = Int(ox - ow / 2): oy = Int(oy - oh / 2)
+        If pos = 2 Then ox = ox - ow
+        If pos = 3 Then oy = oy - oh
+        If pos = 4 Then ox = ox + ow
+        If pos = 5 Then oy = oy + oh
         
         If ScrollMode Then
-            x = x + ScrollX + ScrollBX: y = y + ScrollY + ScrollBY
+            ox = ox + ScrollX + ScrollBX: oy = oy + ScrollY + ScrollBY
             Dim Ret As Long
-            GdipIsVisibleRect GG, x - 1, y - 1, w, h, Ret
+            GdipIsVisibleRect GG, ox - 1, oy - 1, ow, oh, Ret
             If Not Ret Then OutOfScroll = True: Exit Sub
         End If
         
-        GdipDrawImageRect GG, Res.ResourceImageHandle(index), x, y, w, h
+        GdipDrawImageRect GG, Res.ResourceImageHandle(index), ox, oy, ow, oh
         
         With DrawF
-            .Left = x
-            .top = y
-            .Right = cw
-            .Bottom = ch
+            .Left = ox
+            .top = oy
+            .Right = ow
+            .Bottom = oh
         End With
         
         If Debug_focus Then
             GdipSetPenColor Pen, argb(255, 255, 0, 255)
-            GdipDrawRectangle GG, Pen, x, y, w - 1, h - 1
+            GdipDrawRectangle GG, Pen, ox, oy, ow - 1, oh - 1
+        End If
+        
+        If Debug_pos Then
+            GdipSetPenColor Pen, argb(255, 0, 183, 195)
+            GdipDrawLine GG, Pen, x - 5, y, x + 5, y
+            GdipDrawLine GG, Pen, x, y - 5, x, y + 5
         End If
     End Sub
     Public Sub DrawImage(n, x As Long, y As Long, Optional cx, Optional cy, Optional cw, Optional ch, Optional Alpha, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0, Optional Direction As ImgDirection = DirNormal)
         'If OutOfScroll Then Exit Sub
         
         Dim b As BLENDFUNCTION, index As Integer, bl As Long
+        Dim ox As Long, oy As Long, ow As Long, oh As Long
+        ox = x: oy = y: ow = w: oh = h
+        Dim ocx As Long, ocy As Long, ocw As Long, och As Long
         
         If Not IsMissing(Alpha) Then
             Dim pro As Single
@@ -178,22 +190,22 @@ Public TopPage As Boolean
             index = n
         End If
         
-        If IsMissing(cx) Then cx = 0
-        If IsMissing(cy) Then cy = 0
-        If IsMissing(cw) Then cw = Res.ImgSize(index, imgGetWidth) - cx
-        If IsMissing(ch) Then ch = Res.ImgSize(index, imgGetHeight) - cy
+        If IsMissing(cx) Then ocx = 0 Else: ocx = cx
+        If IsMissing(cy) Then ocy = 0 Else: ocy = cy
+        If IsMissing(cw) Then ocw = Res.ImgSize(index, imgGetWidth) - ocx Else: ocw = cw
+        If IsMissing(ch) Then och = Res.ImgSize(index, imgGetHeight) - ocy Else: och = ch
         
-        If pos = 1 Then x = Int(x - cw / 2): y = Int(y - ch / 2)
-        If pos = 2 Then x = x - cw
-        If pos = 3 Then y = y - ch
-        If pos = 4 Then x = x + cw
-        If pos = 5 Then y = y + ch
+        If pos = 1 Then ox = Int(ox - ocw / 2): oy = Int(oy - och / 2)
+        If pos = 2 Then ox = ox - ocw
+        If pos = 3 Then oy = oy - och
+        If pos = 4 Then ox = ox + ocw
+        If pos = 5 Then oy = oy + och
         
         If ScrollMode Then
-            x = x + ScrollX + ScrollBX: y = y + ScrollY + ScrollBY
+            ox = ox + ScrollX + ScrollBX: oy = oy + ScrollY + ScrollBY
             Dim Ret As Long, Crect As RECT
             With Crect
-                .Left = x: .top = y: .Right = x + cw: .Bottom = y + ch
+                .Left = ox: .top = oy: .Right = ox + ocw: .Bottom = oy + och
             End With
             If RectVisible(CDC, Crect) <> 1 Then OutOfScroll = True: Exit Sub
         End If
@@ -207,31 +219,41 @@ Public TopPage As Boolean
         End If
         
         If IsMissing(Alpha) Then
-            BitBlt CDC, x, y, cw, ch, srcDC, cx, cy, vbSrcCopy
+            BitBlt CDC, ox, oy, ocw, och, srcDC, ocx, ocy, vbSrcCopy
         Else
-            AlphaBlend CDC, x, y, cw, ch, srcDC, cx, cy, cw, ch, bl
+            AlphaBlend CDC, ox, oy, ocw, och, srcDC, ocx, ocy, ocw, och, bl
         End If
         
         With DrawF
-            .Left = x
-            .top = y
-            .Right = cw
-            .Bottom = ch
+            .Left = ox
+            .top = oy
+            .Right = ocw
+            .Bottom = och
         End With
         
         If Debug_focus Then
             GdipSetPenColor Pen, argb(255, 0, 0, 255)
-            GdipDrawRectangle GG, Pen, x, y, cw - 1, ch - 1
+            GdipDrawRectangle GG, Pen, ox, oy, ocw - 1, och - 1
+        End If
+        
+        If Debug_pos Then
+            GdipSetPenColor Pen, argb(255, 0, 183, 195)
+            GdipDrawLine GG, Pen, x - 5, y, x + 5, y
+            GdipDrawLine GG, Pen, x, y - 5, x, y + 5
         End If
     End Sub
 '========================================================
 '   Writer
     Public Sub Writes(ByVal text As String, x As Long, y As Long, Optional size As Long = 14, Optional Color As Long, Optional w As Long = 0, Optional h As Long = 0, Optional align As StringAlignment = StringAlignmentNear, Optional style As FontStyle = FontStyleRegular, Optional animation As Integer = 0)
         'If OutOfScroll Then Exit Sub
+        
+        Dim ox As Long, oy As Long
+        ox = x: oy = y
+        
         If ScrollMode Then
-            x = x + ScrollX + ScrollBX: y = y + ScrollY + ScrollBY
+            ox = ox + ScrollX + ScrollBX: oy = oy + ScrollY + ScrollBY
             Dim Ret As Long
-            GdipIsVisibleRect GG, x, y, w, h, Ret
+            GdipIsVisibleRect GG, ox, oy, w, h, Ret
             If Ret = 0 Then OutOfScroll = True: Exit Sub
         End If
         
@@ -243,25 +265,31 @@ Public TopPage As Boolean
                 al = co(3): al = al / 255
                 
                 If Anis(animation).custom Then
-                    CallByName DrawBox, Anis(animation).func, VbMethod, x, y, w, h, al, pro
+                    CallByName DrawBox, Anis(animation).func, VbMethod, ox, oy, w, h, al, pro
                 Else
-                    CallByName EAni, Anis(animation).func, VbMethod, x, y, w, h, al, pro
+                    CallByName EAni, Anis(animation).func, VbMethod, ox, oy, w, h, al, pro
                 End If
                 Color = argb(al * 255, co(0), co(1), co(2))
             End If
         End If
         
-        EF.Writes text, x, y, GG, Color, size, w, h, align, style
+        EF.Writes text, ox, oy, GG, Color, size, w, h, align, style
         With DrawF
-            .Left = x
-            .top = y
+            .Left = ox
+            .top = oy
             .Right = w
             .Bottom = h
         End With
         
         If Debug_focus Then
             GdipSetPenColor Pen, argb(255, 0, 255, 0)
-            GdipDrawRectangle GG, Pen, x, y, w - 1, h - 1
+            GdipDrawRectangle GG, Pen, ox, oy, w - 1, h - 1
+        End If
+        
+        If Debug_pos Then
+            GdipSetPenColor Pen, argb(255, 0, 183, 195)
+            GdipDrawLine GG, Pen, x - 5, y, x + 5, y
+            GdipDrawLine GG, Pen, x, y - 5, x, y + 5
         End If
     End Sub
 '========================================================
@@ -313,10 +341,14 @@ Public TopPage As Boolean
         'shape:0=rect,1=ellipse,2=rectr
         'style:0=fill,1=border
         'If OutOfScroll Then Exit Sub
+
+        Dim ox As Long, oy As Long, ow As Long, oh As Long
+        ox = x: oy = y: ow = w: oh = h
+        
         If ScrollMode Then
-            x = x + ScrollX + ScrollBX: y = y + ScrollY + ScrollBY
+            ox = ox + ScrollX + ScrollBX: oy = oy + ScrollY + ScrollBY
             Dim Ret As Long
-            GdipIsVisibleRect GG, x - 1, y - 1, w, h, Ret
+            GdipIsVisibleRect GG, ox - 1, oy - 1, ow, oh, Ret
             If Not Ret Then OutOfScroll = True: Exit Sub
         End If
         
@@ -328,9 +360,9 @@ Public TopPage As Boolean
                 al = co(3): al = al / 255
                 
                 If Anis(animation).custom Then
-                    CallByName DrawBox, Anis(animation).func, VbMethod, x, y, w, h, al, pro
+                    CallByName DrawBox, Anis(animation).func, VbMethod, ox, oy, ow, oh, al, pro
                 Else
-                    CallByName EAni, Anis(animation).func, VbMethod, x, y, w, h, al, pro
+                    CallByName EAni, Anis(animation).func, VbMethod, ox, oy, ow, oh, al, pro
                 End If
                 Color = argb(al * 255, co(0), co(1), co(2))
             End If
@@ -338,28 +370,28 @@ Public TopPage As Boolean
         
         GdipResetPath path
         
-        If pos = 1 Then x = Int(x - w / 2): y = Int(y - h / 2)
-        If pos = 2 Then x = x - w
-        If pos = 3 Then y = y - h
-        If pos = 4 Then x = x + w
-        If pos = 5 Then y = y + h
+        If pos = 1 Then ox = Int(ox - ow / 2): oy = Int(oy - oh / 2)
+        If pos = 2 Then ox = ox - ow
+        If pos = 3 Then oy = oy - oh
+        If pos = 4 Then ox = ox + ow
+        If pos = 5 Then oy = oy + oh
         
 ReShape:
-        If shape = 0 Then GdipAddPathRectangle path, x, y, w - 1, h - 1
-        If shape = 1 Then GdipAddPathEllipse path, x, y, w - 1, h - 1
+        If shape = 0 Then GdipAddPathRectangle path, ox, oy, ow - 1, oh - 1
+        If shape = 1 Then GdipAddPathEllipse path, ox, oy, ow - 1, oh - 1
         If shape = 2 Then
         
             If Radius = 0 Then
                 shape = 0: GoTo ReShape
             End If
             
-            If Radius > w Then Radius = w
-            If Radius > h Then Radius = h
+            If Radius > ow Then Radius = ow
+            If Radius > oh Then Radius = oh
             
-            GdipAddPathArc path, x, y, Radius, Radius, 180, 90
-            GdipAddPathArc path, x + w - Radius, y, Radius, Radius, 270, 90
-            GdipAddPathArc path, x + w - Radius, y + h - Radius, Radius, Radius, 0, 90
-            GdipAddPathArc path, x, y + h - Radius, Radius, Radius, 90, 90
+            GdipAddPathArc path, ox, oy, Radius, Radius, 180, 90
+            GdipAddPathArc path, ox + ow - Radius, oy, Radius, Radius, 270, 90
+            GdipAddPathArc path, ox + ow - Radius, oy + oh - Radius, Radius, Radius, 0, 90
+            GdipAddPathArc path, ox, oy + oh - Radius, Radius, Radius, 90, 90
             GdipClosePathFigure path
             
         End If
@@ -378,23 +410,33 @@ ReShape:
         If shape = 0 Then GdipSetSmoothingMode GG, SmoothingModeAntiAlias
         
         With DrawF
-            .Left = x
-            .top = y
-            .Right = w
-            .Bottom = h
+            .Left = ox
+            .top = oy
+            .Right = ow
+            .Bottom = oh
         End With
         
         If Debug_focus Then
             GdipSetPenColor Pen, argb(255, 255, 0, 0)
-            GdipDrawRectangle GG, Pen, x, y, w - 1, h - 1
+            GdipDrawRectangle GG, Pen, ox, oy, ow - 1, oh - 1
+        End If
+        
+        If Debug_pos Then
+            GdipSetPenColor Pen, argb(255, 0, 183, 195)
+            GdipDrawLine GG, Pen, x - 5, y, x + 5, y
+            GdipDrawLine GG, Pen, x, y - 5, x, y + 5
         End If
     End Sub
     Public Sub PaintArc(x As Long, y As Long, w As Long, h As Long, degree As Long, Optional Start As Long = 0, Optional Color As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0)
         'style:0=fill,1=border,2=sector
+
+        Dim ox As Long, oy As Long, ow As Long, oh As Long
+        ox = x: oy = y: ow = w: oh = h
+        
         If ScrollMode Then
-            x = x + ScrollX + ScrollBX: y = y + ScrollY + ScrollBY
+            ox = ox + ScrollX + ScrollBX: oy = oy + ScrollY + ScrollBY
             Dim Ret As Long
-            GdipIsVisibleRect GG, x - 1, y - 1, w, h, Ret
+            GdipIsVisibleRect GG, ox - 1, oy - 1, ow, oh, Ret
             If Not Ret Then OutOfScroll = True: Exit Sub
         End If
         
@@ -406,9 +448,9 @@ ReShape:
                 al = co(3): al = al / 255
                 
                 If Anis(animation).custom Then
-                    CallByName DrawBox, Anis(animation).func, VbMethod, x, y, w, h, al, pro
+                    CallByName DrawBox, Anis(animation).func, VbMethod, ox, oy, ow, oh, al, pro
                 Else
-                    CallByName EAni, Anis(animation).func, VbMethod, x, y, w, h, al, pro
+                    CallByName EAni, Anis(animation).func, VbMethod, ox, oy, ow, oh, al, pro
                 End If
                 Color = argb(al * 255, co(0), co(1), co(2))
             End If
@@ -416,14 +458,14 @@ ReShape:
         
         GdipResetPath path
         
-        If pos = 1 Then x = Int(x - w / 2): y = Int(y - h / 2)
-        If pos = 2 Then x = x - w
-        If pos = 3 Then y = y - h
-        If pos = 4 Then x = x + w
-        If pos = 5 Then y = y + h
+        If pos = 1 Then ox = Int(x - ow / 2): oy = Int(y - oh / 2)
+        If pos = 2 Then ox = ox - ow
+        If pos = 3 Then oy = oy - oh
+        If pos = 4 Then ox = ox + ow
+        If pos = 5 Then oy = oy + oh
         
-        GdipAddPathArc path, x, y, w, h, Start, degree
-        If style = 2 Then GdipAddPathLine path, x + w / 2, y + w / 2, x + w / 2, y + w / 2
+        GdipAddPathArc path, ox, oy, ow, oh, Start, degree
+        If style = 2 Then GdipAddPathLine path, ox + ow / 2, oy + ow / 2, ox + ow / 2, oy + ow / 2
         If style = 0 Then GdipClosePathFigure path
         
         If Color <> 0 Then
@@ -438,15 +480,21 @@ ReShape:
         If style = 1 Then GdipDrawPath GG, Pen, path
         
         With DrawF
-            .Left = x
-            .top = y
-            .Right = w
-            .Bottom = h
+            .Left = ox
+            .top = oy
+            .Right = ow
+            .Bottom = oh
         End With
         
         If Debug_focus Then
             GdipSetPenColor Pen, argb(255, 0, 255, 255)
-            GdipDrawRectangle GG, Pen, x, y, w - 1, h - 1
+            GdipDrawRectangle GG, Pen, ox, oy, ow - 1, oh - 1
+        End If
+        
+        If Debug_pos Then
+            GdipSetPenColor Pen, argb(255, 0, 183, 195)
+            GdipDrawLine GG, Pen, x - 5, y, x + 5, y
+            GdipDrawLine GG, Pen, x, y - 5, x, y + 5
         End If
     End Sub
     Public Sub PaintPolygon(Color As Long, style As Integer, ParamArray Points())

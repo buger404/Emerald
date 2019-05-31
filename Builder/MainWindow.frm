@@ -53,7 +53,7 @@ Private Sub Form_Load()
     
     '创建音乐列表
     Set MusicList = New GMusicList
-    MusicList.Create App.Path & "\music"
+    MusicList.Create App.path & "\music"
 
     '开始显示
     With oShadow

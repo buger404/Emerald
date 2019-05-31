@@ -23,7 +23,10 @@ Public Sub Update()
     Page.DrawImage "menu.png", GW - 74, 78 / 2 - 64 / 2, Alpha:=1
     
     Page.DrawImage "focus.png", GW - 202, 78 / 2 - 64 / 2, Alpha:=1
-    If Debug_focus Then Page.Paint 0, GW - 202, 0, 64, 78, argb(50, 128, 128, 128)
+    If Debug_focus Then Page.Paint 0, GW - 202, 0, 64, 79, argb(50, 128, 128, 128)
+    
+    Page.DrawImage "pos.png", GW - 202 - 64, 78 / 2 - 64 / 2, Alpha:=1
+    If Debug_pos Then Page.Paint 0, GW - 202 - 64, 0, 64, 79, argb(50, 128, 128, 128)
 End Sub
 Public Sub Wheel(Direction As Integer, Depth As Single)
 

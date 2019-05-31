@@ -46,6 +46,11 @@ Attribute VB_Name = "AboutMe"
 '   -Example.vbp移位
 '   -修复卸载异常的问题
 '   -修复工程代码更新的一些问题
+'   -修复卸载时选择否导致的异常
+'   -更改图标
+'   -不再支持Windows XP
+'   -添加Debug坐标中心显示
+'   -绘图过程独立存放坐标
 '   更新内容(ver.525)
 '   -添加ColorCheckBox
 '   -Builder自动添加代码引用

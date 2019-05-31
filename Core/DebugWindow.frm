@@ -65,7 +65,7 @@ Private Sub Form_Load()
     
     SetWindowPos Me.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE Or SWP_NOSIZE
     
-    For i = 1 To 3
+    For i = 1 To 4
         Load touchArea(i)
         With touchArea(i)
             .Visible = True
@@ -78,6 +78,8 @@ Private Sub Form_Load()
                     .ToolTipText = "鼠标状态指示"
                 Case 3
                     .ToolTipText = "显示/不显示绘制矩形"
+                Case 4
+                    .ToolTipText = "显示/不显示绘制源坐标"
             End Select
         End With
     Next
@@ -93,6 +95,8 @@ Private Sub touchArea_Click(index As Integer)
             Debuginfo.Show
         Case 3
             Debug_focus = Not Debug_focus
+        Case 4
+            Debug_pos = Not Debug_pos
     End Select
 End Sub
 

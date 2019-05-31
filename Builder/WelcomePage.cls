@@ -33,9 +33,9 @@ Public Sub Update()
     
     If InstalledPath <> "" Then
         If (Not IsUpdate) Then
-            If Command$ = "-Uninstall" Then
-                Page.Writes "Say Goodbye to Emerald Builder", GW / 2, 200, Color:=argb(255, 242, 242, 242), size:=36, align:=StringAlignmentCenter, animation:=1
-                Page.Writes "Are you really going to uninstall me ?", GW / 2, 260, Color:=argb(150, 242, 242, 242), size:=18, align:=StringAlignmentCenter, animation:=2
+            If Cmd = "-uninstall" Then
+                Page.Writes "Say Goodbye to Emerald Builder", GW / 2, 200, Color:=argb(255, 27, 27, 27), size:=36, align:=StringAlignmentCenter, animation:=1
+                Page.Writes "Are you really going to uninstall me ?", GW / 2, 260, Color:=argb(150, 27, 27, 27), size:=18, align:=StringAlignmentCenter, animation:=2
                 BtnStr = "Uninstall"
             Else
             
@@ -53,7 +53,7 @@ Public Sub Update()
                 Page.Writes "关于", 350 + pro * 22, 170 + pro * 36, Color:=argb(255, 242, 242, 242), size:=18 + pro * 4, animation:=1, style:=FontStyleBold
                 Page.Writes "制作： Error 404（QQ 1361778219）" & vbCrLf & "邮箱： ris_vb@126.com", 350 - pro * 110, 220 + pro * 40, Color:=argb(150, 242, 242, 242), size:=18, animation:=2
                 Page.Writes "版本： " & Version, 350 - pro * 50, 270 + pro * 40, Color:=argb(150 - pro * 150, 242, 242, 242), size:=18, animation:=2
-                Page.Writes "感谢Inter.net群，Redstone群和南笙的支持。", 350 - pro * 90, 340 + pro * 180, Color:=argb(150 - pro * 60, 242, 242, 242), size:=18 - pro * 2, animation:=2
+                Page.Writes "感谢Inter.net群，Redstone群和南笙的支持。", 350 - pro * 110, 340 + pro * 180, Color:=argb(150 - pro * 60, 242, 242, 242), size:=18 - pro * 2, animation:=2
                 If NewVersion = 0 Then
                     NewVersion = 1
                     Call CheckOnLineUpdate
@@ -95,12 +95,14 @@ Public Sub Update()
         
 Draw:
     If Page.ShowColorButton(0, GW / 2 - 130 / 2, GH - 150, 130, 40, BtnStr, argb(255, 255, 255, 255), argb(255, 85, 219, 211), argb(255, 55, 189, 181), size:=16) = 3 Then
-        ECore.NewTransform transFadeIn, 700, "SetupPage"
-        CmdMark = BtnStr
         If BtnStr = "Uninstall" Then
             If Dialog("卸载", "你确定要卸载Emerald Builder？", "是的", "手滑") <> 1 Then Exit Sub
+            ECore.NewTransform transFadeIn, 700, "SetupPage"
+            CmdMark = BtnStr
             Call Uninstall
         Else
+            ECore.NewTransform transFadeIn, 700, "SetupPage"
+            CmdMark = BtnStr
             Call Setup
         End If
     End If

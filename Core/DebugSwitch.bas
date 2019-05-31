@@ -3,7 +3,7 @@ Attribute VB_Name = "DebugSwitch"
 
 '======================================================
 '   是否开启Debug
-    Public Const DebugMode As Boolean = False
+    Public Const DebugMode As Boolean = True
 '   禁用开场LOGO
     Public Const DisableLOGO As Boolean = True
 '   是否跳过多余的开场LOGO（如果资源已经加载完毕）
@@ -51,5 +51,5 @@ Attribute VB_Name = "DebugSwitch"
 
 '======================================================
 '   Warning: please don't edit the following code .
-    Public Debug_focus As Boolean
+    Public Debug_focus As Boolean, Debug_pos As Boolean
 '======================================================
