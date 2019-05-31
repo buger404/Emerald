@@ -20,6 +20,7 @@ Attribute VB_Exposed = False
         path As String
         mark As Integer '    0=新增 1=变化 2=用户修改
         Rep As Boolean
+        incrase As Long
     End Type
     Dim FileList() As CopyList
     Dim BackupSwitch As Boolean
@@ -51,6 +52,7 @@ Public Sub CheckFiles()
     
     For i = 1 To UBound(fl)
         om = False
+        t = 0
         If Dir(Cmd & "\core\" & fl(i)) <> "" Then
             If Dir(Cmd & "\.emr\cache\" & fl(i)) <> "" Then
                 Open Cmd & "\.emr\cache\" & fl(i) For Input As #1
@@ -63,6 +65,7 @@ Public Sub CheckFiles()
                 With FileList(UBound(FileList))
                     .path = fl(i)
                     .mark = 1
+                    .incrase = FileLen(App.path & "\core\" & fl(i)) - t
                     .Rep = True
                 End With
             End If
@@ -71,6 +74,7 @@ Public Sub CheckFiles()
     
     For i = 1 To UBound(fl)
         om = True
+        t = 0
         If Dir(Cmd & "\core\" & fl(i)) <> "" Then
             If Dir(Cmd & "\.emr\cache\" & fl(i)) <> "" Then
                 Open Cmd & "\.emr\cache\" & fl(i) For Input As #1
@@ -83,6 +87,7 @@ Public Sub CheckFiles()
                 With FileList(UBound(FileList))
                     .path = fl(i)
                     .mark = 2
+                    .incrase = FileLen(App.path & "\core\" & fl(i)) - t
                     .Rep = False
                 End With
             End If
@@ -117,6 +122,8 @@ Public Sub Update2()
                 Page.Paint 0, GW - 150, 170 + (i - PIndex) * 40, 90, 24, Color
                 Page.Writes "您修改过", GW - 150, 170 + (i - PIndex) * 40, 16, argb(255, 255, 255, 255), 90, 24, StringAlignmentCenter
         End Select
+        
+        Page.Writes IIf(FileList(i).incrase > 0, "+", "") & FileList(i).incrase & " bytes", GW - 170, 170 + (i - PIndex) * 40, 18, argb(140, 27, 27, 27), style:=FontStyleBold, align:=StringAlignmentFar
         Page.Writes FileList(i).path, 80, 170 + (i - PIndex) * 40, 18, Color, style:=IIf(FileList(i).mark = 2, FontStyleBold, 0)
         
         If i <> PIndex + 5 Then Page.PaintLine 50, 170 + (i - PIndex) * 40 + 32, GW - 50, 170 + (i - PIndex) * 40 + 32, argb(255, 222, 222, 222), 1

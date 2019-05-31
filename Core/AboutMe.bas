@@ -51,6 +51,7 @@ Attribute VB_Name = "AboutMe"
 '   -不再支持Windows XP
 '   -添加Debug坐标中心显示
 '   -绘图过程独立存放坐标
+'   -显示更新代码大小变化
 '   更新内容(ver.525)
 '   -添加ColorCheckBox
 '   -Builder自动添加代码引用
