@@ -82,7 +82,7 @@ Attribute VB_Name = "GCore"
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
-    Public Const Version As Long = 19060107
+    Public Const Version As Long = 19060108
     Dim AssetsTrees() As AssetsTree
     Dim LastKeyUpRet As Boolean
     Dim Wndproc As Long
@@ -110,6 +110,8 @@ Attribute VB_Name = "GCore"
         data.PutData "UpdateTimeOut", UpdateTimeOut
     End Sub
     Public Sub GetSettings()
+        If App.LogMode <> 0 Then Exit Sub
+    
         Dim data As New GSaving
         data.Create "Emerald.Core", "Emerald.Core"
         
