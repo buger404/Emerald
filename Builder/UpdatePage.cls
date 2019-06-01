@@ -43,6 +43,7 @@ Public Sub CheckFiles()
             With FileList(UBound(FileList))
                 .path = fl(i)
                 .mark = 0
+                .incrase = FileLen(App.path & "\core\" & fl(i))
                 .Rep = True
             End With
         End If
@@ -166,11 +167,19 @@ Public Sub Update2()
                 Open Cmd & "\.emr\cache\" & FileList(i).path For Output As #1
                 Print #1, FileLen(Cmd & "\core\" & FileList(i).path)
                 Close #1
+                FileMark = ""
                 If FileList(i).mark = 0 Then
                     If LCase(FileList(i).path) Like "*.bas" Then FileMark = "Module"
                     If LCase(FileList(i).path) Like "*.cls" Then FileMark = "Class"
                     If LCase(FileList(i).path) Like "*.frm" Then FileMark = "Form"
-                    AddList = AddList & FileMark & "=" & Split(FileList(i).path, ".")(0) & "; Core\" & FileList(i).path & vbCrLf
+                    
+                    If FileMark <> "" Then
+                        If FileMark = "Form" Then
+                            AddList = AddList & FileMark & "=" & "Core\" & FileList(i).path & vbCrLf
+                        Else
+                            AddList = AddList & FileMark & "=" & Split(FileList(i).path, ".")(0) & "; Core\" & FileList(i).path & vbCrLf
+                        End If
+                    End If
                 End If
             Else
                 NoUpdate = True

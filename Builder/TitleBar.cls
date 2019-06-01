@@ -37,6 +37,15 @@ Public Sub Update()
     m = CheckMouse(GW - 120, 0, 60, 30 + 16 / 0.75)
     If Page.ShowColorButton(0, GW - 120, 0, 61, 30 + 16 / 0.75, "-", IIf(m = 0, argb(255, 128, 128, 128), argb(255, 255, 255, 255)), argb(0, 128, 128, 128), argb(100, 128, 128, 128), size:=18) = 2 Then
         MainWindow.WindowState = 1
+        Mouse.state = 0
+    End If
+    
+    If Abouting And Not SetMode Then
+        m = CheckMouse(GW - 180, 0, 60, 30 + 16 / 0.75)
+        If Page.ShowColorButton(0, GW - 180, 0, 61, 30 + 16 / 0.75, "设置", IIf(m = 0, argb(255, 128, 128, 128), argb(255, 255, 255, 255)), argb(0, 128, 128, 128), argb(100, 128, 128, 128), size:=18, style:=FontStyleBold) = 2 Then
+            Call GetSettings
+            SetMode = True: ECore.NewTransform , 700, "WelcomePage"
+        End If
     End If
 End Sub
 Public Sub Wheel(Direction As Integer, Depth As Single)
@@ -64,7 +73,7 @@ Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
     '导入游戏资源
-    Page.Res.NewImages App.Path & "\assets"
+    Page.Res.NewImages App.path & "\assets"
     Page.TopPage = True '置顶页面
     '创建页面
     ECore.Add Page, "TitleBar"

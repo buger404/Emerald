@@ -41,6 +41,8 @@ End Sub
 Private Sub Form_Load()
     '初始化Emerald
     StartEmerald Me.Hwnd, 805, 556
+    DebugSwitch.HideLOGO = 1
+    
     '创建字体
     MakeFont "微软雅黑"
     '创建页面管理器

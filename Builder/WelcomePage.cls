@@ -16,9 +16,35 @@ Attribute VB_Exposed = False
     Public Page As GPage
 '======================================
     Dim HideTime As Long
+Public Sub DrawSet()
 
+    Page.Clear argb(255 * 0.85, 242, 242, 249) '清空画布
+    
+    Page.Writes "设置", GW / 2, 100, Color:=argb(255, 27, 27, 27), size:=32, align:=StringAlignmentCenter, animation:=1
+    Page.Writes "在这里管理全局设置", GW / 2, 150, Color:=argb(150, 27, 27, 27), size:=18, align:=StringAlignmentCenter, animation:=2
+    
+    Page.ShowColorCheckBox DebugMode, 50, 210, 300, 24, "开启Debug调试栏", argb(255, 222, 222, 222), argb(255, 95, 229, 221), argb(150, 27, 27, 27), size:=16
+    Page.ShowColorCheckBox HideLOGO, 50, 250, 300, 24, "禁用LOGO动画", argb(255, 222, 222, 222), argb(255, 95, 229, 221), argb(150, 27, 27, 27), size:=16
+    Page.ShowColorCheckBox DisableLOGO, 50, 290, 300, 24, "省略多余的LOGO动画", argb(255, 222, 222, 222), argb(255, 95, 229, 221), argb(150, 27, 27, 27), size:=16
+    Page.Writes "更新间隔： " & UpdateCheckInterval & "（天）", 50, 350, 16, argb(150, 27, 27, 27), 300, 24
+    If CheckMouse2 = mMouseUp Then UpdateCheckInterval = Val(InputBox("输入新的值：" & vbCrLf & "UpdateCheckInterval", "Emerald", UpdateCheckInterval))
+    Page.Writes "更新超时： " & UpdateTimeOut & "（毫秒）", 50, 380, 16, argb(150, 27, 27, 27), 300, 24
+    If CheckMouse2 = mMouseUp Then UpdateTimeOut = Val(InputBox("输入新的值：" & vbCrLf & "UpdateTimeOut", "Emerald", UpdateTimeOut))
+
+    If Page.ShowColorButton(0, GW / 2 - 130 / 2, GH - 80, 130, 40, "保存", argb(255, 255, 255, 255), argb(255, 85, 219, 211), argb(255, 55, 189, 181), size:=16) = 3 Then
+        Dim data As New GSaving
+        data.Create "Emerald.Core", "Emerald.Core"
+        Call SaveSettings(data)
+        Set data = Nothing
+        
+        SetMode = False
+        ECore.NewTransform , 700, "WelcomePage"
+    End If
+End Sub
 Public Sub Update()
     '绘制事件
+    
+    If SetMode Then Call DrawSet: Exit Sub
     
     Dim BtnStr As String
     
@@ -38,6 +64,8 @@ Public Sub Update()
                 Page.Writes "Are you really going to uninstall me ?", GW / 2, 260, Color:=argb(150, 27, 27, 27), size:=18, align:=StringAlignmentCenter, animation:=2
                 BtnStr = "Uninstall"
             Else
+            
+                Abouting = True
             
                 Dim pro As Single
                 If HideTime <> 0 Then pro = Cubic((GetTickCount - 3000 - HideTime) / 1000, 0, 1, 1, 1)
@@ -134,7 +162,7 @@ Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
     '导入游戏资源
-    Page.Res.NewImages App.path & "\assets", 0.5
+    Page.Res.NewImages App.path & "\assets"
     '创建页面
     ECore.Add Page, "WelcomePage"
     

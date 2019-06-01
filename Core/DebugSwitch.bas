@@ -2,16 +2,8 @@ Attribute VB_Name = "DebugSwitch"
 '   Emerald 设置项
 
 '======================================================
-'   是否开启Debug
-    Public Const DebugMode As Boolean = False
-'   禁用开场LOGO
-    Public Const DisableLOGO As Boolean = False
-'   是否跳过多余的开场LOGO（如果资源已经加载完毕）
-    Public Const HideLOGO As Boolean = False
-'   检查更新间隔时长（天）
-    Public Const UpdateCheckInterval As Long = 1
-'   更新检查超时时间（毫秒）
-    Public Const UpdateTimeOut As Long = 2000
+'   该设置已经迁移
+'   相关设置请转到Builder中的“设置”
 '======================================================
 
 
@@ -50,6 +42,7 @@ Attribute VB_Name = "DebugSwitch"
 
 
 '======================================================
-'   Warning: please don't edit the following code .
+'   警告：不要修改下列代码
+    Public DebugMode As Integer, DisableLOGO As Integer, HideLOGO As Integer, UpdateCheckInterval As Long, UpdateTimeOut As Long
     Public Debug_focus As Boolean, Debug_pos As Boolean
 '======================================================

@@ -8,6 +8,8 @@ Public NewVersion As Long
 Public CmdMark As String, SetupErr As Long, Repaired As Boolean
 Public AppInfo() As String
 Public Cmd As String
+Public Abouting As Boolean
+Public SetMode As Boolean
 Public Sub CheckUpdate()
     On Error GoTo ErrHandle
     

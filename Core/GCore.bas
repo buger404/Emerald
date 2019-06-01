@@ -85,8 +85,47 @@ Attribute VB_Name = "GCore"
     Dim AssetsTrees() As AssetsTree
     Dim LastKeyUpRet As Boolean
     Dim Wndproc As Long
-'========================================================
+'================================================================================
+    '读取INI
+    Private Declare Function GetPrivateProfileString Lib "kernel32" Alias "GetPrivateProfileStringW" (ByVal lpApplicationName As Long, ByVal lpKeyName As Long, ByVal lpDefault As Long, ByVal lpReturnedString As Long, ByVal nSize As Long, ByVal lpFileName As Long) As Long
+'================================================================================
+'   运行时
+'   读取INI文件
+'   <SectionName:标题名称,KeyName:项名称,IniFileName:INI文件路径>
+    Private Function ReadINI(ByVal SectionName As String, ByVal KeyName As String, ByVal IniFileName As String) As String
+        Dim strBuf As String
+        strBuf = String(128, 0)
+        GetPrivateProfileString StrPtr(SectionName), StrPtr(KeyName), StrPtr(""), StrPtr(strBuf), 128, StrPtr(IniFileName)
+        strBuf = Left(strBuf, InStr(strBuf, Chr(0)))
+        ReadINI = strBuf
+    End Function
+'================================================================================
 '   Init
+    Public Sub SaveSettings(data As GSaving)
+        data.PutData "DebugMode", DebugMode
+        data.PutData "DisableLOGO", DisableLOGO
+        data.PutData "HideLOGO", HideLOGO
+        data.PutData "UpdateCheckInterval", UpdateCheckInterval
+        data.PutData "UpdateTimeOut", UpdateTimeOut
+    End Sub
+    Public Sub GetSettings()
+        Dim data As New GSaving
+        data.Create "Emerald.Core", "Emerald.Core"
+        
+        If data.GetData("DebugMode") = "" Then
+            UpdateCheckInterval = 1
+            UpdateTimeOut = 2000
+            Call SaveSettings(data)
+        End If
+        
+        DebugSwitch.DebugMode = Val(data.GetData("DebugMode"))
+        DebugSwitch.DisableLOGO = Val(data.GetData("DisableLOGO"))
+        DebugSwitch.HideLOGO = Val(data.GetData("HideLOGO"))
+        DebugSwitch.UpdateCheckInterval = Val(data.GetData("UpdateCheckInterval"))
+        DebugSwitch.UpdateTimeOut = Val(data.GetData("UpdateTimeOut"))
+        
+        Set data = Nothing
+    End Sub
     Public Sub StartEmerald(Hwnd As Long, w As Long, h As Long)
     
         Dim strComputer, objWMIService, colItems, objItem, strOSversion As String
@@ -103,6 +142,8 @@ Attribute VB_Name = "GCore"
             MsgBox "非常抱歉，Emerald不再支持运行在Windows 7以下版本的操作系统。" & vbCrLf & vbCrLf & "如果您有方法提供支持，请联系QQ 1361778219。", 48, "Emerald：不兼容的操作系统"
             End
         End Select
+    
+        Call GetSettings
     
         If DebugMode Then
             If App.LogMode <> 0 Then MsgBox "错误：生成时未关闭Debug模式。": End
@@ -356,6 +397,8 @@ sth:
         Else
             Debug.Print Now, "Emerald：上次检查更新时间 " & CDate(data.GetData("UpdateTime"))
         End If
+        
+        Set data = Nothing
     End Sub
 '========================================================
 '   AssetsTree
