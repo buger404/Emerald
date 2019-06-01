@@ -55,6 +55,11 @@ Dim Hwnd As Long, mRate As Long, mVolume As Single
         mVolume = 0.5: mRate = 1
     End Sub
     Public Sub Create(ByVal Path As String)
+        If Not BassInstalled Then
+            BASS_Init -1, 44100, BASS_DEVICE_3D, Hwnd, 0
+            BassInstalled = True
+        End If
+        
         If Hwnd <> 0 Then Call Dispose
         Hwnd = BASS_StreamCreateFile(BASSFALSE, StrPtr(Path), 0, 0, 0)
         BASS_ChannelSetAttribute Hwnd, BASS_ATTRIB_VOL, mVolume

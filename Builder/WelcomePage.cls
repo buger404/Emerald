@@ -16,6 +16,33 @@ Attribute VB_Exposed = False
     Public Page As GPage
 '======================================
     Dim HideTime As Long
+Public Sub DrawSetup()
+
+    Page.Clear argb(255 * 0.85, 242, 242, 249) '清空画布
+    
+    Page.Paint 0, 0, 150, GW, GH - 150, argb(255, 255, 255, 255)
+    
+    If Page.Res.GetImage("setupappicon.png") = 0 Then
+        Page.Paint 1, 50, 150 - 64, 128, 128, argb(255, 95, 229, 221)
+        Page.Writes "G", 50 + 64, 150 - 64 + 32, 48, argb(255, 255, 255, 255), align:=StringAlignmentCenter
+    Else
+        Page.DrawImage "setupappicon.png", 50, 150 - 64, Alpha:=1
+    End If
+    
+    Page.Writes SPackage.GameName, GW - 50, 97, 24, argb(255, 95, 229, 221), style:=FontStyleBold, align:=StringAlignmentFar
+    Page.Writes SPackage.GameVersion, GW - 50, 170, 18, argb(150, 27, 27, 27), align:=StringAlignmentFar
+    Page.Writes "By " & SPackage.Maker & "(QQ " & SPackage.MakerQQ & ")", GW - 50, 200, 16, argb(255, 95, 229, 221), align:=StringAlignmentFar
+    
+    Page.Writes "简介：" & vbCrLf & SPackage.GameDescribe, 50, 250, 18, argb(150, 27, 27, 27)
+    
+    Page.Writes "Powered by Emerald", 20, GH - 40, 16, argb(150, 27, 27, 27)
+    
+    If Page.ShowColorButton(0, GW - 170, GH - 80, 130, 40, "安装", argb(255, 255, 255, 255), argb(255, 85, 219, 211), argb(255, 55, 189, 181), size:=16) = 3 Then
+        ECore.NewTransform transFadeIn, 700, "SetupPage"
+        CmdMark = "Setup"
+        Call SetupPack
+    End If
+End Sub
 Public Sub DrawSet()
 
     Page.Clear argb(255 * 0.85, 242, 242, 249) '清空画布
@@ -45,6 +72,7 @@ Public Sub Update()
     '绘制事件
     
     If SetMode Then Call DrawSet: Exit Sub
+    If SetupMode Then Call DrawSetup: Exit Sub
     
     Dim BtnStr As String
     

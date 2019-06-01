@@ -50,10 +50,10 @@ ErrHandle:
                "注意：Emerald只适用于VB6", "好吧"
     End If
 End Sub
-Public Function CheckFileName(name As String) As Boolean
-    CheckFileName = ((InStr(name, "*") Or InStr(name, "\") Or InStr(name, "/") Or InStr(name, ":") Or InStr(name, "?") Or InStr(name, """") Or InStr(name, "<") Or InStr(name, ">") Or InStr(name, "|") Or InStr(name, " ") Or InStr(name, "!") Or InStr(name, "-") Or InStr(name, "+") Or InStr(name, "#") Or InStr(name, "@") Or InStr(name, "$") Or InStr(name, "^") Or InStr(name, "&") Or InStr(name, "(") Or InStr(name, ")")) = 0)
+Public Function CheckFileName(Name As String) As Boolean
+    CheckFileName = ((InStr(Name, "*") Or InStr(Name, "\") Or InStr(Name, "/") Or InStr(Name, ":") Or InStr(Name, "?") Or InStr(Name, """") Or InStr(Name, "<") Or InStr(Name, ">") Or InStr(Name, "|") Or InStr(Name, " ") Or InStr(Name, "!") Or InStr(Name, "-") Or InStr(Name, "+") Or InStr(Name, "#") Or InStr(Name, "@") Or InStr(Name, "$") Or InStr(Name, "^") Or InStr(Name, "&") Or InStr(Name, "(") Or InStr(Name, ")")) = 0)
     Dim t As String
-    If name <> "" Then t = Left(name, 1)
+    If Name <> "" Then t = Left(Name, 1)
     CheckFileName = CheckFileName And (Trim(Str(Val(t))) <> t)
 End Function
 Sub Uninstall()
@@ -78,6 +78,14 @@ Sub Uninstall()
     WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\icon"
     WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\command\"
     WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\"
+    
+    WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\shell\emeraldp\icon"
+    WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\shell\emeraldp\command\"
+    WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\shell\emeraldp\"
+    
+    WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\Background\shell\emeraldp\icon"
+    WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\Background\shell\emeraldp\command\"
+    WSHShell.RegDelete "HKEY_CLASSES_ROOT\Directory\Background\shell\emeraldp\"
     
     SetupPage.SetupInfo = "正在删除：软件信息"
     SetupPage.Progress = 0.7
@@ -140,6 +148,15 @@ Sub Setup()
     WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\icon", exeP
     
     WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\command\", exeP & " ""%v"""
+    
+    WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\shell\emeraldp\", "制作该Emerald工程的安装包"
+    WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\shell\emeraldp\icon", exeP
+    WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\shell\emeraldp\command\", exeP & " p""%v"""
+    
+    WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\Background\shell\emeraldp\", "制作该Emerald工程的安装包"
+    WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\Background\shell\emeraldp\icon", exeP
+    WSHShell.RegWrite "HKEY_CLASSES_ROOT\Directory\Background\shell\emeraldp\command\", exeP & " p""%v"""
+    
     
     Call FakeSleep
     
@@ -238,7 +255,56 @@ Public Sub CheckOnLineUpdate()
     End If
 End Sub
 Sub Main()
+    Dim PackPos As Long, targetEXE As String
+    targetEXE = App.path & "\" & App.EXEName & ".exe"
+    'targetEXE = "C:\Users\Error404\Documents\Emerald\Export\Warcraft - 安装包.exe"
+    
     MainWindow.Show
+    ECore.Display
+    DoEvents
+    
+    If LCase(Trim(Replace(Command$, """", ""))) = "-uninstallgame" Then
+        If Dialog("卸载", "确实要卸载该游戏吗？", "是", "手滑") <> 1 Then Unload MainWindow: End
+        CmdMark = "Uninstall"
+        SetupMode = True
+        ECore.NewTransform , 700, "SetupPage"
+        Call UninPack
+        Exit Sub
+    End If
+    
+    PackPos = FindPackage(targetEXE, 598000)
+    If PackPos <> -1 Then
+        '从指定位置把安装包分离出来
+        Dim tempPath As String, data() As Byte, data2() As Byte
+        tempPath = VBA.Environ("temp")
+        If Dir(tempPath & "\setuppack.emrpack") <> "" Then Kill tempPath & "\setuppack.emrpack"
+        ReDim data(FileLen(targetEXE) - 1)
+        ReDim data2(UBound(data) - PackPos)
+        Open targetEXE For Binary As #1
+        Get #1, , data
+        Close #1
+        CopyMemory data2(0), data(PackPos), UBound(data) - PackPos + 1
+        ReDim Preserve data(PackPos - 1)
+        Open tempPath & "\setuppack.emrpack" For Binary As #1
+        Put #1, , data2
+        Close #1
+        Open tempPath & "\emrtempUninstall.exe" For Binary As #1
+        Put #1, , data
+        Close #1
+        Open tempPath & "\setuppack.emrpack" For Binary As #1
+        Get #1, , SPackage
+        Close #1
+        If SPackage.files(0).path <> "" Then
+            Open tempPath & "\setupappicon.png" For Binary As #1
+            Put #1, , SPackage.files(0).data
+            Close #1
+            WelcomePage.Page.Res.newImage tempPath & "\setupappicon.png", 128, 128
+        End If
+        SetupMode = True
+        Kill tempPath & "\setuppack.emrpack"
+        ECore.NewTransform , 700, "WelcomePage"
+        Exit Sub
+    End If
     
     Call CheckUpdate
     Call GetVBIDEPath
@@ -249,6 +315,9 @@ Sub Main()
     
     Cmd = Replace(Command$, """", "")
     'Cmd = "E:\Error 404\魔兽混战3"
+    'Cmd = "pC:\Users\Error404\Desktop\Project\魔兽混战3"
+    Dim pmode As Boolean
+    If Left(Cmd, 1) = "p" Then pmode = True: Cmd = Right(Cmd, Len(Cmd) - 1)
     
     If Cmd <> "" Then
         Dim appn As String, f As String, t As String, p As String
@@ -282,10 +351,61 @@ Sub Main()
             Dim sw2 As String
             If UBound(info) >= 2 Then sw2 = Trim(info(2))
             If Val(info(0)) < Version Or sw2 = "True" Then
+                If pmode Then
+                    Dialog "请更新", "请保证您的工程正在使用最新版Emerald。", "OK"
+                    Unload MainWindow: End
+                End If
                 ECore.NewTransform , 700, "UpdatePage"
                 AppInfo = info
                 Exit Sub
             Else
+                If pmode Then
+                    If Dialog("打包", "现在开始打包吗？", "好", "不要") <> 1 Then Unload MainWindow: End
+                    If Dir(Cmd & "\app.png") = "" Then
+                        Dialog "警告", "找不到游戏图标文件：app.png，请设置。", "行"
+                        Unload MainWindow: End
+                    End If
+                    If Dir(Cmd & "\app.exe") = "" Then
+                        Dialog "警告", "找不到游戏主程序：app.exe，请设置。", "行"
+                        Unload MainWindow: End
+                    End If
+                    Dim QQ As Long, Maker As String, Name As String, Describe As String, GVersion As String
+                    QQ = Val(InputBox("输入你的QQ号。。。"))
+                    Dim tempr As String
+                    Open Cmd & "\" & Dir(Cmd & "\*.vbp") For Input As #1
+                    Do While Not EOF(1)
+                        Line Input #1, tempr
+                        If InStr(tempr, "VersionProductName") = 1 Then Name = Split(tempr, """")(1)
+                        If InStr(tempr, "VersionFileDescription") = 1 Then Describe = Split(tempr, """")(1)
+                        If InStr(tempr, "VersionCompanyName") = 1 Then Maker = Split(tempr, """")(1)
+                        If InStr(tempr, "MajorVer") = 1 Then GVersion = GVersion & Split(tempr, "=")(1) & "."
+                        If InStr(tempr, "MinorVer") = 1 Then GVersion = GVersion & Split(tempr, "=")(1) & "."
+                        If InStr(tempr, "RevisionVer") = 1 Then GVersion = GVersion & Split(tempr, "=")(1)
+                    Loop
+                    Close #1
+                    If Name = "" Then
+                        Dialog "警告", "游戏名称不能为空。", "行"
+                        Unload MainWindow: End
+                    End If
+                    MakePackage Cmd, Maker, Name, GVersion, Describe, QQ
+                    CreateFolder GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\"
+                    If Dir(GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & Name & " - 安装包.exe") <> "" Then Kill GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & Name & " - 安装包.exe"
+                    Open VBA.Environ("temp") & "\copyemr.cmd" For Output As #1
+                    Print #1, "@echo off"
+                    Print #1, "echo Emerald Package Toolkit , Version: " & Version
+                    Print #1, "echo Building Installer..."
+                    Print #1, "ping localhost -n 2 > nul"
+                    Print #1, "copy """ & targetEXE & """ /b + """ & VBA.Environ("temp") & "\emrpack"" /b """ & GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & Name & " - 安装包.exe"""
+                    Close #1
+                    ShellExecuteA 0, "open", VBA.Environ("temp") & "\copyemr.cmd", "", "", SW_SHOW
+                    Do While Dir(GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & Name & " - 安装包.exe") = ""
+                        Sleep 10: DoEvents
+                        ECore.Display
+                    Loop
+                    Dialog "恭喜", "安装包制作成功", "好的"
+                    ShellExecuteA 0, "open", "explorer.exe", "/select,""" & GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & Name & " - 安装包.exe" & """", "", SW_SHOW
+                    Unload MainWindow: End
+                End If
                 Dialog "无操作", "你的工程已经在使用最新的Emerald了。", "手滑"
                 Unload MainWindow: End
             End If

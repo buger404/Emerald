@@ -4,17 +4,17 @@ Begin VB.Form MainWindow
    BackColor       =   &H80000005&
    BorderStyle     =   0  'None
    Caption         =   "Emerald Builder"
-   ClientHeight    =   6672
-   ClientLeft      =   12
-   ClientTop       =   12
+   ClientHeight    =   6670
+   ClientLeft      =   10
+   ClientTop       =   10
    ClientWidth     =   9660
    Icon            =   "MainWindow.frx":0000
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   556
+   ScaleHeight     =   667
    ScaleMode       =   3  'Pixel
-   ScaleWidth      =   805
+   ScaleWidth      =   966
    StartUpPosition =   2  '屏幕中心
    Begin VB.Timer DrawTimer 
       Enabled         =   0   'False
@@ -42,7 +42,8 @@ Private Sub Form_Load()
     '初始化Emerald
     StartEmerald Me.Hwnd, 805, 556
     DebugSwitch.HideLOGO = 1
-    
+    DebugSwitch.DisableLOGO = 1
+     
     '创建字体
     MakeFont "微软雅黑"
     '创建页面管理器

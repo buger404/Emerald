@@ -118,6 +118,7 @@ Public TopPage As Boolean
         Else
             index = n
         End If
+        If index = 0 Then Exit Sub
         
         If IsMissing(ow) Then GdipGetImageWidth Res.ResourceImageHandle(index), ow
         If IsMissing(oh) Then GdipGetImageWidth Res.ResourceImageHandle(index), oh
@@ -189,6 +190,7 @@ Public TopPage As Boolean
         Else
             index = n
         End If
+        If index = 0 Then Exit Sub
         
         If IsMissing(cx) Then ocx = 0 Else: ocx = cx
         If IsMissing(cy) Then ocy = 0 Else: ocy = cy

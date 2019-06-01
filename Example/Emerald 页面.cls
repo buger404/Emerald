@@ -17,7 +17,7 @@ Attribute VB_Exposed = False
 '======================================
 
 Public Sub Update()
-    '绘制事件
+    '游戏每一帧的过程（绘制过程请放在此处）
     
     Page.Clear '清空画布
 

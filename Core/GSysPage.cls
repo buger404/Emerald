@@ -35,6 +35,7 @@ Public Sub LOGODialog()
     Dim w As Long, h As Long
     w = Page.Res.ImgSize("logo.png", imgGetWidth)
     h = Page.Res.ImgSize("logo.png", imgGetHeight)
+    If w = 0 Then Exit Sub
     
     Page.Clear argb(255, 16, 16, 35)
     
@@ -81,7 +82,7 @@ End Sub
 Public Sub SaveDialog()
     Page.Paint 0, 0, 0, 600, 76, argb(255, 242, 242, 242)
     Page.DrawImage "save.png", 40, 40, Alpha:=1
-    Page.Writes "你希望该应用在以下位置保存数据吗？" & vbCrLf & ESave.Path, 40, 130, 18, argb(255, 64, 64, 64)
+    Page.Writes "你希望该应用在以下位置保存数据吗？" & vbCrLf & ESave.path, 40, 130, 18, argb(255, 64, 64, 64)
     
     Page.Writes "*如果不允许，该应用可能永远保持初始状态。", 40, 400 - 110, 16, argb(255, 96, 96, 96)
     
@@ -113,11 +114,11 @@ End Sub
 Public Sub Lostfocus()
 
 End Sub
-Public Sub AnimationDone(ID As Integer)
+Public Sub AnimationDone(id As Integer)
 
 End Sub
 Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
-    Page.Res.NewImages App.Path & "\assets\debug"
+    Page.Res.NewImages App.path & "\assets\debug"
 End Sub

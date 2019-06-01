@@ -17,7 +17,42 @@ Attribute VB_Exposed = False
     Public Progress As Single, SetupInfo As String, DoneMark As Boolean
     Dim DisplayProgress As Single, ChangeTime As Long
 '======================================
+Public Sub UpdateDone2()
+    
+    Page.Clear argb(255 * 0.85, 242, 242, 249) '清空画布
+    
+    If CmdMark = "Uninstall" Then GoTo uninpage
+    
+    If SetupErr = 0 Then
+        Page.Writes "安装成功", GW / 2, GH / 2 - 40, 30, argb(255, 27, 27, 27), align:=StringAlignmentCenter
+    Else
+        Page.Writes "安装已经完成，但是发生了一些错误。", GW / 2, 200, 20, argb(255, 254, 84, 57), align:=StringAlignmentCenter
+        Page.Writes "错误代码：0x" & format(Hex(SetupErr), "000000"), GW / 2, 230, 16, argb(150, 254, 84, 57), align:=StringAlignmentCenter
+        Page.Writes Error(SetupErr), GW / 2, 250, 16, argb(150, 254, 84, 57), align:=StringAlignmentCenter
+        
+        Page.Writes "请联系游戏开发者", GW / 2, 400, 16, argb(150, 27, 27, 27), align:=StringAlignmentCenter
+    End If
+    
+    If Page.ShowColorButton(0, GW / 2 - 130 / 2, GH - 80, 130, 40, "OK", argb(255, 255, 255, 255), argb(255, 85, 219, 211), argb(255, 55, 189, 181), size:=16) = 3 Then
+        Unload MainWindow: End
+    End If
+    
+    Exit Sub
+    
+uninpage:
+    If SetupErr = 0 Then
+        Page.Writes "卸载完成", GW / 2, GH / 2, 30, argb(255, 27, 27, 27), align:=StringAlignmentCenter
+    Else
+        Page.Writes "卸载已经完成，但是发生了一些错误。", GW / 2, 200, 20, argb(255, 254, 84, 57), align:=StringAlignmentCenter
+        Page.Writes "错误代码：0x" & format(Hex(SetupErr), "000000"), GW / 2, 230, 16, argb(150, 254, 84, 57), align:=StringAlignmentCenter
+        Page.Writes Error(SetupErr), GW / 2, 250, 16, argb(150, 254, 84, 57), align:=StringAlignmentCenter
+        
+        Page.Writes "请联系开发者", GW / 2, 400, 16, argb(150, 27, 27, 27), align:=StringAlignmentCenter
+    End If
+End Sub
 Public Sub UpdateDone()
+    If SetupMode Then Call UpdateDone2: Exit Sub
+    
     Page.Clear argb(255 * 0.85, 242, 242, 249) '清空画布
     
     If CmdMark = "Uninstall" Then GoTo uninpage
@@ -102,7 +137,7 @@ Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
     '导入游戏资源
-    Page.Res.NewImages App.Path & "\assets", 0.7
+    Page.Res.NewImages App.path & "\assets", 0.7
     '创建页面
     ECore.Add Page, "SetupPage"
     

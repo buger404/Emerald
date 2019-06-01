@@ -21,13 +21,23 @@ Public Sub Update()
     
     Page.Clear 0 '清空画布
 
-    Page.Writes "Emerald Builder", 20, 20, Color:=argb(255, 128, 128, 128), size:=16
+    Page.Writes IIf(Not SetupMode, "Emerald Builder", SPackage.GameName & " - 安装程序"), 20, 20, Color:=argb(255, 128, 128, 128), size:=16
     
     Dim m As Integer
     m = CheckMouse(GW - 60, 0, 60, 30 + 16 / 0.75)
     If ECore.ActivePage <> "SetupPage" Or SetupPage.DoneMark = True Then
         If Page.ShowColorButton(0, GW - 60, 0, 61, 30 + 16 / 0.75, "×", IIf(m = 0, argb(255, 128, 128, 128), argb(255, 255, 255, 255)), argb(0, 254, 84, 57), argb(255, 254, 84, 57), size:=18) = 2 Then
             Unload MainWindow
+            If CmdMark = "Uninstall" And SetupMode Then
+                Open VBA.Environ("temp") & "\copyemr.cmd" For Output As #1
+                Print #1, "@echo off"
+                Print #1, "echo Emerald Package Toolkit , Version: " & Version
+                Print #1, "echo Deleting Remain Files..."
+                Print #1, "ping localhost -n 5 > nul"
+                Print #1, "rd /s /q """ & App.path & """"
+                Close #1
+                ShellExecuteA 0, "open", VBA.Environ("temp") & "\copyemr.cmd", "", "", SW_SHOW
+            End If
             End
         End If
     Else

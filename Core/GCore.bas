@@ -55,14 +55,14 @@ Attribute VB_Name = "GCore"
         Hwnd As Long
         ImgHwnd As Long
         Imgs(3) As Long
-        name As String
-        folder As String
+        Name As String
+        Folder As String
         w As Long
         h As Long
         copyed As Boolean
     End Type
     Public Type AssetsTree
-        Files() As GMem
+        files() As GMem
         path As String
         arg1 As Variant
         arg2 As Variant
@@ -81,7 +81,8 @@ Attribute VB_Name = "GCore"
     Public PreLoadCount As Long, LoadedCount As Long, ReLoadCount As Long
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
-    Public Const Version As Long = 19053111
+    Public BassInstalled As Boolean
+    Public Const Version As Long = 19060107
     Dim AssetsTrees() As AssetsTree
     Dim LastKeyUpRet As Boolean
     Dim Wndproc As Long
@@ -152,7 +153,7 @@ Attribute VB_Name = "GCore"
         ReDim AssetsTrees(0)
         
         InitGDIPlus
-        BASS_Init -1, 44100, BASS_DEVICE_3D, Hwnd, 0
+        
         GHwnd = Hwnd: GW = w: GH = h
         Dim DPI As Long
         DPI = 1440 / Screen.TwipsPerPixelX
@@ -193,11 +194,11 @@ Attribute VB_Name = "GCore"
         If Not (ECore Is Nothing) Then ECore.Dispose
         If Not (EF Is Nothing) Then EF.Dispose
         TerminateGDIPlus
-        BASS_Free
+        If BassInstalled Then BASS_Free
     End Sub
-    Public Sub MakeFont(ByVal name As String)
+    Public Sub MakeFont(ByVal Name As String)
         Set EF = New GFont
-        EF.MakeFont name
+        EF.MakeFont Name
         EmeraldInstalled = True
     End Sub
 '========================================================

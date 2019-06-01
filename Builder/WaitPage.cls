@@ -15,12 +15,19 @@ Attribute VB_Exposed = False
 '   页面绘制器
     Dim Page As GPage
     Dim pos As Single, degree As Single
+    Dim first As Boolean
 '======================================
 
 Public Sub Update()
     '绘制事件
     
     Page.Clear argb(255 * 0.85, 242, 242, 249) '清空画布
+    
+    If Not first Then
+        Page.Writes "请稍后", GW / 2, GH / 2, 28, argb(150, 27, 27, 27), align:=StringAlignmentCenter
+        first = True
+        Exit Sub
+    End If
     
     Page.PaintArc GW / 2, GH / 2, 200, 200, 120, (GetTickCount Mod 3000) / 3000 * 360, argb(255, 232, 76, 61), 13, 1, posOnCenter
     Page.PaintArc GW / 2, GH / 2, 200, 200, 120, (GetTickCount Mod 1800) / 1800 * 360 + 90, argb(255, 240, 127, 34), 14, 1, posOnCenter
@@ -52,7 +59,7 @@ Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
     '导入游戏资源
-    Page.Res.NewImages App.path & "\assets"
+    Page.Res.NewImages App.Path & "\assets"
     '创建页面
     ECore.Add Page, "WaitPage"
     
