@@ -27,6 +27,7 @@ Dim GTick As Long
 Dim Anis() As AniTask
 Dim DrawBox As Object, brush As Long, path As Long, Pen As Long
 Dim ScrollMode As Boolean, ScrollX As Long, ScrollY As Long, ScrollBX As Long, ScrollBY As Long, CRgn As Long
+Dim AniCollection() As EAnimation, PlayAni() As EAnimation
 Public CDC As Long, GG As Long, OutOfScroll As Boolean
 Public Res As GResource
 Public TopPage As Boolean
@@ -34,6 +35,7 @@ Public TopPage As Boolean
 '   Init
     Public Sub Create(dBox As Object)
         ReDim Anis(0)
+        ReDim AniCollection(0): ReDim PlayAni(0)
         Set Res = New GResource
         
         GTick = 1000 / 30
@@ -75,7 +77,7 @@ Public TopPage As Boolean
     End Sub
     Public Sub Display(DC As Long)
         If TopPage Then
-            PaintDC CDC, DC, Alpha:=1
+            PaintDC CDC, DC, alpha:=1
         Else
             BitBlt DC, 0, 0, GW, GH, CDC, 0, 0, vbSrcCopy
         End If
@@ -91,8 +93,109 @@ Public TopPage As Boolean
     Public Property Let GIFTick(nGIFTick As Long)
         GTick = nGIFTick
     End Property
+    Public Sub LoadAnimation(path As String)
+        ReDim Preserve AniCollection(UBound(AniCollection) + 1)
+        AniCollection(UBound(AniCollection)) = Animations.LoadAnimation(path)
+        With AniCollection(UBound(AniCollection))
+            For i = 1 To UBound(.channel)
+                For s = 1 To UBound(.channel(i).frames)
+                    For t = 0 To UBound(.channel(i).frames(s).aframes)
+                        .channel(i).frames(s).aframes(t).picindex = Res.GetImage(.channel(i).frames(s).aframes(t).pic)
+                    Next
+                Next
+            Next
+        End With
+    End Sub
+    Public Sub LoadAnimationsFromDir(path As String)
+        Dim f As String
+        If Right(path, 1) <> "\" Then path = path & "\"
+        
+        f = Dir(path & "*.emrani")
+        Do While f <> ""
+            Call LoadAnimation(path & f)
+            f = Dir()
+        Loop
+    End Sub
+    Private Function FindAnimation(name As String) As EAnimation
+        For i = 1 To UBound(AniCollection)
+            If AniCollection(i).name = name Then FindAnimation = AniCollection(i): Exit For
+        Next
+    End Function
+    Private Function GetPlayAnimation(playname As String) As Integer
+        For i = 1 To UBound(PlayAni)
+            If PlayAni(i).name = playname Then GetPlayAnimation = i: Exit For
+        Next
+    End Function
+    Public Sub CreatePlayAnimation(name As String, playname As String, channel As String)
+        ReDim Preserve PlayAni(UBound(PlayAni) + 1)
+        PlayAni(UBound(PlayAni)) = FindAnimation(name)
+        PlayAni(UBound(PlayAni)).name = playname
+        PlayAni(UBound(PlayAni)).tick = GetTickCount
+        For i = 1 To UBound(PlayAni(UBound(PlayAni)).channel)
+            PlayAni(UBound(PlayAni)).channel(i).CurrentFrame = 1
+            If PlayAni(UBound(PlayAni)).channel(i).name = channel Then PlayAni(UBound(PlayAni)).CurrentChannel = i
+        Next
+    End Sub
+    Public Sub DisposePlayAnimation(playname As String)
+        PlayAni(GetPlayAnimation(playname)) = PlayAni(UBound(PlayAni))
+        ReDim Preserve PlayAni(UBound(PlayAni) - 1)
+    End Sub
+    Public Sub SwitchChannel(playname As String, channel As String)
+        Dim s As Integer
+        s = GetPlayAnimation(playname)
+        
+        For i = 1 To UBound(PlayAni(s).channel)
+            If PlayAni(s).channel(i).name = channel Then
+                PlayAni(s).channel(i).CurrentFrame = 1
+                PlayAni(s).CurrentChannel = i
+                PlayAni(s).tick = GetTickCount
+                Exit For
+            End If
+        Next
+    End Sub
 '========================================================
 '   Images
+    Public Sub DrawAnimation(playname As String, x As Long, y As Long)
+        Dim s As Integer, m As Integer, w As Long, h As Long, last As Boolean
+        
+        s = GetPlayAnimation(playname)
+        
+        With PlayAni(s).channel(PlayAni(s).CurrentChannel).frames(PlayAni(s).channel(PlayAni(s).CurrentChannel).CurrentFrame)
+            For i = 0 To UBound(.aframes)
+                If .aframes(i).alpha = 1 Then m = 1
+                If .aframes(i).alpha <> 1 Then m = 1
+                If .aframes(i).size <> 1 Then m = 0
+                
+                If m = 0 Then
+                    w = Res.ImgSize(.aframes(i).picindex, imgGetWidth) * .aframes(i).size
+                    h = Res.ImgSize(.aframes(i).picindex, imgGetHeight) * .aframes(i).size
+                    DrawImageEx .aframes(i).picindex, x + .aframes(i).x, y + .aframes(i).y, w, h, PlayAni(s).position
+                Else
+                    DrawImage .aframes(i).picindex, x + .aframes(i).x, y + .aframes(i).y, pos:=PlayAni(s).position, alpha:=.aframes(i).alpha
+                End If
+            Next
+            
+            If .tick <> 0 Then
+                last = (PlayAni(s).channel(PlayAni(s).CurrentChannel).CurrentFrame = UBound(PlayAni(s).channel(PlayAni(s).CurrentChannel).frames))
+                If GetTickCount - PlayAni(s).tick >= .tick Then
+                    If .msg = "dispose" Then DisposePlayAnimation playname: Exit Sub
+                    If .msg <> "" Then Debug.Print Now, .msg
+                    If last Then
+                        PlayAni(s).channel(PlayAni(s).CurrentChannel).CurrentFrame = 1
+                    Else
+                        PlayAni(s).channel(PlayAni(s).CurrentChannel).CurrentFrame = PlayAni(s).channel(PlayAni(s).CurrentChannel).CurrentFrame + 1
+                    End If
+                    PlayAni(s).tick = GetTickCount
+                    If Not (EMusic Is Nothing) Then
+                        For i = 0 To UBound(PlayAni(s).channel(PlayAni(s).CurrentChannel).frames(PlayAni(s).channel(PlayAni(s).CurrentChannel).CurrentFrame).sounds)
+                            EMusic.Play PlayAni(s).channel(PlayAni(s).CurrentChannel).frames(PlayAni(s).channel(PlayAni(s).CurrentChannel).CurrentFrame).sounds(i).snd
+                        Next
+                    End If
+                End If
+            End If
+        End With
+        
+    End Sub
     Public Sub DrawImageEx(n, x As Long, y As Long, Optional w, Optional h, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0)
         Dim index As Integer
         
@@ -156,7 +259,7 @@ Public TopPage As Boolean
             GdipDrawLine GG, Pen, x, y - 5, x, y + 5
         End If
     End Sub
-    Public Sub DrawImage(n, x As Long, y As Long, Optional cx, Optional cy, Optional cw, Optional ch, Optional Alpha, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0, Optional Direction As ImgDirection = DirNormal)
+    Public Sub DrawImage(n, x As Long, y As Long, Optional cx, Optional cy, Optional cw, Optional ch, Optional alpha, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0, Optional Direction As ImgDirection = DirNormal)
         'If OutOfScroll Then Exit Sub
         
         Dim b As BLENDFUNCTION, index As Integer, bl As Long
@@ -164,7 +267,7 @@ Public TopPage As Boolean
         ox = x: oy = y: ow = w: oh = h
         Dim ocx As Long, ocy As Long, ocw As Long, och As Long
         
-        If Not IsMissing(Alpha) Then
+        If Not IsMissing(alpha) Then
             Dim pro As Single
             pro = 1
             If animation <> 0 Then
@@ -172,15 +275,15 @@ Public TopPage As Boolean
                     pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).Start - Anis(animation).delay) / Anis(animation).during)
                 End If
             End If
-            Alpha = Alpha * pro
+            alpha = alpha * pro
             
-            If Alpha < 0 Then Alpha = 0
-            If Alpha > 1 Then Alpha = 1
+            If alpha < 0 Then alpha = 0
+            If alpha > 1 Then alpha = 1
             With b
                 .AlphaFormat = &H1
                 .BlendFlags = &H0
                 .BlendOp = 0
-                .SourceConstantAlpha = Int(Alpha * 255)
+                .SourceConstantAlpha = Int(alpha * 255)
             End With
             CopyMemory bl, b, 4
         End If
@@ -220,7 +323,7 @@ Public TopPage As Boolean
             srcDC = Res.ResourceGIFCurrentHandle(index)
         End If
         
-        If IsMissing(Alpha) Then
+        If IsMissing(alpha) Then
             BitBlt CDC, ox, oy, ocw, och, srcDC, ocx, ocy, vbSrcCopy
         Else
             AlphaBlend CDC, ox, oy, ocw, och, srcDC, ocx, ocy, ocw, och, bl
@@ -578,7 +681,7 @@ ReShape:
         w = Res.ImgSize(i, imgGetWidth): h = Res.ImgSize(i, imgGetHeight)
         
         m = CheckMouse(x, y, w, Int(h / 2))
-        DrawImage i, x, y, cy:=IIf(m <> 0, Int(h / 2), 0), ch:=Int(h / 2), Alpha:=1
+        DrawImage i, x, y, cy:=IIf(m <> 0, Int(h / 2), 0), ch:=Int(h / 2), alpha:=1
         
         Writes text, x, y + h / 2 / 2 - size / 0.75 / 2, size, Color, w, size / 0.75, StringAlignmentCenter, style
         
@@ -590,7 +693,7 @@ ReShape:
         w = Res.ImgSize(i, imgGetWidth): h = Res.ImgSize(i, imgGetHeight)
         
         m = CheckMouse(x, y, w, h)
-        DrawImage i, x, y, Alpha:=IIf(m, 1, 0.8)
+        DrawImage i, x, y, alpha:=IIf(m, 1, 0.8)
         
         Writes text, x, y + h / 2 - size / 0.75 / 2, size, Color, w, size / 0.75, StringAlignmentCenter, style
     
@@ -615,7 +718,7 @@ ReShape:
         w = Res.ImgSize(i, imgGetWidth): h = Res.ImgSize(i, imgGetHeight)
         
         m = CheckMouse(x, y, w, Int(h / 2))
-        DrawImage i, x, y, cy:=IIf(value = True, Int(h / 2), 0), ch:=Int(h / 2), Alpha:=1
+        DrawImage i, x, y, cy:=IIf(value = True, Int(h / 2), 0), ch:=Int(h / 2), alpha:=1
         If m = 3 Then value = IIf(value = True, False, True)
         
         Writes text, X2 + w + size / 0.75 / 2, Y2 + h / 2 / 2 - size / 0.75 / 2, size, Color, GW, size / 0.75, StringAlignmentNear, style

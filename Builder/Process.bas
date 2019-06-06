@@ -9,7 +9,7 @@ Public CmdMark As String, SetupErr As Long, Repaired As Boolean
 Public AppInfo() As String
 Public Cmd As String
 Public Abouting As Boolean
-Public SetMode As Boolean
+Public SetMode As Boolean, PackPos As Long
 Public Sub CheckUpdate()
     On Error GoTo ErrHandle
     
@@ -50,10 +50,10 @@ ErrHandle:
                "注意：Emerald只适用于VB6", "好吧"
     End If
 End Sub
-Public Function CheckFileName(Name As String) As Boolean
-    CheckFileName = ((InStr(Name, "*") Or InStr(Name, "\") Or InStr(Name, "/") Or InStr(Name, ":") Or InStr(Name, "?") Or InStr(Name, """") Or InStr(Name, "<") Or InStr(Name, ">") Or InStr(Name, "|") Or InStr(Name, " ") Or InStr(Name, "!") Or InStr(Name, "-") Or InStr(Name, "+") Or InStr(Name, "#") Or InStr(Name, "@") Or InStr(Name, "$") Or InStr(Name, "^") Or InStr(Name, "&") Or InStr(Name, "(") Or InStr(Name, ")")) = 0)
+Public Function CheckFileName(name As String) As Boolean
+    CheckFileName = ((InStr(name, "*") Or InStr(name, "\") Or InStr(name, "/") Or InStr(name, ":") Or InStr(name, "?") Or InStr(name, """") Or InStr(name, "<") Or InStr(name, ">") Or InStr(name, "|") Or InStr(name, " ") Or InStr(name, "!") Or InStr(name, "-") Or InStr(name, "+") Or InStr(name, "#") Or InStr(name, "@") Or InStr(name, "$") Or InStr(name, "^") Or InStr(name, "&") Or InStr(name, "(") Or InStr(name, ")")) = 0)
     Dim t As String
-    If Name <> "" Then t = Left(Name, 1)
+    If name <> "" Then t = Left(name, 1)
     CheckFileName = CheckFileName And (Trim(Str(Val(t))) <> t)
 End Function
 Sub Uninstall()
@@ -230,7 +230,7 @@ Public Sub CheckOnLineUpdate()
         
         Dim xmlHttp As Object, Ret As String, Start As Long
         Set xmlHttp = CreateObject("Microsoft.XMLHTTP")
-        xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
+        xmlHttp.open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
         xmlHttp.send
         
         Start = GetTickCount
@@ -255,9 +255,11 @@ Public Sub CheckOnLineUpdate()
     End If
 End Sub
 Sub Main()
-    Dim PackPos As Long, targetEXE As String
+    Dim targetEXE As String
     targetEXE = App.path & "\" & App.EXEName & ".exe"
     'targetEXE = "C:\Users\Error404\Documents\Emerald\Export\Warcraft - 安装包.exe"
+    
+    PackPos = FindPackage(targetEXE, 598000)
     
     MainWindow.Show
     ECore.Display
@@ -272,7 +274,6 @@ Sub Main()
         Exit Sub
     End If
     
-    PackPos = FindPackage(targetEXE, 598000)
     If PackPos <> -1 Then
         '从指定位置把安装包分离出来
         Dim tempPath As String, data() As Byte, data2() As Byte
@@ -343,6 +344,7 @@ Sub Main()
             If Dir(p & "\.emr\backup", vbDirectory) = "" Then MkDir p & "\.emr\backup"
             If Dir(p & "\.emr\cache", vbDirectory) = "" Then MkDir p & "\.emr\cache"
             If Dir(p & "\assets\debug", vbDirectory) = "" Then MkDir p & "\assets\debug"
+            If Dir(p & "\animation", vbDirectory) = "" Then MkDir p & "\animation"
             If Dir(p & "\music", vbDirectory) = "" Then MkDir p & "\music"
             info = Split(xinfo, vbCrLf)
         End If
@@ -369,13 +371,13 @@ Sub Main()
                         Dialog "警告", "找不到游戏主程序：app.exe，请设置。", "行"
                         Unload MainWindow: End
                     End If
-                    Dim QQ As Long, Maker As String, Name As String, Describe As String, GVersion As String
+                    Dim QQ As Long, Maker As String, name As String, Describe As String, GVersion As String
                     QQ = Val(InputBox("输入你的QQ号。。。"))
                     Dim tempr As String
                     Open Cmd & "\" & Dir(Cmd & "\*.vbp") For Input As #1
                     Do While Not EOF(1)
                         Line Input #1, tempr
-                        If InStr(tempr, "VersionProductName") = 1 Then Name = Split(tempr, """")(1)
+                        If InStr(tempr, "VersionProductName") = 1 Then name = Split(tempr, """")(1)
                         If InStr(tempr, "VersionFileDescription") = 1 Then Describe = Split(tempr, """")(1)
                         If InStr(tempr, "VersionCompanyName") = 1 Then Maker = Split(tempr, """")(1)
                         If InStr(tempr, "MajorVer") = 1 Then GVersion = GVersion & Split(tempr, "=")(1) & "."
@@ -383,27 +385,27 @@ Sub Main()
                         If InStr(tempr, "RevisionVer") = 1 Then GVersion = GVersion & Split(tempr, "=")(1)
                     Loop
                     Close #1
-                    If Name = "" Then
+                    If name = "" Then
                         Dialog "警告", "游戏名称不能为空。", "行"
                         Unload MainWindow: End
                     End If
-                    MakePackage Cmd, Maker, Name, GVersion, Describe, QQ
+                    MakePackage Cmd, Maker, name, GVersion, Describe, QQ
                     CreateFolder GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\"
-                    If Dir(GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & Name & " - 安装包.exe") <> "" Then Kill GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & Name & " - 安装包.exe"
+                    If Dir(GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & name & " - 安装包.exe") <> "" Then Kill GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & name & " - 安装包.exe"
                     Open VBA.Environ("temp") & "\copyemr.cmd" For Output As #1
                     Print #1, "@echo off"
                     Print #1, "echo Emerald Package Toolkit , Version: " & Version
                     Print #1, "echo Building Installer..."
                     Print #1, "ping localhost -n 2 > nul"
-                    Print #1, "copy """ & targetEXE & """ /b + """ & VBA.Environ("temp") & "\emrpack"" /b """ & GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & Name & " - 安装包.exe"""
+                    Print #1, "copy """ & targetEXE & """ /b + """ & VBA.Environ("temp") & "\emrpack"" /b """ & GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & name & " - 安装包.exe"""
                     Close #1
                     ShellExecuteA 0, "open", VBA.Environ("temp") & "\copyemr.cmd", "", "", SW_SHOW
-                    Do While Dir(GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & Name & " - 安装包.exe") = ""
+                    Do While Dir(GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & name & " - 安装包.exe") = ""
                         Sleep 10: DoEvents
                         ECore.Display
                     Loop
                     Dialog "恭喜", "安装包制作成功", "好的"
-                    ShellExecuteA 0, "open", "explorer.exe", "/select,""" & GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & Name & " - 安装包.exe" & """", "", SW_SHOW
+                    ShellExecuteA 0, "open", "explorer.exe", "/select,""" & GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & name & " - 安装包.exe" & """", "", SW_SHOW
                     Unload MainWindow: End
                 End If
                 Dialog "无操作", "你的工程已经在使用最新的Emerald了。", "手滑"

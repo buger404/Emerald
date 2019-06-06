@@ -22,20 +22,21 @@ Dim List() As MusicL
 '   Init
     Private Sub Class_Initialize()
         ReDim List(0)
+        Set EMusic = Me
     End Sub
 '========================================================
 '   Manager
-    Public Sub Create(ByVal folder As String)
-        Dim file As String
-        If Right(folder, 1) <> "\" Then folder = folder & "\"
-        file = Dir(folder)
+    Public Sub Create(ByVal Folder As String)
+        Dim File As String
+        If Right(Folder, 1) <> "\" Then Folder = Folder & "\"
+        File = Dir(Folder)
         
-        Do While file <> ""
+        Do While File <> ""
             ReDim Preserve List(UBound(List) + 1)
             Set List(UBound(List)).Music = New GMusic
-            List(UBound(List)).Music.Create folder & file
-            List(UBound(List)).name = file
-            file = Dir()
+            List(UBound(List)).Music.Create Folder & File
+            List(UBound(List)).name = File
+            File = Dir()
         Loop
     End Sub
 '========================================================

@@ -62,7 +62,7 @@ Public Sub UpdateDone()
         Page.Writes "在资源管理器中右键创建你的工程吧！", GW / 2, 140, 16, argb(150, 27, 27, 27), align:=StringAlignmentCenter, animation:=1
         
         Page.Paint 0, GW / 2, 160 + (GH - 160 - 80) / 2, GW + 1, 270, argb(255, 255, 255, 255), pos:=posOnCenter, animation:=2
-        Page.DrawImage "tip.png", GW / 2, 160 + (GH - 160 - 80) / 2, Alpha:=1, pos:=posOnCenter, animation:=2
+        Page.DrawImage "tip.png", GW / 2, 160 + (GH - 160 - 80) / 2, alpha:=1, pos:=posOnCenter, animation:=2
     Else
         Page.Writes "安装已经完成，但是发生了一些错误。", GW / 2, 200, 20, argb(255, 254, 84, 57), align:=StringAlignmentCenter
         Page.Writes "错误代码：0x" & format(Hex(SetupErr), "000000"), GW / 2, 230, 16, argb(150, 254, 84, 57), align:=StringAlignmentCenter
@@ -137,7 +137,9 @@ Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
     '导入游戏资源
-    Page.Res.NewImages App.path & "\assets", 0.7
+    If PackPos = -1 Then
+        Page.Res.NewImages App.path & "\assets", 0.7
+    End If
     '创建页面
     ECore.Add Page, "SetupPage"
     

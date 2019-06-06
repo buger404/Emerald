@@ -55,7 +55,7 @@ Attribute VB_Name = "GCore"
         Hwnd As Long
         ImgHwnd As Long
         Imgs(3) As Long
-        Name As String
+        name As String
         Folder As String
         w As Long
         h As Long
@@ -73,7 +73,7 @@ Attribute VB_Name = "GCore"
         DirVertical = 2
         DirHorizontalVertical = 3
     End Enum
-    Public ECore As GMan, EF As GFont, EAni As Object, ESave As GSaving
+    Public ECore As GMan, EF As GFont, EAni As Object, ESave As GSaving, EMusic As GMusicList
     Public GHwnd As Long, GDC As Long, GW As Long, GH As Long
     Public Mouse As MState, DrawF As RECT
     Public FPS As Long, FPSt As Long, tFPS As Long, FPSct As Long, FPSctt As Long
@@ -109,8 +109,8 @@ Attribute VB_Name = "GCore"
         data.PutData "UpdateCheckInterval", UpdateCheckInterval
         data.PutData "UpdateTimeOut", UpdateTimeOut
     End Sub
-    Public Sub GetSettings()
-        If App.LogMode <> 0 Then Exit Sub
+    Public Sub GetSettings(Optional SkipDebug As Boolean = False)
+        If App.LogMode <> 0 And SkipDebug = False Then Exit Sub
     
         Dim data As New GSaving
         data.Create "Emerald.Core", "Emerald.Core"
@@ -198,9 +198,9 @@ Attribute VB_Name = "GCore"
         TerminateGDIPlus
         If BassInstalled Then BASS_Free
     End Sub
-    Public Sub MakeFont(ByVal Name As String)
+    Public Sub MakeFont(ByVal name As String)
         Set EF = New GFont
-        EF.MakeFont Name
+        EF.MakeFont name
         EmeraldInstalled = True
     End Sub
 '========================================================
@@ -285,17 +285,17 @@ sth:
         
         CreateCDC = DC
     End Function
-    Public Sub PaintDC(DC As Long, destDC As Long, Optional x As Long = 0, Optional y As Long = 0, Optional cx As Long = 0, Optional cy As Long = 0, Optional cw, Optional ch, Optional Alpha)
+    Public Sub PaintDC(DC As Long, destDC As Long, Optional x As Long = 0, Optional y As Long = 0, Optional cx As Long = 0, Optional cy As Long = 0, Optional cw, Optional ch, Optional alpha)
         Dim b As BLENDFUNCTION, index As Integer, bl As Long
         
-        If Not IsMissing(Alpha) Then
-            If Alpha < 0 Then Alpha = 0
-            If Alpha > 1 Then Alpha = 1
+        If Not IsMissing(alpha) Then
+            If alpha < 0 Then alpha = 0
+            If alpha > 1 Then alpha = 1
             With b
                 .AlphaFormat = &H1
                 .BlendFlags = &H0
                 .BlendOp = 0
-                .SourceConstantAlpha = Int(Alpha * 255)
+                .SourceConstantAlpha = Int(alpha * 255)
             End With
             CopyMemory bl, b, 4
         End If
@@ -303,7 +303,7 @@ sth:
         If IsMissing(cw) Then cw = GW - cx
         If IsMissing(ch) Then ch = GH - cy
         
-        If IsMissing(Alpha) Then
+        If IsMissing(alpha) Then
             BitBlt destDC, x, y, cw, ch, DC, cx, cy, vbSrcCopy
         Else
             AlphaBlend destDC, x, y, cw, ch, DC, cx, cy, cw, ch, bl
@@ -375,7 +375,7 @@ sth:
             
             Dim xmlHttp As Object, Ret As String, Start As Long
             Set xmlHttp = CreateObject("Microsoft.XMLHTTP")
-            xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
+            xmlHttp.open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
             xmlHttp.send
                          
             Start = GetTickCount

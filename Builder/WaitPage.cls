@@ -24,7 +24,7 @@ Public Sub Update()
     Page.Clear argb(255 * 0.85, 242, 242, 249) '清空画布
     
     If Not first Then
-        Page.Writes "请稍后", GW / 2, GH / 2, 28, argb(150, 27, 27, 27), align:=StringAlignmentCenter
+        Page.Writes "请稍候", GW / 2, GH / 2, 28, argb(150, 27, 27, 27), align:=StringAlignmentCenter
         first = True
         Exit Sub
     End If
@@ -59,7 +59,7 @@ Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
     '导入游戏资源
-    Page.Res.NewImages App.Path & "\assets"
+
     '创建页面
     ECore.Add Page, "WaitPage"
     

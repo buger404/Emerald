@@ -26,16 +26,16 @@ Public Sub DrawSetup()
         Page.Paint 1, 50, 150 - 64, 128, 128, argb(255, 95, 229, 221)
         Page.Writes "G", 50 + 64, 150 - 64 + 32, 48, argb(255, 255, 255, 255), align:=StringAlignmentCenter
     Else
-        Page.DrawImage "setupappicon.png", 50, 150 - 64, Alpha:=1
+        Page.DrawImage "setupappicon.png", 50, 150 - 64, alpha:=1
     End If
     
-    Page.Writes SPackage.GameName, GW - 50, 97, 24, argb(255, 95, 229, 221), style:=FontStyleBold, align:=StringAlignmentFar
+    Page.Writes SPackage.GameName, GW - 50, 97, 24, argb(255, 27, 27, 27), style:=FontStyleBold, align:=StringAlignmentFar
     Page.Writes SPackage.GameVersion, GW - 50, 170, 18, argb(150, 27, 27, 27), align:=StringAlignmentFar
     Page.Writes "By " & SPackage.Maker & "(QQ " & SPackage.MakerQQ & ")", GW - 50, 200, 16, argb(255, 95, 229, 221), align:=StringAlignmentFar
     
     Page.Writes "简介：" & vbCrLf & SPackage.GameDescribe, 50, 250, 18, argb(150, 27, 27, 27)
     
-    Page.Writes "Powered by Emerald", 20, GH - 40, 16, argb(150, 27, 27, 27)
+    Page.Writes "Powered by Emerald", 20, GH - 40, 16, argb(120, 27, 27, 27)
     
     If Page.ShowColorButton(0, GW - 170, GH - 80, 130, 40, "安装", argb(255, 255, 255, 255), argb(255, 85, 219, 211), argb(255, 55, 189, 181), size:=16) = 3 Then
         ECore.NewTransform transFadeIn, 700, "SetupPage"
@@ -101,8 +101,13 @@ Public Sub Update()
                 If pro < 0 Then pro = 0
             
                 Page.Clear argb(255 * 0.85, 64, 64, 73) '清空画布
-            
-                Page.DrawImage "404.png", 165, GH / 2, Alpha:=1 - pro, pos:=posOnCenter, animation:=1
+                
+                Page.DrawAnimation "test", 250, 250
+                If CheckMouse2 = mMouseUp Then
+                    Page.SwitchChannel "test", IIf(Mouse.button = 1, "Default", "Test2")
+                End If
+                
+                Page.DrawImage "404.png", 165, GH / 2, alpha:=1 - pro, pos:=posOnCenter, animation:=1
                 
                 'Page.ShowColorCheckBox Debug_focus, 20, 100, 200, 24, "Debug_Switch", argb(255, 222, 222, 222), argb(255, 0, 176, 240), argb(150, 242, 242, 242), 18
                 
@@ -190,9 +195,15 @@ Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
     '导入游戏资源
-    Page.Res.NewImages App.path & "\assets"
+    If PackPos = -1 Then
+        Page.Res.NewImages App.path & "\assets"
+        Page.Res.NewImages App.path & "\assets\test"
+    End If
     '创建页面
     ECore.Add Page, "WelcomePage"
+    '导入动画
+    Page.LoadAnimationsFromDir App.path & "\animation"
+    Page.CreatePlayAnimation "test", "test", "Default"
     
     '===============================================
     '   如果需要添加动画，请放置在此处
