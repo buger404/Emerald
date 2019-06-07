@@ -179,7 +179,10 @@ Public TopPage As Boolean
                 last = (PlayAni(s).channel(PlayAni(s).CurrentChannel).CurrentFrame = UBound(PlayAni(s).channel(PlayAni(s).CurrentChannel).frames))
                 If GetTickCount - PlayAni(s).tick >= .tick Then
                     If .msg = "dispose" Then DisposePlayAnimation playname: Exit Sub
-                    If .msg <> "" Then Debug.Print Now, .msg
+                    If .msg <> "" Then
+                        On Error Resume Next
+                        CallByName SrcClass, "AnimationMsg", VbMethod, playname, .msg
+                    End If
                     If last Then
                         PlayAni(s).channel(PlayAni(s).CurrentChannel).CurrentFrame = 1
                     Else

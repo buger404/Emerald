@@ -11,7 +11,7 @@ Attribute VB_Name = "BMEA_Engine"
 '================================================================================
 '   主体
 '   <Inputs:需要加密的内容>
-    Function BMEA(ByVal Inputs As String) As String
+    Function BMEA(ByVal Inputs As String, Optional BMKey) As String
         Dim StrEA() As Byte, Key As String, temp As Long, KeyP As Integer
         Dim LongEA As Long, LongRet As String
         Dim RepLst1 As String, RepLst2() As String, RepLst As String, RepP As Integer, WaitChr As String, RepRet As String
@@ -20,6 +20,7 @@ Attribute VB_Name = "BMEA_Engine"
         
         BowRep = "ABCDEF"
         WowRep = "汪嗷呜吼嘤喵"
+        If Not IsMissing(BMKey) Then WowRep = BMKey
         StrEA = Inputs: Key = Len(Inputs): KeyP = 1
         RepLst1 = "0123456789ABCDEF"
         ReDim RepLst2(Len(RepLst1))
@@ -97,5 +98,9 @@ Attribute VB_Name = "BMEA_Engine"
         Loop
         
         BMEA = BowRet & WowRet
+    End Function
+    Public Function GetBMKey() As String
+        Randomize
+        GetBMKey = Hex(Int(Rnd * 1000000000 + 10000000)) & Hex(Int(Rnd * 1000000000 + 10000000)) & Hex(Int(Rnd * 1000000000 + 10000000)) & Hex(Int(Rnd * 1000000000 + 10000000))
     End Function
 '================================================================================

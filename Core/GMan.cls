@@ -27,6 +27,7 @@ Dim mPage As String, aPage As Object
 Dim OutOfWindow As Boolean
 Dim FirstPlay As Boolean
 Public CDC As Long, ODC As Long, GG As Long, pB As Long
+Public LastPage As String
 Dim IsLayered As Boolean
 '========================================================
 '   Init
@@ -67,6 +68,7 @@ Dim IsLayered As Boolean
         ActivePage = mPage
     End Property
     Public Property Let ActivePage(nPage As String)
+        LastPage = mPage
         For i = 1 To UBound(Pages)
             If mPage = Pages(i).name Then CallByName Pages(i).p.SrcClass, "Leave", VbMethod: Exit For
         Next
@@ -175,34 +177,34 @@ skipPage:
         Select Case Transform.kind
             Case 0 'FadeIn
                 pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
-                PaintDC ODC, CDC, Alpha:=1 - pro
+                PaintDC ODC, CDC, alpha:=1 - pro
             Case 1 'FadeOut
                 pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 0, 0, 1)
-                PaintDC ODC, CDC, Alpha:=1 - pro
+                PaintDC ODC, CDC, alpha:=1 - pro
             Case 2 'ToRight
                 pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
-                PaintDC ODC, CDC, (pro * GW), Alpha:=1
+                PaintDC ODC, CDC, (pro * GW), alpha:=1
             Case 3 'ToLeft
                 pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
-                PaintDC ODC, CDC, -(pro * GW), Alpha:=1
+                PaintDC ODC, CDC, -(pro * GW), alpha:=1
             Case 4 'ToUp
                 pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
-                PaintDC ODC, CDC, 0, -(pro * GW), Alpha:=1
+                PaintDC ODC, CDC, 0, -(pro * GW), alpha:=1
             Case 5 'ToDown
                 pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
-                PaintDC ODC, CDC, 0, (pro * GW), Alpha:=1
+                PaintDC ODC, CDC, 0, (pro * GW), alpha:=1
             Case 6 'ToRight(Fade)
                 pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
-                PaintDC ODC, CDC, (pro * GW), Alpha:=1 - pro
+                PaintDC ODC, CDC, (pro * GW), alpha:=1 - pro
             Case 7 'ToLeft(Fade)
                 pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
-                PaintDC ODC, CDC, -(pro * GW), Alpha:=1 - pro
+                PaintDC ODC, CDC, -(pro * GW), alpha:=1 - pro
             Case 8 'ToUp(Fade)
                 pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
-                PaintDC ODC, CDC, 0, -(pro * GW), Alpha:=1 - pro
+                PaintDC ODC, CDC, 0, -(pro * GW), alpha:=1 - pro
             Case 9 'ToDown(Fade)
                 pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
-                PaintDC ODC, CDC, 0, (pro * GW), Alpha:=1 - pro
+                PaintDC ODC, CDC, 0, (pro * GW), alpha:=1 - pro
             Case 10 'HighLight
                 pro = (GetTickCount - Transform.time) / Transform.during
                 Select Case pro

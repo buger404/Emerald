@@ -82,7 +82,7 @@ Attribute VB_Name = "GCore"
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
-    Public Const Version As Long = 19060108
+    Public Const Version As Long = 19060706
     Dim AssetsTrees() As AssetsTree
     Dim LastKeyUpRet As Boolean
     Dim Wndproc As Long
@@ -113,7 +113,7 @@ Attribute VB_Name = "GCore"
         If App.LogMode <> 0 And SkipDebug = False Then Exit Sub
     
         Dim data As New GSaving
-        data.Create "Emerald.Core", "Emerald.Core"
+        data.Create "Emerald.Core"
         
         If data.GetData("DebugMode") = "" Then
             UpdateCheckInterval = 1
@@ -369,13 +369,13 @@ sth:
         End If
         
         Dim data As New GSaving
-        data.Create "Emerald.Core", "Emerald.Core"
+        data.Create "Emerald.Core"
         If Now - CDate(data.GetData("UpdateTime")) >= UpdateCheckInterval Or data.GetData("UpdateAble") = 1 Then
             data.PutData "UpdateTime", Now
             
             Dim xmlHttp As Object, Ret As String, Start As Long
             Set xmlHttp = CreateObject("Microsoft.XMLHTTP")
-            xmlHttp.open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
+            xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
             xmlHttp.send
                          
             Start = GetTickCount

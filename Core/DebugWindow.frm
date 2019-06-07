@@ -65,7 +65,7 @@ Private Sub Form_Load()
     
     SetWindowPos Me.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE Or SWP_NOSIZE
     
-    For i = 1 To 4
+    For i = 1 To 5
         Load touchArea(i)
         With touchArea(i)
             .Visible = True
@@ -80,6 +80,8 @@ Private Sub Form_Load()
                     .ToolTipText = "显示/不显示绘制矩形"
                 Case 4
                     .ToolTipText = "显示/不显示绘制源坐标"
+                Case 5
+                    .ToolTipText = "存档数据管理"
             End Select
         End With
     Next
@@ -97,6 +99,17 @@ Private Sub touchArea_Click(index As Integer)
             Debug_focus = Not Debug_focus
         Case 4
             Debug_pos = Not Debug_pos
+        Case 5
+            If Not Debug_data Then
+                SysPage.DoneMark = False: SysPage.DoneStep = 0
+                SysPage.OpenTime = GetTickCount: SysPage.index = 3
+                Call ECore.NewTransform
+                Debug_data = True
+            Else
+                SysPage.DoneMark = True
+                Call ECore.NewTransform
+                Debug_data = False
+            End If
     End Select
 End Sub
 

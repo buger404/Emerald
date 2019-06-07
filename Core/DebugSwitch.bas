@@ -10,6 +10,17 @@ Attribute VB_Name = "DebugSwitch"
 '==============================================================================
 '   版本更新注意事项
 '==============================================================================
+'   1.动画功能的加入
+'     请在你的每一个游戏页面模块加入：
+'        Public Sub AnimationMsg(id As String, msg As String)
+'            '动画消息接收
+'        End Sub
+'   2.存档的修改
+'     需要你提供存档的秘钥。现在创建存档的第二个参数已经变成秘钥，请注意！
+'     ***请在代码中妥善保管你的秘钥，防止你的游戏存档被修改。
+'     ***不要随意修改秘钥，那样会导致旧的存档被擦除！
+'     ***如果无法确定秘钥，可以在立即面板中，输入debug.print GetBMKey
+'==============================================================================
 '   1.鼠标点击修复
 '      请在你的游戏窗口找到如下代码
 '       Private Sub Form_MouseMove(button As Integer, Shift As Integer, X As Single, Y As Single)
@@ -44,5 +55,5 @@ Attribute VB_Name = "DebugSwitch"
 '======================================================
 '   警告：不要修改下列代码
     Public DebugMode As Integer, DisableLOGO As Integer, HideLOGO As Integer, UpdateCheckInterval As Long, UpdateTimeOut As Long
-    Public Debug_focus As Boolean, Debug_pos As Boolean
+    Public Debug_focus As Boolean, Debug_pos As Boolean, Debug_data As Boolean
 '======================================================

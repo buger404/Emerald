@@ -24,6 +24,7 @@ Attribute VB_Exposed = False
     End Type
     Dim FileList() As CopyList
     Dim BackupSwitch As Boolean
+    Dim WarnStr As String
 '======================================
 Public Sub CheckFiles()
     Dim f As String, fl() As String
@@ -140,13 +141,6 @@ Public Sub Update2()
     
     If Page.ShowColorButton(0, GW - 120 - 50, GH - 80, 120, 40, "替换", argb(150, 27, 27, 27), argb(255, 222, 222, 222), argb(130, 95, 229, 221), size:=18) = 3 Then
         If Dialog("警告", "即将替换所选文件。" & IIf(BackupSwitch, "并创建备份。", ""), "好", "等等！") <> 1 Then Exit Sub
-        If Val(AppInfo(0)) < 19051004 Then
-            Dialog "警告", "资源加载函数已经迁移。" & vbCrLf & "Page->Page.Res" & vbCrLf & vbCrLf & "* 详情参照Emerald提供的代码模板", "哦"
-        End If
-        If Val(AppInfo(0)) < 19051110 Then
-            Dialog "警告", "窗口鼠标检测出现问题" & vbCrLf & "请参照DebugSwitch模块里的注释修改代码！" & vbCrLf & vbCrLf & "* 详情参照Emerald提供的代码模板", "哦"
-            Dialog "警告", "画布清空机制修改" & vbCrLf & "请在你的绘图过程加上Page.Clear！" & vbCrLf & vbCrLf & "* 详情参照Emerald提供的代码模板", "哦"
-        End If
         ECore.NewTransform transFadeIn, 700, "WaitPage"
         
         Dim Backstr As String
@@ -219,6 +213,7 @@ Public Sub Update2()
     Page.Writes "帮助我选择...", 50, GH - 30 - 40, 16, argb(150, 27, 27, 27), 200, 20, style:=FontStyleUnderline
     If CheckMouse2 = mMouseUp Then
         Call CheckFiles
+        ECore.NewTransform
     End If
 End Sub
 Public Sub Update()
@@ -244,6 +239,12 @@ Public Sub Update()
     Page.Writes "最新版本：  " & Version & "（领先" & leadstr & "）", 50, 220, 18, argb(220, 27, 27, 27)
     Page.Writes "工程版本：  " & Val(AppInfo(0)), 50, 250, 18, argb(130, 27, 27, 27)
     
+    If WarnStr <> "" Then
+        Page.Paint 0, 0, 295, GW, 130, argb(255, 255, 255, 255)
+        Page.Paint 0, 0, 295, 10, 130, argb(255, 255, 205, 66)
+        Page.Writes WarnStr, 50, 315, 16, argb(130, 27, 27, 27)
+    End If
+    
     If Page.ShowColorButton(0, GW - 150 - 50, GH - 100, 150, 50, "立即更新", argb(150, 27, 27, 27), argb(255, 222, 222, 222), argb(130, 95, 229, 221), size:=18) = 3 Then
         Call CheckFiles
         ECore.NewTransform , 700
@@ -265,6 +266,20 @@ End Sub
 Public Sub Enter()
     '页面进入事件
     Step = 0: BackupSwitch = True
+End Sub
+Public Sub GetWarnStr()
+    WarnStr = ""
+    If Val(AppInfo(0)) < 19051004 Then
+        WarnStr = WarnStr & "资源加载函数已经迁移(Page->Page.Res)" & vbCrLf
+    End If
+    If Val(AppInfo(0)) < 19051110 Then
+        WarnStr = WarnStr & "窗口鼠标检测出现问题（请参照DebugSwitch模块里的注释修改代码）" & vbCrLf
+        WarnStr = WarnStr & "画布清空机制修改（请在你的绘图过程加上Page.Clear）" & vbCrLf
+    End If
+    If Val(AppInfo(0)) < 19060706 Then
+        WarnStr = WarnStr & "存档机制修改（详情查看DebugSwitch模块中的注释）" & vbCrLf
+        WarnStr = WarnStr & "动画的加入需要你修改部分代码（详情查看DebugSwitch模块中的注释）" & vbCrLf
+    End If
 End Sub
 Public Sub Leave()
     '页面离开事件

@@ -224,13 +224,13 @@ Public Sub CheckOnLineUpdate()
     End If
     
     Dim data As New GSaving
-    data.Create "Emerald.Core", "Emerald.Core"
+    data.Create "Emerald.Core"
     If Now - CDate(data.GetData("UpdateTime")) >= UpdateCheckInterval Or data.GetData("UpdateAble") = 1 Then
         data.PutData "UpdateTime", Now
         
         Dim xmlHttp As Object, Ret As String, Start As Long
         Set xmlHttp = CreateObject("Microsoft.XMLHTTP")
-        xmlHttp.open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
+        xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
         xmlHttp.send
         
         Start = GetTickCount
@@ -257,7 +257,7 @@ End Sub
 Sub Main()
     Dim targetEXE As String
     targetEXE = App.path & "\" & App.EXEName & ".exe"
-    'targetEXE = "C:\Users\Error404\Documents\Emerald\Export\Warcraft - 安装包.exe"
+    'targetEXE = "D:\MyDoc\Emerald\Export\Minesweeper - 安装包.exe"
     
     PackPos = FindPackage(targetEXE, 598000)
     
@@ -359,20 +359,16 @@ Sub Main()
                 End If
                 ECore.NewTransform , 700, "UpdatePage"
                 AppInfo = info
+                UpdatePage.GetWarnStr
                 Exit Sub
             Else
                 If pmode Then
                     If Dialog("打包", "现在开始打包吗？", "好", "不要") <> 1 Then Unload MainWindow: End
-                    If Dir(Cmd & "\app.png") = "" Then
-                        Dialog "警告", "找不到游戏图标文件：app.png，请设置。", "行"
-                        Unload MainWindow: End
-                    End If
                     If Dir(Cmd & "\app.exe") = "" Then
                         Dialog "警告", "找不到游戏主程序：app.exe，请设置。", "行"
                         Unload MainWindow: End
                     End If
                     Dim QQ As Long, Maker As String, name As String, Describe As String, GVersion As String
-                    QQ = Val(InputBox("输入你的QQ号。。。"))
                     Dim tempr As String
                     Open Cmd & "\" & Dir(Cmd & "\*.vbp") For Input As #1
                     Do While Not EOF(1)
@@ -396,7 +392,7 @@ Sub Main()
                     Print #1, "@echo off"
                     Print #1, "echo Emerald Package Toolkit , Version: " & Version
                     Print #1, "echo Building Installer..."
-                    Print #1, "ping localhost -n 2 > nul"
+                    Print #1, "ping localhost -n 3 > nul"
                     Print #1, "copy """ & targetEXE & """ /b + """ & VBA.Environ("temp") & "\emrpack"" /b """ & GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & name & " - 安装包.exe"""
                     Close #1
                     ShellExecuteA 0, "open", VBA.Environ("temp") & "\copyemr.cmd", "", "", SW_SHOW

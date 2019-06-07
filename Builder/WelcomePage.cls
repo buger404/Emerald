@@ -31,7 +31,7 @@ Public Sub DrawSetup()
     
     Page.Writes SPackage.GameName, GW - 50, 97, 24, argb(255, 27, 27, 27), style:=FontStyleBold, align:=StringAlignmentFar
     Page.Writes SPackage.GameVersion, GW - 50, 170, 18, argb(150, 27, 27, 27), align:=StringAlignmentFar
-    Page.Writes "By " & SPackage.Maker & "(QQ " & SPackage.MakerQQ & ")", GW - 50, 200, 16, argb(255, 95, 229, 221), align:=StringAlignmentFar
+    Page.Writes "By " & SPackage.Maker, GW - 50, 200, 16, argb(255, 95, 229, 221), align:=StringAlignmentFar
     
     Page.Writes "简介：" & vbCrLf & SPackage.GameDescribe, 50, 250, 18, argb(150, 27, 27, 27)
     
@@ -60,7 +60,7 @@ Public Sub DrawSet()
 
     If Page.ShowColorButton(0, GW / 2 - 130 / 2, GH - 80, 130, 40, "保存", argb(255, 255, 255, 255), argb(255, 85, 219, 211), argb(255, 55, 189, 181), size:=16) = 3 Then
         Dim data As New GSaving
-        data.Create "Emerald.Core", "Emerald.Core"
+        data.Create "Emerald.Core"
         Call SaveSettings(data)
         Set data = Nothing
         
@@ -102,10 +102,14 @@ Public Sub Update()
             
                 Page.Clear argb(255 * 0.85, 64, 64, 73) '清空画布
                 
-                Page.DrawAnimation "test", 250, 250
-                If CheckMouse2 = mMouseUp Then
-                    Page.SwitchChannel "test", IIf(Mouse.button = 1, "Default", "Test2")
-                End If
+                'Page.DrawAnimation "test", 250, 250
+                'If CheckMouse2 = mMouseUp Then
+                '    Page.SwitchChannel "test", IIf(Mouse.button = 1, "Default", "Test2")
+                'End If
+                'Page.DrawAnimation "test", 300, 250
+                'Page.DrawAnimation "test", 200, 250
+                'Page.DrawAnimation "test", 400, 250
+                'Page.DrawAnimation "test", 100, 0
                 
                 Page.DrawImage "404.png", 165, GH / 2, alpha:=1 - pro, pos:=posOnCenter, animation:=1
                 
@@ -197,17 +201,20 @@ Private Sub Class_Initialize()
     '导入游戏资源
     If PackPos = -1 Then
         Page.Res.NewImages App.path & "\assets"
-        Page.Res.NewImages App.path & "\assets\test"
+        'Page.Res.NewImages App.path & "\assets\test", 0.4
+        '导入动画
+        'Page.LoadAnimationsFromDir App.path & "\animation"
+        'Page.CreatePlayAnimation "test", "test", "Default"
     End If
     '创建页面
     ECore.Add Page, "WelcomePage"
-    '导入动画
-    Page.LoadAnimationsFromDir App.path & "\animation"
-    Page.CreatePlayAnimation "test", "test", "Default"
     
     '===============================================
     '   如果需要添加动画，请放置在此处
         Page.NewAnimation False, "FadeIn", 2, 500
         Page.NewAnimation False, "FadeIn", 2, 500
     '===============================================
+End Sub
+Public Sub AnimationMsg(id As String, msg As String)
+    '动画消息接收
 End Sub

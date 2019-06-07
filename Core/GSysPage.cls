@@ -14,8 +14,10 @@ Attribute VB_Exposed = False
 'Emerald 相关代码
 
 Public Page As GPage, index As Integer, Win As Object
+Public BDC As Long
 Public Key As Integer
 Public OpenTime As Long, DoneMark As Boolean, DoneStep As Integer
+Public DataPage As Integer
 Dim ChangeTime As Long, LastLoadPro As Single, LastLoadPro2 As Single
 Public Sub Update()
     Page.Clear
@@ -24,7 +26,48 @@ Public Sub Update()
         Call SaveDialog
         Case 1
         Call LOGODialog
+        Case 3
+        Call SaveManDialog
     End Select
+End Sub
+Public Sub SaveManDialog()
+    Page.Clear argb(220, 242, 242, 249)
+    
+    Page.Paint 2, GW * 0.2, GH * 0.1, GW * 0.6, GH * 0.8, argb(255, 255, 255, 255), 30
+    Page.Writes "存档管理", GW / 2, 83, 18, argb(255, 27, 27, 27), align:=StringAlignmentCenter
+    Page.Writes "key " & IIf(ESave.Key <> "", ESave.Key, "[Default]"), GW / 2, 107, 14, argb(150, 27, 27, 27), align:=StringAlignmentCenter
+
+    Dim temp As String, temp2 As String
+
+    If Page.ShowColorButton(1, GW * 0.2 + GW * 0.6 - 24, GH * 0.1 - 24, 48, 48, "+", argb(255, 255, 255, 255), argb(130, 95, 229, 221), argb(255, 95, 229, 221), size:=24, style:=FontStyleBold) = 3 Then
+        temp2 = InputBox("输入新的数据的名称", "新建数据")
+        If temp2 = "" Then Exit Sub
+        temp = InputBox("输入新的值：" & vbCrLf & temp2, "存档修改")
+        If temp = "" Then Exit Sub
+        ESave.PutData temp2, temp
+    End If
+
+    Dim max As Long, i As Integer
+    max = Int(GH * 0.5 / 30)
+
+    For i = DataPage + 1 To DataPage + max
+        If i > ESave.Count Then Exit For
+        Page.Paint 1, GW / 2 - GW * 0.3 + 20, 80 + 30 + (i - DataPage) * 30 + 2, 20, 20, argb(255, 0, 176, 240)
+        If CheckMouse2 = mMouseUp Then
+            temp = InputBox("输入新的值：" & vbCrLf & ESave.GetName(i), "存档修改", ESave.GetData(ESave.GetName(i)))
+            ESave.PutData ESave.GetName(i), temp
+        End If
+        Page.Writes ESave.GetName(i), GW / 2 - GW * 0.3 + 50, 80 + 30 + (i - DataPage) * 30, 18, argb(150, 27, 27, 27), align:=StringAlignmentNear, style:=FontStyleBold
+        Page.Writes ESave.GetData(ESave.GetName(i)), GW / 2 + GW * 0.3 - 30, 80 + 30 + (i - DataPage) * 30, 18, argb(150, 27, 27, 27), align:=StringAlignmentFar
+    Next
+    
+    Page.Writes (Int(DataPage / max) + 1) & " / " & (Int(ESave.Count / max) + 1), GW / 2, GH - 120, 16, argb(150, 27, 27, 27), align:=StringAlignmentCenter
+    If Page.ShowColorButton(2, GW / 2 - 80 - 20, GH - 120, 40, 22, "<", argb(150, 27, 27, 27), argb(255, 222, 222, 222), argb(130, 95, 229, 221), size:=16, Radius:=60) = 3 Then
+        If DataPage > 0 Then DataPage = DataPage - max: ECore.NewTransform
+    End If
+    If Page.ShowColorButton(2, GW / 2 + 80 - 20, GH - 120, 40, 22, ">", argb(150, 27, 27, 27), argb(255, 222, 222, 222), argb(130, 95, 229, 221), size:=16, Radius:=60) = 3 Then
+        If (Int(DataPage / max) + 1) < (Int(ESave.Count / max) + 1) Then DataPage = DataPage + max: ECore.NewTransform
+    End If
 End Sub
 Public Sub LOGODialog()
     If DisableLOGO Then
@@ -81,7 +124,7 @@ Public Sub LOGODialog()
 End Sub
 Public Sub SaveDialog()
     Page.Paint 0, 0, 0, 600, 76, argb(255, 242, 242, 242)
-    Page.DrawImage "save.png", 40, 40, Alpha:=1
+    Page.DrawImage "save.png", 40, 40, alpha:=1
     Page.Writes "你希望该应用在以下位置保存数据吗？" & vbCrLf & ESave.path, 40, 130, 18, argb(255, 64, 64, 64)
     
     Page.Writes "*如果不允许，该应用可能永远保持初始状态。", 40, 400 - 110, 16, argb(255, 96, 96, 96)
@@ -121,4 +164,6 @@ Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
     Page.Res.NewImages App.path & "\assets\debug"
+    
+    BDC = CreateCDC(GW, GH)
 End Sub

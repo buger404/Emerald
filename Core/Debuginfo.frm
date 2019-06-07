@@ -29,8 +29,8 @@ Begin VB.Form Debuginfo
    StartUpPosition =   2  '屏幕中心
    Begin VB.Timer Reporter 
       Interval        =   20
-      Left            =   4968
-      Top             =   4608
+      Left            =   5496
+      Top             =   5208
    End
 End
 Attribute VB_Name = "Debuginfo"
@@ -53,7 +53,7 @@ Private Sub Reporter_Timer()
     Print "工程名：" & App.Title & vbCrLf
     Me.ForeColor = RGB(0, 176, 240)
     Me.CurrentX = 30
-    Print "鼠标状态：" & Mouse.State & "(" & Mouse.button & ")  (" & Mouse.X & "," & Mouse.Y & ")"
+    Print "鼠标状态：" & Mouse.state & "(" & Mouse.button & ")  (" & Mouse.x & "," & Mouse.y & ")"
     
     Me.ForeColor = RGB(113, 119, 66)
     Me.CurrentX = 30
