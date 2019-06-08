@@ -19,6 +19,7 @@ Public Key As Integer
 Public OpenTime As Long, DoneMark As Boolean, DoneStep As Integer
 Public DataPage As Integer
 Dim ChangeTime As Long, LastLoadPro As Single, LastLoadPro2 As Single
+Dim max2 As Long
 Public Sub Update()
     Page.Clear
     Select Case index
@@ -35,6 +36,12 @@ Public Sub SaveManDialog()
     
     Page.Paint 2, GW * 0.2, GH * 0.1, GW * 0.6, GH * 0.8, argb(255, 255, 255, 255), 30
     Page.Writes "存档管理", GW / 2, 83, 18, argb(255, 27, 27, 27), align:=StringAlignmentCenter
+    
+    If ESave Is Nothing Then
+        Page.Writes "此页面不可用，你没有创建存档。", GW / 2, GH / 2, 18, argb(150, 27, 27, 27), align:=StringAlignmentCenter
+        Exit Sub
+    End If
+    
     Page.Writes "key " & IIf(ESave.Key <> "", ESave.Key, "[Default]"), GW / 2, 107, 14, argb(150, 27, 27, 27), align:=StringAlignmentCenter
 
     Dim temp As String, temp2 As String

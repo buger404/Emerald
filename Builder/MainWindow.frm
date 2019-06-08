@@ -4,17 +4,17 @@ Begin VB.Form MainWindow
    BackColor       =   &H80000005&
    BorderStyle     =   0  'None
    Caption         =   "Emerald Builder"
-   ClientHeight    =   6670
-   ClientLeft      =   10
-   ClientTop       =   10
+   ClientHeight    =   6672
+   ClientLeft      =   12
+   ClientTop       =   12
    ClientWidth     =   9660
    Icon            =   "MainWindow.frx":0000
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   667
+   ScaleHeight     =   556
    ScaleMode       =   3  'Pixel
-   ScaleWidth      =   966
+   ScaleWidth      =   805
    StartUpPosition =   2  'ÆÁÄ»ÖÐÐÄ
    Begin VB.Timer DrawTimer 
       Enabled         =   0   'False

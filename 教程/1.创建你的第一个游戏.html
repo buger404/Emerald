@@ -1,0 +1,157 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="zh-cn">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Emerald 教程</title>
+
+<link rel="icon" href="favicon.ico" mce_href="favicon.ico" type="image/x-icon">
+<link rel="stylesheet" type="text/css" href="css/ui.css"></link>
+<script src="js/main.js"></script>  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="js/jquery-3.3.1.min.js"></script>
+
+
+</head>
+
+<body>
+  <div class="topbar" id="topbar">
+    <span class="logotext">EMERALD</span>
+    <select class="psselect" onchange="godiv(this.options[this.selectedIndex].value);">
+      <option value="0">CREATE YOUR FIRST GAME</option>
+      <option value="1"">MAKE YOUR FIRST PAGE</option>
+    </select>
+  </div>
+  <br>
+  <br>
+  <br>
+  <br>
+  <div class="centerdiv" id="sdiv0">
+    <span class="titletext">CREATE YOUR FIRST GAME</span>
+    <br>
+    <br>
+    <span class="contenttext">
+      首先，你需要从
+      <span class="hightext">Github</span>
+      上下载
+      <span class="hightext">Emerald</span>
+      。
+    </span>
+    <br>
+    <a class="linktext" target="_blank" href="https://github.com/Red-Error404/Emerald/releases">https://github.com/Red-Error404/Emerald/releases</a>
+    <br>
+    <br>
+    <img class="stepimg" src="img\step11.png">
+    <br>
+    <span class="contenttext">
+      运行目录下的
+      <span class="hightext">Builder.exe</span>
+    </span>
+    <br>
+    <img class="stepimg" src="img\step12.png">
+    <br>
+    <span class="contenttext">
+      在工程文件夹中右键，选择
+      <span class="hightext">在此处创建Emerald工程</span>
+      。
+    </span>
+    <br>
+    <img class="stepimg" src="img\step13.png">
+    <br>
+    <span class="contenttext">
+      输入你的工程名称。
+    </span>
+    <br>
+    <img class="stepimg" src="img\step14.png">
+    <br>
+    <span class="contenttext">
+      完成。
+    </span>
+  </div>
+
+  <br>
+
+  <div class="centerdiv" id="sdiv1">
+    <span class="titletext">MAKE YOUR FIRST PAGE</span>
+    <br>
+    <br>
+    <span class="contenttext">
+      在Emerald中，
+      <span class="hightext">GPage</span>
+      处理游戏页面，
+      <span class="hightext">GMan</span>
+      管理游戏页面。
+    </span>
+    <br>
+    <span class="contenttext">
+      因此，本章节中教程将会引导你顺利创建游戏窗口和游戏页面。
+    </span>
+    <br>
+    <br>
+    <span class="contenttext">
+      打开目录下的*.vbp
+    </span>
+    <br>
+    <img class="stepimg" src="img\step21.png">
+    <br>
+    <span class="contenttext">
+      在工程资源管理器中右键->添加->添加窗体
+    </span>
+    <br>
+    <img class="stepimg" src="img\step22.png">
+    <br>
+    <span class="contenttext">
+      在打开的对话框中选择Emerald 游戏窗口。
+    </span>
+    <br>
+    <br>
+    <div class="centerdiv" style="background-color:rgba(255,255,255,1);">
+      <span class="contenttext">
+        游戏窗口为游戏提供一个绘图的容器。你的游戏相关对象的创建将在该窗口中完成。
+      </span>
+    </div>
+    <br>
+    <br>
+    <span class="contenttext">
+      查看Form_Load中的代码，依照注释，确定你的窗口大小。
+    </span>
+    <br>
+    <span class="contenttext">
+      接着，在工程资源管理器中右键->添加->添加类模块
+    </span>
+    <br>
+    <span class="contenttext">
+      在打开的对话框中选择Emerald 页面。
+    </span>
+    <br>
+    <img class="stepimg" src="img\step23.png">
+    <span class="contenttext">
+      打开新的类模块的代码，找到Class_Initialize过程，参照注释，编辑页面名称。
+    </span>
+    <br>
+    <span class="contenttext">
+      然后，转到刚才创建的游戏窗口。
+    </span>
+    <br>
+    <img class="stepimg" src="img\step24.png">
+    <span class="contenttext">
+      在“通用”部分加入你的页面声明
+    </span>
+    <br>
+    <img class="stepimg" src="img\step25.png">
+    <span class="contenttext">
+      在Form_Load中创建它
+    </span>
+    <br>
+    <span class="contenttext">
+      修改下方的EC.ActivePage为你的页面名称，EC.ActivePage指向当前活动的页面，如果在此处不设置，游戏将不能进行。
+    </span>
+    <br>
+
+  </div>
+
+</body>
+
+</html>
