@@ -1,3 +1,5 @@
+var lastfind = -1;
+
 window.onscroll = function topbarFollow(){  
   var objs = document.getElementsByTagName("div");  
   var scrollt = document.body.scrollTop || document.documentElement.scrollTop;
@@ -39,4 +41,35 @@ function godiv(id){
   }
 
   return;
+}  
+
+function searchfor(str){  
+  var objs = document.getElementsByTagName("span");  
+  var finalmark = 0;
+
+  for(var step=0;step<2;step++){
+    for(var i=0;i<objs.length;i++){  
+
+      //测试通过寻找元素内容滑动页面
+      if((objs[i].innerText.indexOf(str) > 0) && (lastfind != i)){
+          objs[i].style.animationName = "searchlight";
+          objs[i].style.animationDuration = 2;
+          window.scrollTo({ 
+              top: objs[i].getBoundingClientRect().top - document.body.clientHeight / 2, 
+              behavior: "smooth" 
+          });    
+          lastfind = i;
+          finalmark = 1;  
+          break;
+      }
+
+    }
+
+    if(finalmark == 1){break;}
+    if(step + 1 == 1){objs = document.getElementsByTagName("td");}
+  }
+
+  lastfind = -1;
+  return;
+
 }  
