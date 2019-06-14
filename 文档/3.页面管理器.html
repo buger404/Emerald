@@ -1,0 +1,242 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="zh-cn">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Emerald 教程</title>
+
+<link rel="icon" href="favicon.ico" mce_href="favicon.ico" type="image/x-icon">
+<link rel="stylesheet" type="text/css" href="css/ui.css"></link>
+<script src="js/main.js"></script>  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="js/jquery-3.3.1.min.js"></script>
+
+
+</head>
+
+<body>
+  <div class="topbar" id="topbar">
+    <span class="logotext">EMERALD</span>
+    <select class="psselect" onchange="godiv(this.options[this.selectedIndex].value);">
+      <option value="0">CHANGE YOUR PAGES</option>
+      <option value="1">MAKE THE WINDOW BETTER</option>
+      <option value="2">OTHER</option>
+    </select>
+  </div>
+  <br>
+  <br>
+  <br>
+  <br>
+
+  <div class="centerdiv" id="sdiv0">
+    <span class="titletext">CHANGE YOUR PAGES</span>
+    <br>
+    <br>
+    <span class="contenttext">
+      根据文档1的步骤，你可以创建多个游戏页面，并由
+      <span class="hightext">ECore</span>
+      统一管理，你可以使用
+      <span class="hightext">ECore.ActivePage</span>
+      属性 或 
+      <span class="hightext">ECore.NewTransform</span>
+      方法进行切换页面。
+    </span>
+    <br>
+    <br>
+    
+    <span class="contenttext">
+        ECore.ActivePage 解说
+    </span>
+    <br>
+    <span class="contenttext">
+        赋值后游戏页面将立即切换到指定页面。
+        <br>
+        示例：ECore.ActivePage = "TestPage"
+    </span>
+    <br>
+    <br>
+    <span class="contenttext">
+        ECore.NewTransform 参数解说
+        <br>
+        该方法既可以用作切换页面，也可以作为过渡效果使用。
+    </span>
+    <table class="table">
+      <tr>
+        <td width="25%">参数名</td>
+        <td width="15%">类型</td>
+        <td width="60%">说明</td>
+      </tr>
+      <tr>
+        <td>[optional] kind</td>
+        <td>TranslationKind</td>
+        <td>将要显示的过渡效果</td>
+      </tr>
+      <tr>
+        <td>[optional] during</td>
+        <td>Long</td>
+        <td>过渡效果持续的时长(ms)</td>
+      </tr>
+      <tr>
+        <td>[optional] newPage</td>
+        <td>String</td>
+        <td>将要切换到的页面的名称，此参数被省略时则不进行页面切换。</td>
+      </tr>
+
+    </table>
+
+    <span class="contenttext">
+        TranslationKind 枚举
+    </span>
+    <table class="table">
+      <tr>
+        <td width="25%">名称</td>
+        <td width="15%">值</td>
+        <td width="60%">说明</td>
+      </tr>
+      <tr>
+        <td>transFadeIn</td>
+        <td>0</td>
+        <td>淡入</td>
+      </tr>
+      <tr>
+        <td>transFadeOut</td>
+        <td>1</td>
+        <td>淡出</td>
+      </tr>
+      <tr>
+        <td>transToRight</td>
+        <td>2</td>
+        <td>向右飞出</td>
+      </tr>
+      <tr>
+        <td>transToLeft</td>
+        <td>3</td>
+        <td>向左飞出</td>
+      </tr>
+      <tr>
+        <td>transToUp</td>
+        <td>4</td>
+        <td>向上飞出</td>
+      </tr>
+      <tr>
+        <td>transToDown</td>
+        <td>5</td>
+        <td>向下飞出</td>
+      </tr>
+      <tr>
+        <td>transToRightFade</td>
+        <td>6</td>
+        <td>向右飞出+淡出</td>
+      </tr>
+      <tr>
+        <td>transToLeftFade</td>
+        <td>7</td>
+        <td>向左飞出+淡出</td>
+      </tr>
+      <tr>
+        <td>transToUpFade</td>
+        <td>8</td>
+        <td>向上飞出+淡出</td>
+      </tr>
+      <tr>
+        <td>transToDownFade</td>
+        <td>9</td>
+        <td>向下飞出+淡出</td>
+      </tr>
+      <tr>
+        <td>transHighLight</td>
+        <td>10</td>
+        <td>闪光</td>
+      </tr>
+      <tr>
+        <td>transFallDark</td>
+        <td>11</td>
+        <td>变暗</td>
+      </tr>
+
+    </table>
+
+  </div>
+
+  <br>
+
+  <div class="centerdiv" id="sdiv1">
+    <span class="titletext">MAKE THE WINDOW BETTER</span>
+    <br>
+    <br>
+    <span class="contenttext">
+      <span class="hightext">Layered</span>
+      方法将使游戏窗口变为分层窗口（使用前请确认你的窗口没有标题栏）。
+      <br>
+      NOTE: 如果你正在制作的是游戏，建议不要这么做（太骚了）。
+    </span>
+    <br>
+    <br>
+    
+    <span class="contenttext">
+        ECore.Layered 参数说明
+    </span>
+    <table class="table">
+      <tr>
+        <td width="25%">参数名</td>
+        <td width="15%">类型</td>
+        <td width="60%">说明</td>
+      </tr>
+      <tr>
+        <td>[optional] WithAero</td>
+        <td>Boolean</td>
+        <td>是否开启Win7 Aero/Win10 亚克力效果，默认为False。</td>
+      </tr>
+
+    </table>
+
+  </div>
+
+  <br>
+  <br>
+
+  <div class="centerdiv" id="sdiv3">
+    <span class="titletext">OTHER</span>
+    <br>
+    <br>
+    <span class="contenttext">
+      Emerald的页面在创建时需要把自己添加到页面管理器，使用的方法是ECore的
+      <span class="hightext">Add</span>
+      方法。
+    </span>
+    <br>
+    <br>
+    
+    <span class="contenttext">
+      ECore.Add 参数解说
+    </span>
+    <table class="table">
+      <tr>
+        <td width="25%">参数名</td>
+        <td width="15%">类型</td>
+        <td width="60%">说明</td>
+      </tr>
+      <tr>
+        <td>p</td>
+        <td>GPage</td>
+        <td>Emerald 页面的绘制器，即模板提供的类模块中的Page。</td>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>String</td>
+        <td>新增页面的名称</td>
+      </tr>
+    </table>
+
+  </div>
+
+  <br>
+  <br>
+
+  <!--emmmmmmm-->
+
+</body>
+
+</html>

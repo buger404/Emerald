@@ -1,5 +1,5 @@
 Attribute VB_Name = "AeroEffect"
-'Emerald Ïà¹Ø´úÂë
+'Emerald ï¿½ï¿½Ø´ï¿½ï¿½ï¿½
 
 Private Declare Function DwmIsCompositionEnabled Lib "DwmApi.dll" (ByRef Enabled As Boolean) As Long
 Private Declare Function DwmEnableComposition Lib "DwmApi.dll" (ByVal compositionAction As CompositionEnable) As Long
