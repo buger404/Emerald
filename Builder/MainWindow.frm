@@ -38,6 +38,11 @@ Private Sub DrawTimer_Timer()
     EC.Display
 End Sub
 
+Private Sub Form_KeyPress(KeyAscii As Integer)
+    '发送字符输入
+    If TextHandle <> 0 Then WaitChr = WaitChr & Chr(KeyAscii)
+End Sub
+
 Private Sub Form_Load()
     '初始化Emerald
     StartEmerald Me.Hwnd, 805, 556

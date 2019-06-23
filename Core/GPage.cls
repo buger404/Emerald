@@ -671,6 +671,63 @@ ReShape:
     End Function
 '========================================================
     'Control
+    Public Function ShowEdit(text As String, shape As Integer, x As Long, y As Long, w As Long, h As Long, TextColor As Long, Color As Long, HoverColor As Long, LineColor As Long, Optional Radius As Long = 0, Optional ShapeStyle As Integer = 0, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
+        Dim m As Integer, r As RECT
+        
+        m = CheckMouse(x, y, w, h)
+        Paint shape, x, y, w, h, IIf(m <> 0 Or TextHandle = VarPtr(text), HoverColor, Color), Radius, style:=ShapeStyle
+        If m = 3 Then TextHandle = VarPtr(text)
+        
+        Dim CtrlPressed As Boolean
+        CtrlPressed = (GetAsyncKeyState(vk_ctrl) <> 0)
+        
+        If VarPtr(text) = TextHandle And WaitChr <> "" Then
+            If WaitChr = Chr(vbKeyReturn) Then
+                TextHandle = 0
+            ElseIf WaitChr = Chr(vbKeyBack) Then
+                If Len(text) > 0 Then text = Left(text, Len(text) - 1)
+            ElseIf Asc(WaitChr) = 22 Then '粘贴
+                On Error Resume Next
+                text = text & Clipboard.GetText
+            ElseIf Asc(WaitChr) = 3 Then '复制
+                On Error Resume Next
+                Clipboard.Clear
+                Clipboard.SetText text
+            ElseIf Asc(WaitChr) = 24 Then '剪切
+                On Error Resume Next
+                Clipboard.Clear
+                Clipboard.SetText text
+                text = ""
+            ElseIf Asc(WaitChr) <= 26 Then  '其他Ctrl组合键
+                
+            Else
+                text = text & WaitChr
+            End If
+            WaitChr = ""
+        End If
+        
+        If Mouse.state = 2 And m = 0 Then TextHandle = 0
+        
+        Writes text, x, y + h / 2 - size / 0.75 / 2 - 1, size, TextColor, w, size / 0.75, StringAlignmentNear, style
+        
+        If TextHandle = VarPtr(text) Then
+            Dim w2 As Long, pro As Long, alpha As Single
+            w2 = EF.GetWidth(GG, text, size, StringAlignmentNear, style)
+            Paint 0, x - 1, y - 1, w + 1, h + 1, LineColor, style:=1
+            pro = GetTickCount Mod 1000
+            If pro <= 700 Then
+                alpha = 1 - Cubic(pro / 700, 0, 1, 1, 1)
+            Else
+                alpha = Cubic((pro - 700) / 300, 0, 1, 1, 1)
+            End If
+            Dim co(3) As Byte, co2 As Long
+            co2 = IIf(m <> 0 Or TextHandle = VarPtr(text), HoverColor, Color)
+            CopyMemory co(0), co2, 4
+            If alpha <> 0 Then Paint 0, x + w2, y + h / 2 - size / 2, 3, size, argb(Int(alpha * 255), 255 - co(2), 255 - co(1), 255 - co(0))
+        End If
+        
+        ShowEdit = m
+    End Function
     Public Sub ShowLoading(x As Long, y As Long, w As Long, h As Long, size As Long, color1 As Long, color2 As Long, color3 As Long)
         
         PaintArc x, y, w, h, 120, (GetTickCount Mod 3000) / 3000 * 360, color3, size * 0.86, 1

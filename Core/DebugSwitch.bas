@@ -9,6 +9,12 @@ Attribute VB_Name = "DebugSwitch"
 
 '==============================================================================
 '   版本更新注意事项
+'   1.文本框的加入
+'     请在你的游戏窗口加入:
+'     Private Sub Form_KeyPress(KeyAscii As Integer)
+'         '发送字符输入
+'         If TextHandle <> 0 Then WaitChr = WaitChr & Chr(KeyAscii)
+'     End Sub
 '==============================================================================
 '   1.动画功能的加入
 '     请在你的每一个游戏页面模块加入：

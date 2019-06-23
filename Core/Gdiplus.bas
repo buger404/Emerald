@@ -5511,6 +5511,7 @@ Public Function argb(ByVal a As Long, ByVal r As Long, ByVal g As Long, ByVal b 
     If r > 255 Then r = 255
     If g > 255 Then g = 255
     If b > 255 Then b = 255
+    If a = 0 And r = 0 And g = 0 And b = 0 Then r = 1
     
     CopyMemory ByVal VarPtr(Color) + 3, a, 1
     CopyMemory ByVal VarPtr(Color) + 2, r, 1

@@ -83,6 +83,7 @@ Attribute VB_Name = "GCore"
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
     Public Const Version As Long = 19060706
+    Public TextHandle As Long, WaitChr As String
     Dim AssetsTrees() As AssetsTree
     Dim LastKeyUpRet As Boolean
     Dim Wndproc As Long

@@ -44,19 +44,31 @@ Dim brush As Long, fFile As String, fFam As Long, strF(2) As Long, Font(8, 1 To 
     End Sub
 '========================================================
 '   FontFromFile
-    Public Sub AddFont(ByVal file As String)
-        fFile = file
-        AddFontResource file
+    Public Sub AddFont(ByVal File As String)
+        fFile = File
+        AddFontResource File
     End Sub
 '========================================================
 '   Writer
-    Public Sub Writes(text As String, X As Long, Y As Long, g As Long, Color As Long, size As Long, w As Long, h As Long, ByVal align As StringAlignment, ByVal style As FontStyle)
+    Public Function GetWidth(g As Long, text As String, size As Long, ByVal align As StringAlignment, ByVal style As FontStyle) As Long
+        Dim r As RECTF, r2 As RECTF
+        GdipMeasureString g, StrPtr(text), Len(text), Font(style, size), r2, strF(align), r, 0, 0
+        
+        GetWidth = r.Right
+    End Function
+    Public Function GetHeight(g As Long, text As String, size As Long, ByVal align As StringAlignment, ByVal style As FontStyle) As Long
+        Dim r As RECTF, r2 As RECTF
+        GdipMeasureString g, StrPtr(text), Len(text), Font(style, size), r2, strF(align), r, 0, 0
+        
+        GetHeight = r.Bottom
+    End Function
+    Public Sub Writes(text As String, x As Long, y As Long, g As Long, Color As Long, size As Long, w As Long, h As Long, ByVal align As StringAlignment, ByVal style As FontStyle)
         On Error Resume Next
         If Font(style, size) = 0 Then
             GdipCreateFont fFam, size, style, UnitPixel, Font(style, size)
         End If
         
         If Color <> 0 Then GdipSetSolidFillColor brush, Color
-        GdipDrawString g, StrPtr(text), -1, Font(style, size), NewRectF(X, Y, w, h), strF(align), brush
+        GdipDrawString g, StrPtr(text), -1, Font(style, size), NewRectF(x, y, w, h), strF(align), brush
     End Sub
 '========================================================
