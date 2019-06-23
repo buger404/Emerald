@@ -22,12 +22,14 @@ Private Type SaveFile
     data() As SaveData
 End Type
 Dim MySave As SaveFile
+Public AutoSave As Boolean
 Public sToken As Boolean, path As String
 Public Key As String
 '========================================================
 '   Init
     Public Function Create(name As String, Optional BMKey) As Boolean
         path = "C:\Users\" & CreateObject("Wscript.Network").Username & "\AppData\Local\" & name
+        AutoSave = True
         
         If Not IsMissing(BMKey) Then Key = BMKey
         
@@ -115,6 +117,6 @@ Public Key As String
             MySave.data(UBound(MySave.data)).value = value
             MySave.data(UBound(MySave.data)).datacheck = IIf(Key = "", BMEA(value & UBound(MySave.data)), BMEA(value & UBound(MySave.data), Key))
         End If
-        Call Save
+        If AutoSave Then Call Save
     End Sub
 '========================================================
