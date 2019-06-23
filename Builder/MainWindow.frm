@@ -58,6 +58,7 @@ Private Sub Form_Load()
     '创建存档（可选）
     Set ESave = New GSaving
     ESave.Create "Emerald.builder", "Emerald.builder"
+    ESave.AutoSave = True
     
     '创建音乐列表
     Set MusicList = New GMusicList

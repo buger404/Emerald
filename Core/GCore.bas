@@ -82,7 +82,7 @@ Attribute VB_Name = "GCore"
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
-    Public Const Version As Long = 19062303
+    Public Const Version As Long = 19062304
     Public TextHandle As Long, WaitChr As String
     Dim AssetsTrees() As AssetsTree
     Dim LastKeyUpRet As Boolean
@@ -115,6 +115,7 @@ Attribute VB_Name = "GCore"
     
         Dim data As New GSaving
         data.Create "Emerald.Core"
+        data.AutoSave = True
         
         If data.GetData("DebugMode") = "" Then
             UpdateCheckInterval = 1
@@ -371,6 +372,7 @@ sth:
         
         Dim data As New GSaving
         data.Create "Emerald.Core"
+        data.AutoSave = True
         If Now - CDate(data.GetData("UpdateTime")) >= UpdateCheckInterval Or data.GetData("UpdateAble") = 1 Then
             data.PutData "UpdateTime", Now
             

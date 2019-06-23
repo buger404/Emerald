@@ -225,6 +225,7 @@ Public Sub CheckOnLineUpdate()
     
     Dim data As New GSaving
     data.Create "Emerald.Core"
+    data.AutoSave = True
     If Now - CDate(data.GetData("UpdateTime")) >= UpdateCheckInterval Or data.GetData("UpdateAble") = 1 Then
         data.PutData "UpdateTime", Now
         

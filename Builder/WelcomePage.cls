@@ -62,6 +62,7 @@ Public Sub DrawSet()
     If Page.ShowColorButton(0, GW / 2 - 130 / 2, GH - 80, 130, 40, "±£´æ", argb(255, 255, 255, 255), argb(255, 85, 219, 211), argb(255, 55, 189, 181), size:=16) = 3 Then
         Dim data As New GSaving
         data.Create "Emerald.Core"
+        data.AutoSave = True
         Call SaveSettings(data)
         Set data = Nothing
         
