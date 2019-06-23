@@ -12,19 +12,20 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Private Declare Function CLSIDFromString Lib "ole32.dll" (ByVal lpszProgID As Long, pCLSID As clsid) As Long
-
+Public HotLoad As Boolean
+Public AssetsFolder As String
 Dim Mems() As GMem
 
 Private Sub Class_Initialize()
     ReDim Mems(0)
 End Sub
-Public Sub Add(mem As Long, kind As Integer, name As String, Optional w, Optional h, Optional folder As String = "")
+Public Sub Add(mem As Long, kind As Integer, name As String, Optional w, Optional h, Optional Folder As String = "")
     ReDim Preserve Mems(UBound(Mems) + 1)
     With Mems(UBound(Mems))
         .Hwnd = mem
         .kind = kind
         .name = name
-        .folder = folder
+        .Folder = Folder
         If Not IsMissing(w) Then .w = w
         If Not IsMissing(h) Then .h = h
     End With
@@ -108,6 +109,15 @@ Public Function GetImage(ByVal name As String) As Integer
             If Mems(i).name = name Then GetImage = i: Exit For
         End If
     Next
+    
+    If HotLoad Then
+        If GetImage = 0 Then
+            If Dir(AssetsFolder & name) <> "" Then
+                newImage AssetsFolder & name
+                GetImage = UBound(Mems)
+            End If
+        End If
+    End If
 End Function
 Public Sub newImage(path As String, Optional arg1, Optional arg2)
     'when arg1 is missing ; i.w = i.w
@@ -151,7 +161,7 @@ Public Sub newImage(path As String, Optional arg1, Optional arg2)
     ReDim Preserve Mems(UBound(Mems) + 1)
     With Mems(UBound(Mems))
         .name = temp(UBound(temp))
-        .folder = temp(UBound(temp) - 1)
+        .Folder = temp(UBound(temp) - 1)
         .w = w
         .h = h
         .ImgHwnd = i
@@ -166,29 +176,32 @@ Public Sub newImage(path As String, Optional arg1, Optional arg2)
     Next
 End Sub
 Public Sub NewImages(path As String, Optional arg1, Optional arg2)
+    AssetsFolder = path
+    If HotLoad Then Exit Sub
+    
     Dim f As String, c As Long
     If Right(path, 1) <> "\" Then path = path & "\"
     
     Dim index As Integer, Tree As AssetsTree
-    Tree.path = path: ReDim Tree.Files(0)
+    Tree.path = path: ReDim Tree.files(0)
     index = FindAssetsTree(path, arg1, arg2)
     
     f = Dir(path)
     Do While f <> ""
         c = c + 1
-        ReDim Preserve Tree.Files(UBound(Tree.Files) + 1)
+        ReDim Preserve Tree.files(UBound(Tree.files) + 1)
         f = Dir()
     Loop
     If index = 0 Then
         PreLoadCount = PreLoadCount + c
     Else
         Tree = GetAssetsTree(path)
-        For i = 1 To UBound(Tree.Files)
+        For i = 1 To UBound(Tree.files)
             ReDim Preserve Mems(UBound(Mems) + 1)
-            Mems(UBound(Mems)) = Tree.Files(i)
+            Mems(UBound(Mems)) = Tree.files(i)
             Mems(UBound(Mems)).copyed = True
         Next
-        ReLoadCount = ReLoadCount + UBound(Tree.Files)
+        ReLoadCount = ReLoadCount + UBound(Tree.files)
         Exit Sub
     End If
     
@@ -202,7 +215,7 @@ Public Sub NewImages(path As String, Optional arg1, Optional arg2)
         Else
             newImage path & f, arg1, arg2
         End If
-        Tree.Files(i) = Mems(UBound(Mems))
+        Tree.files(i) = Mems(UBound(Mems))
         i = i + 1
         f = Dir()
         DoEvents
