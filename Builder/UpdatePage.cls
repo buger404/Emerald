@@ -280,6 +280,9 @@ Public Sub GetWarnStr()
         WarnStr = WarnStr & "存档机制修改（详情查看DebugSwitch模块中的注释）" & vbCrLf
         WarnStr = WarnStr & "动画的加入需要你修改部分代码（详情查看DebugSwitch模块中的注释）" & vbCrLf
     End If
+    If Val(AppInfo(0)) < 19062303 Then
+        WarnStr = WarnStr & "文本框控件的引入需要你添加一些代码（详情查看DebugSwitch模块中的注释）" & vbCrLf
+    End If
 End Sub
 Public Sub Leave()
     '页面离开事件
