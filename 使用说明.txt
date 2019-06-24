@@ -1,3 +1,6 @@
+关于游戏的开发请转到：
+https://github.com/buger404/Emerald/wiki
+
 工程的创建
 1.运行目录下的Builder.exe
 2.新建一个文件夹作为你的工程文件夹

@@ -29,6 +29,8 @@ Dim brush As Long, fFile As String, fFam As Long, strF(2) As Long, Font(8, 1 To 
             GdipSetStringFormatAlign strF(i), i
         Next
         GdipCreateSolidFill argb(255, 64, 64, 64), brush
+        
+        EmeraldInstalled = True
     End Sub
     Public Sub Dispose()
         If fFile <> "" Then RemoveFontResource fFile

@@ -698,7 +698,7 @@ ReShape:
                 Clipboard.Clear
                 Clipboard.SetText text
                 text = ""
-            ElseIf Asc(WaitChr) <= 26 Then  '其他Ctrl组合键
+            ElseIf Asc(WaitChr) <= 26 And Asc(WaitChr) >= 0 Then '其他Ctrl组合键
                 
             Else
                 text = text & WaitChr
@@ -708,12 +708,15 @@ ReShape:
         
         If Mouse.state = 2 And m = 0 Then TextHandle = 0
         
-        Writes text, x, y + h / 2 - size / 0.75 / 2 - 1, size, TextColor, w, size / 0.75, StringAlignmentNear, style
+        Writes text, x + Radius / 4, y + h / 2 - size / 0.75 / 2 - 1, size, TextColor, w - Radius / 2, size / 0.75, StringAlignmentNear, style
         
         If TextHandle = VarPtr(text) Then
             Dim w2 As Long, pro As Long, alpha As Single
             w2 = EF.GetWidth(GG, text, size, StringAlignmentNear, style)
-            Paint 0, x - 1, y - 1, w + 1, h + 1, LineColor, style:=1
+            If w2 > w - Radius / 2 Then
+                If Len(text) > 0 Then text = Left(text, Len(text) - 1): VBA.Beep
+            End If
+            Paint shape, x - 1, y - 1, w + 2, h + 2, LineColor, size:=2, Radius:=Radius, style:=1
             pro = GetTickCount Mod 1000
             If pro <= 700 Then
                 alpha = 1 - Cubic(pro / 700, 0, 1, 1, 1)
@@ -723,7 +726,7 @@ ReShape:
             Dim co(3) As Byte, co2 As Long
             co2 = IIf(m <> 0 Or TextHandle = VarPtr(text), HoverColor, Color)
             CopyMemory co(0), co2, 4
-            If alpha <> 0 Then Paint 0, x + w2, y + h / 2 - size / 2, 3, size, argb(Int(alpha * 255), 255 - co(2), 255 - co(1), 255 - co(0))
+            If alpha <> 0 Then Paint 0, x + w2 + Radius / 4, y + h / 2 - size / 2, 3, size, argb(Int(alpha * 255), 255 - co(2), 255 - co(1), 255 - co(0))
         End If
         
         ShowEdit = m
@@ -794,6 +797,27 @@ ReShape:
         Writes text, x + h + size / 0.75 / 2, y + h / 2 - size / 0.75 / 2, size, ForeColor, GW, size / 0.75, StringAlignmentNear, style
         
         ShowColorCheckBox = m
+    End Function
+    Public Function ShowSliderBar(value, pic As String, x As Long, y As Long) As Integer
+        Dim w As Long, h As Long, i As Integer, m As Integer
+        Dim X2 As Long, Y2 As Long
+        
+        X2 = x: Y2 = y
+        
+        i = Res.GetImage(pic)
+        w = Res.ImgSize(i, imgGetWidth): h = Res.ImgSize(i, imgGetHeight)
+        
+        m = CheckMouse(x, y, w, Int(h / 2))
+        DrawImage i, x, y, cy:=0, ch:=Int(h / 2), alpha:=1
+        DrawImage i, x, y, cy:=Int(h / 2), cw:=value * w, ch:=Int(h / 2), alpha:=1
+        
+        If m > 0 And Mouse.button > 0 Then
+            value = (Mouse.x - x) / w
+            If value < 0 Then value = 0
+            If value > 1 Then value = 1
+        End If
+        
+        ShowSliderBar = m
     End Function
     Public Function ShowHScrollBar(value, x As Long, y As Long, w As Long, h As Long, LineColor As Long, BallColor As Long, Optional size As Long = 2) As Integer
         Dim m As Integer
