@@ -3383,17 +3383,17 @@ Public Const SharpenEffectGuid                As String = "{63CBF3EE-C526-402C-8
 Public Const TintEffectGuid                   As String = "{1077AF00-2848-4441-9489-44AD4C2D7A2C}"
     
     Public Enum GdipEffectType
-        Blur
-        BrightnessContrast
-        ColorBalance
-        ColorCurve
-        ColorLookupTable
-        ColorMatrix
-        HueSaturationLightness
-        Levels
-        RedEyeCorrection
-        Sharpen
-        Tint
+        Blur = 0
+        BrightnessContrast = 1
+        ColorBalance = 2
+        ColorCurve = 3
+        ColorLookupTable = 4
+        ColorMatrix = 5
+        HueSaturationLightness = 6
+        Levels = 7
+        RedEyeCorrection = 8
+        Sharpen = 9
+        Tint = 10
     End Enum
     
     Public Enum HistogramFormat

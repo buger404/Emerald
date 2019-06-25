@@ -114,7 +114,12 @@ Public Sub Update()
                 'Page.DrawAnimation "test", 400, 250
                 'Page.DrawAnimation "test", 100, 0
                 
-                'Page.ShowEdit test, 2, 100, 100, 300, 40, argb(255, 255, 255, 255), argb(180, 32, 32, 32), argb(255, 32, 32, 32), argb(255, 64, 64, 64), 64, 0, 28
+                'If Page.ShowEdit(test, 2, 100, 100, 300, 40, argb(255, 0, 0, 0), argb(180, 255, 255, 255), argb(255, 255, 255, 255), argb(255, 210, 210, 210), 64, 0, 28) = 4 Then
+                '    MsgBox "文本框内容：" & test
+                'End If
+                'If Page.ShowEdit(test, 0, 100, 160, 300, 40, argb(255, 0, 0, 0), argb(180, 255, 255, 255), argb(255, 255, 255, 255), argb(255, 210, 210, 210), 0, 0, 28) = 4 Then
+                '    MsgBox "文本框内容：" & test
+                'End If
                 
                 Page.DrawImage "404.png", 165, GH / 2, alpha:=1 - pro, pos:=posOnCenter, animation:=1
                 
@@ -210,12 +215,30 @@ Private Sub Class_Initialize()
     Page.Create Me
     '导入游戏资源
     If PackPos = -1 Then
-        Page.Res.NewImages App.path & "\assets"
-        Page.Res.NewImages App.path & "\assets\debug"
+        Page.Res.NewImages App.Path & "\assets"
+        Page.Res.NewImages App.Path & "\assets\debug"
         '导入动画
         'Page.LoadAnimationsFromDir App.path & "\animation"
         'Page.CreatePlayAnimation   "test", "test", "Default"
     End If
+    Dim m(4, 4) As Single
+    m(0, 0) = 1: m(0, 1) = 0: m(0, 2) = 0: m(0, 3) = 0
+    m(1, 0) = 0: m(1, 1) = 0: m(1, 2) = 0: m(1, 3) = 0
+    m(2, 0) = 0: m(2, 1) = 0: m(2, 2) = 0: m(2, 3) = 0
+    m(3, 0) = 1: m(3, 1) = 0: m(3, 2) = 0: m(3, 3) = 1
+    
+    'Page.Res.ClipCircle "404.png"
+    '笔记
+    'Page.Res.ApplyBlurEffect 模糊半径，四周阴影
+    'ApplyBrightnessContrastEffect 亮度，对比度
+    'ApplyColorBalanceEffect 红色调，绿色调，蓝色调
+    'ApplyColorCurveEffect 对指定颜色通道应用某个特殊效果
+    'ApplyColorMatrixEffect 反正颜色矩阵就对了
+    'ApplyHueSaturationLightnessEffect 色相，亮度，饱和度
+    'ApplyLevelsEffect 高光，中间色，暗调
+    'ApplySharpenEffect 数量，锐化半径
+    'ApplyTintEffect 程度，色调
+    
     '创建页面
     ECore.Add Page, "WelcomePage"
     

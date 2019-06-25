@@ -24,9 +24,13 @@ Dim brush As Long, fFile As String, fFam As Long, strF(2) As Long, Font(8, 1 To 
         If fFam = 0 Then GdipCreateFontFamilyFromName StrPtr("ËÎÌו"), 0, fFam
         If fFam = 0 Then GdipCreateFontFamilyFromName StrPtr("System"), 0, fFam
         
+        Dim Flag As Long
         For i = 0 To 2
             GdipCreateStringFormat 0, 0, strF(i)
             GdipSetStringFormatAlign strF(i), i
+            'GdipStringFormatGetGenericTypographic strF(i)
+            GdipGetStringFormatFlags strF(i), Flag
+            GdipSetStringFormatFlags strF(i), (Flag Or StringFormatFlagsMeasureTrailingSpaces)
         Next
         GdipCreateSolidFill argb(255, 64, 64, 64), brush
         

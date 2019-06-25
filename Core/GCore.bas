@@ -63,7 +63,7 @@ Attribute VB_Name = "GCore"
     End Type
     Public Type AssetsTree
         files() As GMem
-        path As String
+        Path As String
         arg1 As Variant
         arg2 As Variant
     End Type
@@ -82,7 +82,7 @@ Attribute VB_Name = "GCore"
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
-    Public Const Version As Long = 19062403
+    Public Const Version As Long = 19062503
     Public TextHandle As Long, WaitChr As String
     Dim AssetsTrees() As AssetsTree
     Dim LastKeyUpRet As Boolean
@@ -236,7 +236,7 @@ sth:
         
         GetWinNTVersion = Left(strOSversion, 3)
     End Function
-    Public Sub BlurTo(DC As Long, srcDC As Long, buffWin As Form, Optional Radius As Long = 60)
+    Public Sub BlurTo(DC As Long, srcDC As Long, buffWin As Form, Optional radius As Long = 60)
         Dim i As Long, g As Long, e As Long, b As BlurParams, w As Long, h As Long
         '粘贴到缓冲窗口
         buffWin.AutoRedraw = True
@@ -246,7 +246,7 @@ sth:
         GdipCreateBitmapFromHBITMAP buffWin.Image.handle, buffWin.Image.hpal, i
         
         '模糊操作
-        GdipCreateEffect2 GdipEffectType.Blur, e: b.Radius = Radius: GdipSetEffectParameters e, b, LenB(b)
+        GdipCreateEffect2 GdipEffectType.Blur, e: b.radius = radius: GdipSetEffectParameters e, b, LenB(b)
         GdipGetImageWidth i, w: GdipGetImageHeight i, h
         GdipBitmapApplyEffect i, e, NewRectL(0, 0, w, h), 0, 0, 0
         
@@ -256,12 +256,12 @@ sth:
         GdipDisposeImage i: GdipDeleteGraphics g: GdipDeleteEffect e '垃圾处理
         buffWin.AutoRedraw = False
     End Sub
-    Public Sub BlurImg(img As Long, Radius As Long)
+    Public Sub BlurImg(img As Long, radius As Long)
         Dim b As BlurParams, e As Long, w As Long, h As Long
         
         '模糊操作
 
-        GdipCreateEffect2 GdipEffectType.Blur, e: b.Radius = Radius: GdipSetEffectParameters e, b, LenB(b)
+        GdipCreateEffect2 GdipEffectType.Blur, e: b.radius = radius: GdipSetEffectParameters e, b, LenB(b)
         GdipGetImageWidth img, w: GdipGetImageHeight img, h
         GdipBitmapApplyEffect img, e, NewRectL(0, 0, w, h), 0, 0, 0
         
@@ -411,10 +411,10 @@ sth:
         ReDim Preserve AssetsTrees(UBound(AssetsTrees) + 1)
         AssetsTrees(UBound(AssetsTrees)) = Tree
     End Function
-    Public Function FindAssetsTree(path As String, arg1 As Variant, arg2 As Variant) As Integer
+    Public Function FindAssetsTree(Path As String, arg1 As Variant, arg2 As Variant) As Integer
         On Error Resume Next
         For i = 1 To UBound(AssetsTrees)
-            If AssetsTrees(i).path = path And AssetsTrees(i).arg1 = arg1 And AssetsTrees(i).arg2 = arg2 Then
+            If AssetsTrees(i).Path = Path And AssetsTrees(i).arg1 = arg1 And AssetsTrees(i).arg2 = arg2 Then
                 If Err.Number <> 0 Then
                     Err.Clear
                 Else
@@ -423,9 +423,9 @@ sth:
             End If
         Next
     End Function
-    Public Function GetAssetsTree(path As String) As AssetsTree
+    Public Function GetAssetsTree(Path As String) As AssetsTree
         For i = 1 To UBound(AssetsTrees)
-            If AssetsTrees(i).path = path Then GetAssetsTree = AssetsTrees(i): Exit For
+            If AssetsTrees(i).Path = Path Then GetAssetsTree = AssetsTrees(i): Exit For
         Next
     End Function
 '========================================================

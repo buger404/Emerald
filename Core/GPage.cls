@@ -445,7 +445,7 @@ Public TopPage As Boolean
             GdipDrawRectangle GG, Pen, DrawF.Left, DrawF.top, DrawF.Right + 1, DrawF.Bottom + 1
         End If
     End Sub
-    Public Sub Paint(ByVal shape As Integer, x As Long, y As Long, w As Long, h As Long, Optional Color As Long, Optional Radius As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0)
+    Public Sub Paint(ByVal shape As Integer, x As Long, y As Long, w As Long, h As Long, Optional Color As Long, Optional radius As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0)
         'shape:0=rect,1=ellipse,2=rectr
         'style:0=fill,1=border
         'If OutOfScroll Then Exit Sub
@@ -489,17 +489,17 @@ ReShape:
         If shape = 1 Then GdipAddPathEllipse path, ox, oy, ow - 1, oh - 1
         If shape = 2 Then
         
-            If Radius = 0 Then
+            If radius = 0 Then
                 shape = 0: GoTo ReShape
             End If
             
-            If Radius > ow Then Radius = ow
-            If Radius > oh Then Radius = oh
+            If radius > ow Then radius = ow
+            If radius > oh Then radius = oh
             
-            GdipAddPathArc path, ox, oy, Radius, Radius, 180, 90
-            GdipAddPathArc path, ox + ow - Radius, oy, Radius, Radius, 270, 90
-            GdipAddPathArc path, ox + ow - Radius, oy + oh - Radius, Radius, Radius, 0, 90
-            GdipAddPathArc path, ox, oy + oh - Radius, Radius, Radius, 90, 90
+            GdipAddPathArc path, ox, oy, radius, radius, 180, 90
+            GdipAddPathArc path, ox + ow - radius, oy, radius, radius, 270, 90
+            GdipAddPathArc path, ox + ow - radius, oy + oh - radius, radius, radius, 0, 90
+            GdipAddPathArc path, ox, oy + oh - radius, radius, radius, 90, 90
             GdipClosePathFigure path
             
         End If
@@ -671,11 +671,11 @@ ReShape:
     End Function
 '========================================================
     'Control
-    Public Function ShowEdit(text As String, shape As Integer, x As Long, y As Long, w As Long, h As Long, TextColor As Long, Color As Long, HoverColor As Long, LineColor As Long, Optional Radius As Long = 0, Optional ShapeStyle As Integer = 0, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
+    Public Function ShowEdit(text As String, shape As Integer, x As Long, y As Long, w As Long, h As Long, TextColor As Long, Color As Long, HoverColor As Long, LineColor As Long, Optional radius As Long = 0, Optional ShapeStyle As Integer = 0, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
         Dim m As Integer, r As RECT
         
-        m = CheckMouse(x, y, w, h)
-        Paint shape, x, y, w, h, IIf(m <> 0 Or TextHandle = VarPtr(text), HoverColor, Color), Radius, style:=ShapeStyle
+        m = CheckMouse(x, y, w - IIf(TextHandle = VarPtr(text), h, 0), h)
+        Paint shape, x, y, w, h, IIf(m <> 0 Or TextHandle = VarPtr(text), HoverColor, Color), radius, style:=ShapeStyle
         If m = 3 Then TextHandle = VarPtr(text)
         
         Dim CtrlPressed As Boolean
@@ -684,6 +684,7 @@ ReShape:
         If VarPtr(text) = TextHandle And WaitChr <> "" Then
             If WaitChr = Chr(vbKeyReturn) Then
                 TextHandle = 0
+                m = 4
             ElseIf WaitChr = Chr(vbKeyBack) Then
                 If Len(text) > 0 Then text = Left(text, Len(text) - 1)
             ElseIf Asc(WaitChr) = 22 Then 'Õ³Ìù
@@ -706,17 +707,15 @@ ReShape:
             WaitChr = ""
         End If
         
-        If Mouse.state = 2 And m = 0 Then TextHandle = 0
-        
-        Writes text, x + Radius / 4, y + h / 2 - size / 0.75 / 2 - 1, size, TextColor, w - Radius / 2, size / 0.75, StringAlignmentNear, style
+        Writes text, x + radius / 4, y + h / 2 - size / 0.75 / 2 - 1, size, TextColor, w - radius / 2 - h, size / 0.75, StringAlignmentNear, style
         
         If TextHandle = VarPtr(text) Then
             Dim w2 As Long, pro As Long, alpha As Single
             w2 = EF.GetWidth(GG, text, size, StringAlignmentNear, style)
-            If w2 > w - Radius / 2 Then
+            If w2 > w - radius / 2 - h Then
                 If Len(text) > 0 Then text = Left(text, Len(text) - 1): VBA.Beep
             End If
-            Paint shape, x - 1, y - 1, w + 2, h + 2, LineColor, size:=2, Radius:=Radius, style:=1
+            Paint shape, x, y, w, h, LineColor, size:=2, radius:=radius, style:=1
             pro = GetTickCount Mod 1000
             If pro <= 700 Then
                 alpha = 1 - Cubic(pro / 700, 0, 1, 1, 1)
@@ -726,10 +725,26 @@ ReShape:
             Dim co(3) As Byte, co2 As Long
             co2 = IIf(m <> 0 Or TextHandle = VarPtr(text), HoverColor, Color)
             CopyMemory co(0), co2, 4
-            If alpha <> 0 Then Paint 0, x + w2 + Radius / 4, y + h / 2 - size / 2, 3, size, argb(Int(alpha * 255), 255 - co(2), 255 - co(1), 255 - co(0))
+            If w2 = 0 Then w2 = size / 4
+            If alpha <> 0 Then Paint 0, x + w2 + radius / 4 - size / 8, y + h / 2 - size / 2, 3, size, argb(Int(alpha * 255), 255 - co(2), 255 - co(1), 255 - co(0))
+            
+            Paint shape, x + w - h, y, h, h, LineColor, radius:=radius
+            If CheckMouse2 = mMouseUp Then
+                TextHandle = 0
+                m = 4
+            End If
+            
+            If shape = 2 Then
+                Writes ">", x + w - h, y + h / 2 - size / 0.75 / 2 - 1, size, TextColor, h + 6, size / 0.75, StringAlignmentCenter, FontStyleBold
+            Else
+                Writes ">", x + w - h, y + h / 2 - size / 0.75 / 2 - 2, size, TextColor, h + 3, size / 0.75, StringAlignmentCenter, FontStyleBold
+            End If
         End If
         
+        If Mouse.state = 2 And m = 0 Then TextHandle = 0: m = 4
+        
         ShowEdit = m
+        
     End Function
     Public Sub ShowLoading(x As Long, y As Long, w As Long, h As Long, size As Long, color1 As Long, color2 As Long, color3 As Long)
         
@@ -762,11 +777,11 @@ ReShape:
     
         ShowSimpleButton = m
     End Function
-    Public Function ShowColorButton(shape As Integer, x As Long, y As Long, w As Long, h As Long, text As String, TextColor As Long, Color As Long, HoverColor As Long, Optional Radius As Long = 0, Optional ShapeStyle As Integer = 0, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
+    Public Function ShowColorButton(shape As Integer, x As Long, y As Long, w As Long, h As Long, text As String, TextColor As Long, Color As Long, HoverColor As Long, Optional radius As Long = 0, Optional ShapeStyle As Integer = 0, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
         Dim m As Integer
         
         m = CheckMouse(x, y, w, h)
-        Paint shape, x, y, w, h, IIf(m, HoverColor, Color), Radius, style:=ShapeStyle
+        Paint shape, x, y, w, h, IIf(m, HoverColor, Color), radius, style:=ShapeStyle
         
         Writes text, x, y + h / 2 - size / 0.75 / 2, size, TextColor, w, size / 0.75, StringAlignmentCenter, style
     
