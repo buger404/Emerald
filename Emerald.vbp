@@ -34,6 +34,7 @@ Class=UpdatePage; Builder\UpdatePage.cls
 Module=SetupPackage; Builder\SetupPackage.bas
 Module=SpecialDirs; Builder\SpecialDirs.bas
 Module=Animations; Core\Animations.bas
+Class=GCrashBox; core\GCrashBox.cls
 IconForm="MainWindow"
 Startup="Sub Main"
 HelpFile=""

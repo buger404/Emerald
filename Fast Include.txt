@@ -23,3 +23,4 @@ Module=AboutMe; Core\AboutMe.bas
 Class=GResource; Core\GResource.cls
 Module=AeroEffect; Core\AeroEffect.bas
 Module=Animations; Core\Animations.bas
+Class=GCrashBox; core\GCrashBox.cls

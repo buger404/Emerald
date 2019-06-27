@@ -60,7 +60,7 @@ Attribute VB_Name = "GCore"
         w As Long
         h As Long
         copyed As Boolean
-        CrashPath As Long
+        CrashIndex As Long
     End Type
     Public Type AssetsTree
         files() As GMem
@@ -74,16 +74,29 @@ Attribute VB_Name = "GCore"
         DirVertical = 2
         DirHorizontalVertical = 3
     End Enum
+    Public Type GraphicsBound
+        x As Long
+        y As Long
+        Width As Long
+        Height As Long
+        CrashIndex As Long
+        Shape As Long
+        Strings As String
+    End Type
+    Public Type ColorCollection
+        IsAlpha() As Boolean
+    End Type
+    Public ColorLists() As ColorCollection
     Public ECore As GMan, EF As GFont, EAni As Object, ESave As GSaving, EMusic As GMusicList
     Public GHwnd As Long, GDC As Long, GW As Long, GH As Long
-    Public Mouse As MState, DrawF As RECT
+    Public Mouse As MState, DrawF As GraphicsBound
     Public FPS As Long, FPSt As Long, tFPS As Long, FPSct As Long, FPSctt As Long
     Public SysPage As GSysPage
     Public PreLoadCount As Long, LoadedCount As Long, ReLoadCount As Long
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
-    Public Const Version As Long = 19062503
+    Public Const Version As Long = 19062702
     Public TextHandle As Long, WaitChr As String
     Dim AssetsTrees() As AssetsTree
     Dim LastKeyUpRet As Boolean
@@ -138,7 +151,8 @@ Attribute VB_Name = "GCore"
         Set data = Nothing
     End Sub
     Public Sub StartEmerald(Hwnd As Long, w As Long, h As Long)
-    
+        ReDim ColorLists(0)
+            
         Dim strComputer, objWMIService, colItems, objItem, strOSversion As String
         strComputer = "."
         Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\cimv2")
@@ -340,7 +354,7 @@ sth:
     End Function
     Public Function CheckMouse2() As MButtonState
         'Return Value:0=none,1=in,2=down,3=up
-        If Mouse.x >= DrawF.Left And Mouse.y >= DrawF.top And Mouse.x <= DrawF.Left + DrawF.Right And Mouse.y <= DrawF.top + DrawF.Bottom Then
+        If Mouse.x >= DrawF.x And Mouse.y >= DrawF.y And Mouse.x <= DrawF.x + DrawF.Width And Mouse.y <= DrawF.y + DrawF.Height Then
             CheckMouse2 = Mouse.state + 1
             If Mouse.state = 2 Then Mouse.state = 0
         End If
@@ -383,7 +397,7 @@ sth:
             
             Dim xmlHttp As Object, Ret As String, Start As Long
             Set xmlHttp = CreateObject("Microsoft.XMLHTTP")
-            xmlHttp.open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
+            xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
             xmlHttp.send
                          
             Start = GetTickCount

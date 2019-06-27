@@ -233,7 +233,6 @@ Public Sub Dispose()
                     For s = 0 To 3
                         If Mems(i).Imgs(s) <> 0 Then DeleteObject Mems(i).Imgs(s)
                     Next
-                    If Mems(i).CrashPath <> 0 Then GdipDeletePath Mems(i).CrashPath
                 Case 1 'Graphics
                     GdipDeleteGraphics Mems(i).Hwnd
             End Select
@@ -270,8 +269,8 @@ End Property
 Public Property Get ResourceHandle(index As Integer) As Long
     ResourceHandle = Mems(index).Hwnd
 End Property
-Public Property Get ResourceCrashPath(index As Integer) As Long
-    ResourceCrashPath = Mems(index).CrashPath
+Public Property Get ResourceCrashIndex(index As Integer) As Long
+    ResourceCrashIndex = Mems(index).CrashIndex
 End Property
 Public Property Get ResourceHandle2(index As Integer, Direction As ImgDirection) As Long
     ResourceHandle2 = Mems(index).Imgs(Direction)
@@ -352,66 +351,26 @@ Public Sub newImage(path As String, Optional arg1, Optional arg2)
         Mems(UBound(Mems)).Imgs(s) = DC
     Next
     
-    Dim tempCo As Long, tCo(3) As Byte, edgePoints() As POINTF
+    Dim tempCo As Long, tCo(3) As Byte
     Dim iW As Long, iH As Long
-    Dim RoundCount As Long, ImgMap() As Byte
-    ReDim edgePoints(0): ReDim ImgMap(w + 1, h + 1)
+
+    ReDim Preserve ColorLists(UBound(ColorLists) + 1)
+    ReDim ColorLists(UBound(ColorLists)).IsAlpha(w + 1, h + 1)
     
     DC = Mems(UBound(Mems)).Imgs(0)
     GdipGetImageWidth i, iW: GdipGetImageHeight i, iH
-    For x = 0 To w - 1
-        For y = 0 To h - 1
+    For X = 0 To w - 1
+        For Y = 0 To h - 1
             '取得像素点颜色
-            GdipBitmapGetPixel i, x / (w - 1) * iW, y / (h - 1) * iH, tempCo
+            GdipBitmapGetPixel i, X / (w - 1) * iW, Y / (h - 1) * iH, tempCo
             CopyMemory tCo(0), tempCo, 4
 
-            If tCo(3) = 255 Then ImgMap(x + 1, y + 1) = tCo(3)
+            If tCo(3) = 255 Then ColorLists(UBound(ColorLists)).IsAlpha(X, Y) = True
         Next
         DoEvents
     Next
     
-    Dim PathArea As Long, StartX As Long, StartY As Long, EndX As Long, EndY As Long
-    
-    StartX = (w - 1) / 2: StartY = 0: EndX = w - 1: EndY = (h - 1) / 2
-addPath:
-    For x = StartX To EndX
-        For y = StartY To EndY
-            '取得像素点颜色
-            
-            RoundCount = 0
-            If ImgMap(x + 1, (y + 1) + 1) Then RoundCount = RoundCount + 1
-            If ImgMap((x + 1) + 1, y + 1) Then RoundCount = RoundCount + 1
-            If ImgMap((x + 1) - 1, y + 1) Then RoundCount = RoundCount + 1
-            If ImgMap(x + 1, (y + 1) - 1) Then RoundCount = RoundCount + 1
-            
-            '四边被填充的个数小于2（可以判定为边缘顶点）
-            If ImgMap(x + 1, y + 1) = 255 And RoundCount <= 2 Then '如果完全不透明
-                '加入边缘路径顶点
-                With edgePoints(UBound(edgePoints))
-                    .x = x: .y = y
-                End With
-                ReDim Preserve edgePoints(UBound(edgePoints) + 1)
-            End If
-        Next
-        DoEvents
-    Next
-    PathArea = PathArea + 1
-    '以图片中心为原点建立平面直角坐标系，从第一象限->第四->第三->第二，顺时针依次加入构成一个封闭的路径
-    If PathArea = 1 Then StartX = (w - 1) / 2: StartY = (h - 1) / 2: EndX = w - 1: EndY = h - 1
-    If PathArea = 2 Then StartX = 0: StartY = (h - 1) / 2: EndX = (w - 1) / 2: EndY = h - 1
-    If PathArea = 3 Then StartX = 0: StartY = 0: EndX = (w - 1) / 2: EndY = (h - 1) / 2
-    If PathArea <= 3 Then GoTo addPath
-    
-    If UBound(edgePoints) <> 0 Then
-        ReDim Preserve edgePoints(UBound(edgePoints) - 1)
-        '根据边缘路径顶点创建路径
-        GdipCreatePath FillModeWinding, CrashPath
-         
-        GdipAddPathPolygon CrashPath, edgePoints(0), UBound(edgePoints) + 1
-        GdipClosePathFigure CrashPath
-    End If
-    
-    Mems(UBound(Mems)).CrashPath = CrashPath
+    Mems(UBound(Mems)).CrashIndex = UBound(ColorLists)
 End Sub
 Public Sub NewImages(path As String, Optional arg1, Optional arg2)
     AssetsFolder = path
