@@ -60,10 +60,11 @@ Attribute VB_Name = "GCore"
         w As Long
         h As Long
         copyed As Boolean
+        CrashPath As Long
     End Type
     Public Type AssetsTree
         files() As GMem
-        Path As String
+        path As String
         arg1 As Variant
         arg2 As Variant
     End Type
@@ -101,6 +102,11 @@ Attribute VB_Name = "GCore"
         strBuf = Left(strBuf, InStr(strBuf, Chr(0)))
         ReadINI = strBuf
     End Function
+    Public Sub OutPutDebug(str As String)
+        Open App.path & "\debug.txt" For Append As #1
+        Print #1, Now & "    " & str
+        Close #1
+    End Sub
 '================================================================================
 '   Init
     Public Sub SaveSettings(data As GSaving)
@@ -377,7 +383,7 @@ sth:
             
             Dim xmlHttp As Object, Ret As String, Start As Long
             Set xmlHttp = CreateObject("Microsoft.XMLHTTP")
-            xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
+            xmlHttp.open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
             xmlHttp.send
                          
             Start = GetTickCount
@@ -411,10 +417,10 @@ sth:
         ReDim Preserve AssetsTrees(UBound(AssetsTrees) + 1)
         AssetsTrees(UBound(AssetsTrees)) = Tree
     End Function
-    Public Function FindAssetsTree(Path As String, arg1 As Variant, arg2 As Variant) As Integer
+    Public Function FindAssetsTree(path As String, arg1 As Variant, arg2 As Variant) As Integer
         On Error Resume Next
         For i = 1 To UBound(AssetsTrees)
-            If AssetsTrees(i).Path = Path And AssetsTrees(i).arg1 = arg1 And AssetsTrees(i).arg2 = arg2 Then
+            If AssetsTrees(i).path = path And AssetsTrees(i).arg1 = arg1 And AssetsTrees(i).arg2 = arg2 Then
                 If Err.Number <> 0 Then
                     Err.Clear
                 Else
@@ -423,9 +429,9 @@ sth:
             End If
         Next
     End Function
-    Public Function GetAssetsTree(Path As String) As AssetsTree
+    Public Function GetAssetsTree(path As String) As AssetsTree
         For i = 1 To UBound(AssetsTrees)
-            If AssetsTrees(i).Path = Path Then GetAssetsTree = AssetsTrees(i): Exit For
+            If AssetsTrees(i).path = path Then GetAssetsTree = AssetsTrees(i): Exit For
         Next
     End Function
 '========================================================

@@ -122,7 +122,7 @@ Public Sub Update()
                 'End If
                 
                 Page.DrawImage "404.png", 165, GH / 2, alpha:=1 - pro, pos:=posOnCenter, animation:=1
-                
+
                 'Page.ShowColorCheckBox Debug_focus, 20, 100, 200, 24, "Debug_Switch", argb(255, 222, 222, 222), argb(255, 0, 176, 240), argb(150, 242, 242, 242), 18
                 
                 Page.Writes "关于", 350 + pro * 22, 170 + pro * 36, Color:=argb(255, 242, 242, 242), size:=18 + pro * 4, animation:=1, style:=FontStyleBold
@@ -215,8 +215,8 @@ Private Sub Class_Initialize()
     Page.Create Me
     '导入游戏资源
     If PackPos = -1 Then
-        Page.Res.NewImages App.Path & "\assets"
-        Page.Res.NewImages App.Path & "\assets\debug"
+        Page.Res.NewImages App.path & "\assets"
+        Page.Res.NewImages App.path & "\assets\debug"
         '导入动画
         'Page.LoadAnimationsFromDir App.path & "\animation"
         'Page.CreatePlayAnimation   "test", "test", "Default"

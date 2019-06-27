@@ -28,7 +28,7 @@ Public Sub ClipCircle(n)
         index = n
     End If
 
-    Dim Path As Long, bmpGraph As Long, BMP As Long, BMP2 As Long, tempGraph As Long
+    Dim path As Long, bmpGraph As Long, BMP As Long, BMP2 As Long, tempGraph As Long
     Dim w As Long, h As Long
     
     GdipGetImageWidth Mems(index).ImgHwnd, w
@@ -42,9 +42,9 @@ Public Sub ClipCircle(n)
     GdipSetSmoothingMode tempGraph, SmoothingModeAntiAlias
     GdipSetSmoothingMode bmpGraph, SmoothingModeAntiAlias
     
-    GdipCreatePath FillModeWinding, Path
-    GdipAddPathEllipseI Path, 1, 1, w * 2 - 2, h * 2 - 2
-    GdipSetClipPath bmpGraph, Path, CombineModeReplace
+    GdipCreatePath FillModeWinding, path
+    GdipAddPathEllipseI path, 1, 1, w * 2 - 2, h * 2 - 2
+    GdipSetClipPath bmpGraph, path, CombineModeReplace
     
     GdipDrawImageRectI bmpGraph, Mems(index).ImgHwnd, 0, 0, w * 2, h * 2
     GdipResetClip bmpGraph
@@ -53,7 +53,7 @@ Public Sub ClipCircle(n)
     
     GdipDrawImageRectI tempGraph, BMP, 0, 0, w - 1, h - 1
 
-    GdipDeletePath Path
+    GdipDeletePath path
     GdipDeleteGraphics bmpGraph
     GdipDisposeImage BMP
     GdipDeleteGraphics tempGraph
@@ -233,6 +233,7 @@ Public Sub Dispose()
                     For s = 0 To 3
                         If Mems(i).Imgs(s) <> 0 Then DeleteObject Mems(i).Imgs(s)
                     Next
+                    If Mems(i).CrashPath <> 0 Then GdipDeletePath Mems(i).CrashPath
                 Case 1 'Graphics
                     GdipDeleteGraphics Mems(i).Hwnd
             End Select
@@ -269,6 +270,9 @@ End Property
 Public Property Get ResourceHandle(index As Integer) As Long
     ResourceHandle = Mems(index).Hwnd
 End Property
+Public Property Get ResourceCrashPath(index As Integer) As Long
+    ResourceCrashPath = Mems(index).CrashPath
+End Property
 Public Property Get ResourceHandle2(index As Integer, Direction As ImgDirection) As Long
     ResourceHandle2 = Mems(index).Imgs(Direction)
 End Property
@@ -291,7 +295,7 @@ Public Function GetImage(ByVal name As String) As Integer
         End If
     End If
 End Function
-Public Sub newImage(Path As String, Optional arg1, Optional arg2)
+Public Sub newImage(path As String, Optional arg1, Optional arg2)
     'when arg1 is missing ; i.w = i.w
     'when arg2 is missing but arg1 has content ; i.w = i.w * arg1
     'other ; i.w = arg1
@@ -300,17 +304,18 @@ Public Sub newImage(Path As String, Optional arg1, Optional arg2)
     If IsMissing(arg2) And (Not IsMissing(arg1)) Then si = 1
     If (Not IsMissing(arg2)) And (Not IsMissing(arg1)) Then si = 2
     
-    GdipCreateBitmapFromFile StrPtr(Path), i
+    GdipCreateBitmapFromFile StrPtr(path), i
     GdipGetImageWidth i, w: GdipGetImageHeight i, h
     
     If si = 1 Then w = Round(w * arg1): h = Round(h * arg1)
     If si = 2 Then w = arg1: h = arg2
     
-    Dim gC As clsid, gL As Long, index As Long, temp() As String
+    Dim gC As clsid, gL As Long, index As Long, temp() As String, CrashPath As Long
     CLSIDFromString StrPtr("{6AEDBD6D-3FB5-418A-83A6-7F45229DC872}"), gC
     GdipImageGetFrameCount i, gC, gL
+    
     If gL > 0 Then  '动态GIF支持
-        temp = Split(Path, "\")
+        temp = Split(path, "\")
         Add 0, 0, temp(UBound(temp)), w, h, temp(UBound(temp) - 1)
         With Mems(UBound(Mems))
             .GIF.Count = gL
@@ -329,7 +334,7 @@ Public Sub newImage(Path As String, Optional arg1, Optional arg2)
         Exit Sub
     End If
     
-    temp = Split(Path, "\")
+    temp = Split(path, "\")
     ReDim Preserve Mems(UBound(Mems) + 1)
     With Mems(UBound(Mems))
         .name = temp(UBound(temp))
@@ -346,19 +351,80 @@ Public Sub newImage(Path As String, Optional arg1, Optional arg2)
         GdipDeleteGraphics g
         Mems(UBound(Mems)).Imgs(s) = DC
     Next
+    
+    Dim tempCo As Long, tCo(3) As Byte, edgePoints() As POINTF
+    Dim iW As Long, iH As Long
+    Dim RoundCount As Long, ImgMap() As Byte
+    ReDim edgePoints(0): ReDim ImgMap(w + 1, h + 1)
+    
+    DC = Mems(UBound(Mems)).Imgs(0)
+    GdipGetImageWidth i, iW: GdipGetImageHeight i, iH
+    For x = 0 To w - 1
+        For y = 0 To h - 1
+            '取得像素点颜色
+            GdipBitmapGetPixel i, x / (w - 1) * iW, y / (h - 1) * iH, tempCo
+            CopyMemory tCo(0), tempCo, 4
+
+            If tCo(3) = 255 Then ImgMap(x + 1, y + 1) = tCo(3)
+        Next
+        DoEvents
+    Next
+    
+    Dim PathArea As Long, StartX As Long, StartY As Long, EndX As Long, EndY As Long
+    
+    StartX = (w - 1) / 2: StartY = 0: EndX = w - 1: EndY = (h - 1) / 2
+addPath:
+    For x = StartX To EndX
+        For y = StartY To EndY
+            '取得像素点颜色
+            
+            RoundCount = 0
+            If ImgMap(x + 1, (y + 1) + 1) Then RoundCount = RoundCount + 1
+            If ImgMap((x + 1) + 1, y + 1) Then RoundCount = RoundCount + 1
+            If ImgMap((x + 1) - 1, y + 1) Then RoundCount = RoundCount + 1
+            If ImgMap(x + 1, (y + 1) - 1) Then RoundCount = RoundCount + 1
+            
+            '四边被填充的个数小于2（可以判定为边缘顶点）
+            If ImgMap(x + 1, y + 1) = 255 And RoundCount <= 2 Then '如果完全不透明
+                '加入边缘路径顶点
+                With edgePoints(UBound(edgePoints))
+                    .x = x: .y = y
+                End With
+                ReDim Preserve edgePoints(UBound(edgePoints) + 1)
+            End If
+        Next
+        DoEvents
+    Next
+    PathArea = PathArea + 1
+    '以图片中心为原点建立平面直角坐标系，从第一象限->第四->第三->第二，顺时针依次加入构成一个封闭的路径
+    If PathArea = 1 Then StartX = (w - 1) / 2: StartY = (h - 1) / 2: EndX = w - 1: EndY = h - 1
+    If PathArea = 2 Then StartX = 0: StartY = (h - 1) / 2: EndX = (w - 1) / 2: EndY = h - 1
+    If PathArea = 3 Then StartX = 0: StartY = 0: EndX = (w - 1) / 2: EndY = (h - 1) / 2
+    If PathArea <= 3 Then GoTo addPath
+    
+    If UBound(edgePoints) <> 0 Then
+        ReDim Preserve edgePoints(UBound(edgePoints) - 1)
+        '根据边缘路径顶点创建路径
+        GdipCreatePath FillModeWinding, CrashPath
+         
+        GdipAddPathPolygon CrashPath, edgePoints(0), UBound(edgePoints) + 1
+        GdipClosePathFigure CrashPath
+    End If
+    
+    Mems(UBound(Mems)).CrashPath = CrashPath
 End Sub
-Public Sub NewImages(Path As String, Optional arg1, Optional arg2)
-    AssetsFolder = Path
+Public Sub NewImages(path As String, Optional arg1, Optional arg2)
+    AssetsFolder = path
     If HotLoad Then Exit Sub
     
     Dim f As String, c As Long
-    If Right(Path, 1) <> "\" Then Path = Path & "\"
+    If Right(path, 1) <> "\" Then path = path & "\"
     
     Dim index As Integer, Tree As AssetsTree
-    Tree.Path = Path: ReDim Tree.files(0)
-    index = FindAssetsTree(Path, arg1, arg2)
+    Tree.path = path: ReDim Tree.files(0)
+    index = FindAssetsTree(path, arg1, arg2)
     
-    f = Dir(Path)
+    f = Dir(path)
     Do While f <> ""
         c = c + 1
         ReDim Preserve Tree.files(UBound(Tree.files) + 1)
@@ -367,7 +433,7 @@ Public Sub NewImages(Path As String, Optional arg1, Optional arg2)
     If index = 0 Then
         PreLoadCount = PreLoadCount + c
     Else
-        Tree = GetAssetsTree(Path)
+        Tree = GetAssetsTree(path)
         For i = 1 To UBound(Tree.files)
             ReDim Preserve Mems(UBound(Mems) + 1)
             Mems(UBound(Mems)) = Tree.files(i)
@@ -377,15 +443,15 @@ Public Sub NewImages(Path As String, Optional arg1, Optional arg2)
         Exit Sub
     End If
     
-    f = Dir(Path)
+    f = Dir(path)
     i = 1
     Do While f <> ""
         If IsMissing(arg1) Then
-            newImage Path & f
+            newImage path & f
         ElseIf IsMissing(arg2) Then
-            newImage Path & f, arg1
+            newImage path & f, arg1
         Else
-            newImage Path & f, arg1, arg2
+            newImage path & f, arg1, arg2
         End If
         Tree.files(i) = Mems(UBound(Mems))
         i = i + 1
