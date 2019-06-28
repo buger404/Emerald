@@ -12,58 +12,58 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Dim tF As GraphicsBound
-Dim Result As Boolean
+Dim result As Boolean
 Public Sub Reset()
     tF = DrawF
-    Result = False
+    result = False
 End Sub
 Public Function CrashResult() As Boolean
-    CrashResult = Result
+    CrashResult = result
 End Function
 Public Function IsCrash() As Boolean
 
     Dim StartX As Long, StartY As Long, EndX As Long, EndY As Long
-    If tF.X > DrawF.X Then
-        StartX = tF.X: EndX = DrawF.X + DrawF.Width
+    If tF.x > DrawF.x Then
+        StartX = tF.x: EndX = DrawF.x + DrawF.Width
     Else
-        StartX = DrawF.X: EndX = tF.X + tF.Width
+        StartX = DrawF.x: EndX = tF.x + tF.Width
     End If
-    If tF.Y > DrawF.Y Then
-        StartY = tF.Y: EndY = DrawF.Y + DrawF.Height
+    If tF.y > DrawF.y Then
+        StartY = tF.y: EndY = DrawF.y + DrawF.Height
     Else
-        StartY = DrawF.Y: EndY = tF.Y + tF.Height
+        StartY = DrawF.y: EndY = tF.y + tF.Height
     End If
     
     '碰都没碰到！GUN！
     If EndX - StartX < 0 Or EndY - StartY < 0 Then Exit Function
     
     '哦。那绝对撞到了。GUN！
-    If DrawF.Shape <> -1 Then Result = True: IsCrash = True: Exit Function
+    If DrawF.Shape <> -1 Then result = True: IsCrash = True: Exit Function
     
     If tF.CrashIndex = 0 Or DrawF.CrashIndex = 0 Then Exit Function
     
-    Dim ret As Boolean
-    Dim x2 As Long, y2 As Long
+    Dim Ret As Boolean
+    Dim X2 As Long, Y2 As Long
     Dim w1 As Long, w2 As Long, h1 As Long, h2 As Long
     w1 = UBound(ColorLists(tF.CrashIndex).IsAlpha, 1)
     h1 = UBound(ColorLists(tF.CrashIndex).IsAlpha, 2)
     w2 = UBound(ColorLists(DrawF.CrashIndex).IsAlpha, 1)
     h2 = UBound(ColorLists(DrawF.CrashIndex).IsAlpha, 2)
     
-    For X = StartX - tF.X To EndX - tF.X
-        For Y = StartY - tF.Y To EndY - tF.Y
-            If X <= w1 And Y <= h1 And X >= 0 And Y >= 0 Then
-                If ColorLists(tF.CrashIndex).IsAlpha(X, Y) Then
-                    ret = True
-                    x2 = X + tF.X - DrawF.X
-                    y2 = Y + tF.Y - DrawF.Y
-                    If x2 <= w2 And y2 <= h2 And x2 >= 0 And y2 >= 0 Then
-                        ret = ret And ColorLists(DrawF.CrashIndex).IsAlpha(x2, y2)
+    For x = StartX - tF.x To EndX - tF.x
+        For y = StartY - tF.y To EndY - tF.y
+            If x * tF.WSc <= w1 And y * tF.HSc <= h1 And x >= 0 And y >= 0 Then
+                If ColorLists(tF.CrashIndex).IsAlpha(x * tF.WSc, y * tF.HSc) Then
+                    Ret = True
+                    X2 = (x + tF.x - DrawF.x) * DrawF.WSc
+                    Y2 = (y + tF.y - DrawF.y) * DrawF.HSc
+                    If X2 <= w2 And Y2 <= h2 And X2 >= 0 And Y2 >= 0 Then
+                        Ret = Ret And ColorLists(DrawF.CrashIndex).IsAlpha(X2, Y2)
                     Else
-                        ret = False
+                        Ret = False
                     End If
                     '撞到我了！赔钱！没钱？GUN！
-                    If ret Then Result = True: IsCrash = True: Exit Function
+                    If Ret Then result = True: IsCrash = True: Exit Function
                 End If
             End If
         Next
