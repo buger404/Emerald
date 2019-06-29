@@ -435,7 +435,7 @@ SkipName:
         If Dir(p & "\assets\debug", vbDirectory) = "" Then MkDir p & "\assets\debug"
         If Dir(p & "\music", vbDirectory) = "" Then MkDir p & "\music"
         
-        CopyInto App.path & "\core", p & "\core"
+        CopyInto App.path & "\core", p & "\core", True
         CopyInto App.path & "\assets\debug", p & "\assets\debug"
         CopyInto App.path & "\framework", p
         
@@ -481,7 +481,7 @@ Function Dialog(t As String, c As String, ParamArray b()) As Integer
     Dialog = DialogPage.Key
     ECore.NewTransform transFadeIn, 700, last
 End Function
-Sub CopyInto(Src As String, Dst As String)
+Sub CopyInto(Src As String, Dst As String, Optional WriteCache As Boolean = False)
     Dim f As String, p As Boolean
     p = Dir(Dst & "\Core.bas") <> ""
     f = Dir(Src & "\")
@@ -490,6 +490,12 @@ Sub CopyInto(Src As String, Dst As String)
             If p Then GoTo skip
         End If
         FileCopy Src & "\" & f, Dst & "\" & f
+        If WriteCache Then
+            Open Cmd & "\.emr\cache\" & f For Output As #1
+            Print #1, FileLen(Dst & "\" & f)
+            Close #1
+        End If
+        
         DoEvents
 skip:
         f = Dir()
