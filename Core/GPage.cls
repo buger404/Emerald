@@ -167,11 +167,11 @@ Public TopPage As Boolean
                 If .aframes(i).size <> 1 Then m = 0
                 
                 If m = 0 Then
-                    w = Res.ImgSize(.aframes(i).picindex, imgGetwidth) * .aframes(i).size
+                    w = Res.ImgSize(.aframes(i).picindex, imgGetWidth) * .aframes(i).size
                     h = Res.ImgSize(.aframes(i).picindex, imgGetHeight) * .aframes(i).size
                     DrawImageEx .aframes(i).picindex, x + .aframes(i).x, y + .aframes(i).y, w, h, PlayAni(s).position
                 Else
-                    DrawImage .aframes(i).picindex, x + .aframes(i).x, y + .aframes(i).y, Pos:=PlayAni(s).position, alpha:=.aframes(i).alpha
+                    DrawImage .aframes(i).picindex, x + .aframes(i).x, y + .aframes(i).y, pos:=PlayAni(s).position, alpha:=.aframes(i).alpha
                 End If
             Next
             
@@ -199,7 +199,7 @@ Public TopPage As Boolean
         End With
         
     End Sub
-    Public Sub DrawImageEx(n, x As Long, y As Long, Optional w, Optional h, Optional Pos As PosAlign = posNormal, Optional animation As Integer = 0)
+    Public Sub DrawImageEx(n, x As Long, y As Long, Optional w, Optional h, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0)
         Dim index As Integer
         
         Dim OX As Long, OY As Long, ow As Long, oh As Long
@@ -229,11 +229,11 @@ Public TopPage As Boolean
         If IsMissing(ow) Then GdipGetImageWidth Res.ResourceImageHandle(index), ow
         If IsMissing(oh) Then GdipGetImageWidth Res.ResourceImageHandle(index), oh
         
-        If Pos = 1 Then OX = Int(OX - ow / 2): OY = Int(OY - oh / 2)
-        If Pos = 2 Then OX = OX - ow
-        If Pos = 3 Then OY = OY - oh
-        If Pos = 4 Then OX = OX + ow
-        If Pos = 5 Then OY = OY + oh
+        If pos = 1 Then OX = Int(OX - ow / 2): OY = Int(OY - oh / 2)
+        If pos = 2 Then OX = OX - ow
+        If pos = 3 Then OY = OY - oh
+        If pos = 4 Then OX = OX + ow
+        If pos = 5 Then OY = OY + oh
         
         If ScrollMode Then
             OX = OX + ScrollX + ScrollBX: OY = OY + ScrollY + ScrollBY
@@ -251,7 +251,7 @@ Public TopPage As Boolean
             .Height = oh
             .CrashIndex = Res.ResourceCrashIndex(index)
             .Shape = -1
-            .WSc = Res.ImgSize(index, imgGetwidth) / .Width
+            .WSc = Res.ImgSize(index, imgGetWidth) / .Width
             .HSc = Res.ImgSize(index, imgGetHeight) / .Height
         End With
         
@@ -266,7 +266,7 @@ Public TopPage As Boolean
             GdipDrawLine GG, Pen, x, y - 5, x, y + 5
         End If
     End Sub
-    Public Sub DrawImage(n, x As Long, y As Long, Optional cx, Optional cy, Optional cw, Optional ch, Optional alpha, Optional Pos As PosAlign = posNormal, Optional animation As Integer = 0, Optional Direction As ImgDirection = DirNormal)
+    Public Sub DrawImage(n, x As Long, y As Long, Optional cx, Optional cy, Optional cw, Optional ch, Optional alpha, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0, Optional Direction As ImgDirection = DirNormal)
         'If OutOfScroll Then Exit Sub
         
         Dim b As BLENDFUNCTION, index As Integer, bl As Long
@@ -304,14 +304,14 @@ Public TopPage As Boolean
         
         If IsMissing(cx) Then ocx = 0 Else: ocx = cx
         If IsMissing(cy) Then ocy = 0 Else: ocy = cy
-        If IsMissing(cw) Then ocw = Res.ImgSize(index, imgGetwidth) - ocx Else: ocw = cw
+        If IsMissing(cw) Then ocw = Res.ImgSize(index, imgGetWidth) - ocx Else: ocw = cw
         If IsMissing(ch) Then och = Res.ImgSize(index, imgGetHeight) - ocy Else: och = ch
         
-        If Pos = 1 Then OX = Int(OX - ocw / 2): OY = Int(OY - och / 2)
-        If Pos = 2 Then OX = OX - ocw
-        If Pos = 3 Then OY = OY - och
-        If Pos = 4 Then OX = OX + ocw
-        If Pos = 5 Then OY = OY + och
+        If pos = 1 Then OX = Int(OX - ocw / 2): OY = Int(OY - och / 2)
+        If pos = 2 Then OX = OX - ocw
+        If pos = 3 Then OY = OY - och
+        If pos = 4 Then OX = OX + ocw
+        If pos = 5 Then OY = OY + och
         
         If ScrollMode Then
             OX = OX + ScrollX + ScrollBX: OY = OY + ScrollY + ScrollBY
@@ -458,7 +458,7 @@ Public TopPage As Boolean
             GdipDrawRectangle GG, Pen, DrawF.x, DrawF.y, DrawF.Width + 1, DrawF.Height + 1
         End If
     End Sub
-    Public Sub Paint(ByVal Shape As Integer, x As Long, y As Long, w As Long, h As Long, Optional Color As Long, Optional Radius As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional Pos As PosAlign = posNormal, Optional animation As Integer = 0)
+    Public Sub Paint(ByVal Shape As Integer, x As Long, y As Long, w As Long, h As Long, Optional Color As Long, Optional radius As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0)
         'shape:0=rect,1=ellipse,2=rectr
         'style:0=fill,1=border
         'If OutOfScroll Then Exit Sub
@@ -491,28 +491,28 @@ Public TopPage As Boolean
         
         GdipResetPath path
         
-        If Pos = 1 Then OX = Int(OX - ow / 2): OY = Int(OY - oh / 2)
-        If Pos = 2 Then OX = OX - ow
-        If Pos = 3 Then OY = OY - oh
-        If Pos = 4 Then OX = OX + ow
-        If Pos = 5 Then OY = OY + oh
+        If pos = 1 Then OX = Int(OX - ow / 2): OY = Int(OY - oh / 2)
+        If pos = 2 Then OX = OX - ow
+        If pos = 3 Then OY = OY - oh
+        If pos = 4 Then OX = OX + ow
+        If pos = 5 Then OY = OY + oh
         
 ReShape:
         If Shape = 0 Then GdipAddPathRectangle path, OX, OY, ow - 1, oh - 1
         If Shape = 1 Then GdipAddPathEllipse path, OX, OY, ow - 1, oh - 1
         If Shape = 2 Then
         
-            If Radius = 0 Then
+            If radius = 0 Then
                 Shape = 0: GoTo ReShape
             End If
             
-            If Radius > ow Then Radius = ow
-            If Radius > oh Then Radius = oh
+            If radius > ow Then radius = ow
+            If radius > oh Then radius = oh
             
-            GdipAddPathArc path, OX, OY, Radius, Radius, 180, 90
-            GdipAddPathArc path, OX + ow - Radius, OY, Radius, Radius, 270, 90
-            GdipAddPathArc path, OX + ow - Radius, OY + oh - Radius, Radius, Radius, 0, 90
-            GdipAddPathArc path, OX, OY + oh - Radius, Radius, Radius, 90, 90
+            GdipAddPathArc path, OX, OY, radius, radius, 180, 90
+            GdipAddPathArc path, OX + ow - radius, OY, radius, radius, 270, 90
+            GdipAddPathArc path, OX + ow - radius, OY + oh - radius, radius, radius, 0, 90
+            GdipAddPathArc path, OX, OY + oh - radius, radius, radius, 90, 90
             GdipClosePathFigure path
             
         End If
@@ -550,7 +550,7 @@ ReShape:
             GdipDrawLine GG, Pen, x, y - 5, x, y + 5
         End If
     End Sub
-    Public Sub PaintArc(x As Long, y As Long, w As Long, h As Long, degree As Long, Optional Start As Long = 0, Optional Color As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional Pos As PosAlign = posNormal, Optional animation As Integer = 0)
+    Public Sub PaintArc(x As Long, y As Long, w As Long, h As Long, degree As Long, Optional Start As Long = 0, Optional Color As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0)
         'style:0=fill,1=border,2=sector
 
         Dim OX As Long, OY As Long, ow As Long, oh As Long
@@ -581,11 +581,11 @@ ReShape:
         
         GdipResetPath path
         
-        If Pos = 1 Then OX = Int(x - ow / 2): OY = Int(y - oh / 2)
-        If Pos = 2 Then OX = OX - ow
-        If Pos = 3 Then OY = OY - oh
-        If Pos = 4 Then OX = OX + ow
-        If Pos = 5 Then OY = OY + oh
+        If pos = 1 Then OX = Int(x - ow / 2): OY = Int(y - oh / 2)
+        If pos = 2 Then OX = OX - ow
+        If pos = 3 Then OY = OY - oh
+        If pos = 4 Then OX = OX + ow
+        If pos = 5 Then OY = OY + oh
         
         GdipAddPathArc path, OX, OY, ow, oh, Start, degree
         If style = 2 Then GdipAddPathLine path, OX + ow / 2, OY + ow / 2, OX + ow / 2, OY + ow / 2
@@ -620,6 +620,31 @@ ReShape:
             GdipSetPenColor Pen, argb(255, 0, 183, 195)
             GdipDrawLine GG, Pen, x - 5, y, x + 5, y
             GdipDrawLine GG, Pen, x, y - 5, x, y + 5
+        End If
+    End Sub
+    Public Sub PaintPolygon2(Color As Long, style As Integer, Points())
+
+        GdipResetPath path
+        Dim p() As POINTF
+        ReDim p((UBound(Points) - 1) / 2)
+        For i = 0 To UBound(Points) Step 2
+            p(i / 2).x = Points(i): p(i / 2).y = Points(i + 1)
+        Next
+        
+        GdipAddPathPolygon path, p(0), UBound(p) + 1
+        
+        If style = 0 Then GdipSetSolidFillColor brush, Color
+        If style = 1 Then
+            GdipSetPenColor Pen, Color
+            GdipSetPenWidth Pen, size
+        End If
+        
+        If style = 0 Then GdipFillPath GG, brush, path
+        If style = 1 Then GdipDrawPath GG, Pen, path
+        
+        If Debug_focus Then
+            GdipSetPenColor Pen, argb(255, 0, 176, 240)
+            GdipDrawPath GG, Pen, path
         End If
     End Sub
     Public Sub PaintPolygon(Color As Long, style As Integer, ParamArray Points())
@@ -678,21 +703,21 @@ ReShape:
         
         NewAnimation = UBound(Anis)
     End Function
-    Public Sub StartAnimation(ID As Integer, Optional delay As Long = 0)
-        Anis(ID).Start = GetTickCount
-        Anis(ID).delay = delay
-        Anis(ID).mark = False
+    Public Sub StartAnimation(id As Integer, Optional delay As Long = 0)
+        Anis(id).Start = GetTickCount
+        Anis(id).delay = delay
+        Anis(id).mark = False
     End Sub
-    Public Function AnimationDone(ID As Integer) As Boolean
-        AnimationDone = Anis(ID).mark
+    Public Function AnimationDone(id As Integer) As Boolean
+        AnimationDone = Anis(id).mark
     End Function
 '========================================================
     'Control
-    Public Function ShowEdit(text As String, Shape As Integer, x As Long, y As Long, w As Long, h As Long, TextColor As Long, Color As Long, HoverColor As Long, LineColor As Long, Optional Radius As Long = 0, Optional ShapeStyle As Integer = 0, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
+    Public Function ShowEdit(text As String, Shape As Integer, x As Long, y As Long, w As Long, h As Long, TextColor As Long, Color As Long, HoverColor As Long, LineColor As Long, Optional radius As Long = 0, Optional ShapeStyle As Integer = 0, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
         Dim m As Integer, r As RECT
         
         m = CheckMouse(x, y, w - IIf(TextHandle = VarPtr(text), h, 0), h)
-        Paint Shape, x, y, w, h, IIf(m <> 0 Or TextHandle = VarPtr(text), HoverColor, Color), Radius, style:=ShapeStyle
+        Paint Shape, x, y, w, h, IIf(m <> 0 Or TextHandle = VarPtr(text), HoverColor, Color), radius, style:=ShapeStyle
         If m = 3 Then TextHandle = VarPtr(text)
         
         Dim CtrlPressed As Boolean
@@ -724,15 +749,15 @@ ReShape:
             WaitChr = ""
         End If
         
-        Writes text, x + Radius / 4, y + h / 2 - size / 0.75 / 2 - 1, size, TextColor, w - Radius / 2 - h, size / 0.75, StringAlignmentNear, style
+        Writes text, x + radius / 4, y + h / 2 - size / 0.75 / 2 - 1, size, TextColor, w - radius / 2 - h, size / 0.75, StringAlignmentNear, style
         
         If TextHandle = VarPtr(text) Then
             Dim w2 As Long, pro As Long, alpha As Single
             w2 = EF.GetWidth(GG, text, size, StringAlignmentNear, style)
-            If w2 > w - Radius / 2 - h Then
+            If w2 > w - radius / 2 - h Then
                 If Len(text) > 0 Then text = Left(text, Len(text) - 1): VBA.Beep
             End If
-            Paint Shape, x, y, w, h, LineColor, size:=2, Radius:=Radius, style:=1
+            Paint Shape, x, y, w, h, LineColor, size:=2, radius:=radius, style:=1
             pro = GetTickCount Mod 1000
             If pro <= 700 Then
                 alpha = 1 - Cubic(pro / 700, 0, 1, 1, 1)
@@ -743,9 +768,9 @@ ReShape:
             co2 = IIf(m <> 0 Or TextHandle = VarPtr(text), HoverColor, Color)
             CopyMemory co(0), co2, 4
             If w2 = 0 Then w2 = size / 4
-            If alpha <> 0 Then Paint 0, x + w2 + Radius / 4 - size / 8, y + h / 2 - size / 2, 3, size, argb(Int(alpha * 255), 255 - co(2), 255 - co(1), 255 - co(0))
+            If alpha <> 0 Then Paint 0, x + w2 + radius / 4 - size / 8, y + h / 2 - size / 2, 3, size, argb(Int(alpha * 255), 255 - co(2), 255 - co(1), 255 - co(0))
             
-            Paint Shape, x + w - h, y, h, h, LineColor, Radius:=Radius
+            Paint Shape, x + w - h, y, h, h, LineColor, radius:=radius
             If CheckMouse2 = mMouseUp Then
                 TextHandle = 0
                 m = 4
@@ -773,7 +798,7 @@ ReShape:
     Public Function ShowButton(pic As String, x As Long, y As Long, text As String, Color As Long, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
         Dim w As Long, h As Long, i As Integer, m As Integer
         i = Res.GetImage(pic)
-        w = Res.ImgSize(i, imgGetwidth): h = Res.ImgSize(i, imgGetHeight)
+        w = Res.ImgSize(i, imgGetWidth): h = Res.ImgSize(i, imgGetHeight)
         
         m = CheckMouse(x, y, w, Int(h / 2))
         DrawImage i, x, y, cy:=IIf(m <> 0, Int(h / 2), 0), ch:=Int(h / 2), alpha:=1
@@ -785,7 +810,7 @@ ReShape:
     Public Function ShowSimpleButton(pic As String, x As Long, y As Long, text As String, Color As Long, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
         Dim w As Long, h As Long, i As Integer, m As Integer
         i = Res.GetImage(pic)
-        w = Res.ImgSize(i, imgGetwidth): h = Res.ImgSize(i, imgGetHeight)
+        w = Res.ImgSize(i, imgGetWidth): h = Res.ImgSize(i, imgGetHeight)
         
         m = CheckMouse(x, y, w, h)
         DrawImage i, x, y, alpha:=IIf(m, 1, 0.8)
@@ -794,11 +819,11 @@ ReShape:
     
         ShowSimpleButton = m
     End Function
-    Public Function ShowColorButton(Shape As Integer, x As Long, y As Long, w As Long, h As Long, text As String, TextColor As Long, Color As Long, HoverColor As Long, Optional Radius As Long = 0, Optional ShapeStyle As Integer = 0, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
+    Public Function ShowColorButton(Shape As Integer, x As Long, y As Long, w As Long, h As Long, text As String, TextColor As Long, Color As Long, HoverColor As Long, Optional radius As Long = 0, Optional ShapeStyle As Integer = 0, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
         Dim m As Integer
         
         m = CheckMouse(x, y, w, h)
-        Paint Shape, x, y, w, h, IIf(m, HoverColor, Color), Radius, style:=ShapeStyle
+        Paint Shape, x, y, w, h, IIf(m, HoverColor, Color), radius, style:=ShapeStyle
         
         Writes text, x, y + h / 2 - size / 0.75 / 2, size, TextColor, w, size / 0.75, StringAlignmentCenter, style
     
@@ -810,7 +835,7 @@ ReShape:
         X2 = x: Y2 = y
         
         i = Res.GetImage(pic)
-        w = Res.ImgSize(i, imgGetwidth): h = Res.ImgSize(i, imgGetHeight)
+        w = Res.ImgSize(i, imgGetWidth): h = Res.ImgSize(i, imgGetHeight)
         
         m = CheckMouse(x, y, w, Int(h / 2))
         DrawImage i, x, y, cy:=IIf(value = True, Int(h / 2), 0), ch:=Int(h / 2), alpha:=1
@@ -837,7 +862,7 @@ ReShape:
         X2 = x: Y2 = y
         
         i = Res.GetImage(pic)
-        w = Res.ImgSize(i, imgGetwidth): h = Res.ImgSize(i, imgGetHeight)
+        w = Res.ImgSize(i, imgGetWidth): h = Res.ImgSize(i, imgGetHeight)
         
         m = CheckMouse(x, y, w, Int(h / 2))
         DrawImage i, x, y, cy:=0, ch:=Int(h / 2), alpha:=1
