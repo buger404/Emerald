@@ -14,10 +14,12 @@ Attribute VB_Exposed = False
 Private Declare Function CLSIDFromString Lib "ole32.dll" (ByVal lpszProgID As Long, pCLSID As clsid) As Long
 Public HotLoad As Boolean
 Public AssetsFolder As String
+Public SearchIndex As Long
 Dim Mems() As GMem
 Dim effect As Long, effectw As Long, effecth As Long, effectimg As Long, effectindex As Integer
 Private Sub Class_Initialize()
     ReDim Mems(0)
+    SearchIndex = 1
 End Sub
 Public Sub ClipCircle(n)
     Dim index As Integer
@@ -300,7 +302,7 @@ Public Property Get ResourceImageHandle(index As Integer) As Long
     ResourceImageHandle = Mems(index).ImgHwnd
 End Property
 Public Function GetImage(ByVal Name As String) As Integer
-    For i = 1 To UBound(Mems)
+    For i = SearchIndex To UBound(Mems)
         If Mems(i).kind = 0 Then
             If Mems(i).Name = Name Then GetImage = i: Exit For
         End If
