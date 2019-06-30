@@ -212,12 +212,12 @@ Private Sub ReDraw(i As Integer)
     
     Mems(i).CrashIndex = UBound(ColorLists)
 End Sub
-Public Sub Add(mem As Long, kind As Integer, name As String, Optional w, Optional h, Optional Folder As String = "")
+Public Sub Add(mem As Long, kind As Integer, Name As String, Optional w, Optional h, Optional Folder As String = "")
     ReDim Preserve Mems(UBound(Mems) + 1)
     With Mems(UBound(Mems))
         .Hwnd = mem
         .kind = kind
-        .name = name
+        .Name = Name
         .Folder = Folder
         If Not IsMissing(w) Then .w = w
         If Not IsMissing(h) Then .h = h
@@ -285,7 +285,7 @@ Public Property Get ResourceGIFTime(index As Integer) As Long
     ResourceGIFTime = Mems(index).GIF.time
 End Property
 Public Property Get ResourceName(index As Integer) As Long
-    ResourceName = Mems(index).name
+    ResourceName = Mems(index).Name
 End Property
 Public Property Get ResourceHandle(index As Integer) As Long
     ResourceHandle = Mems(index).Hwnd
@@ -299,23 +299,23 @@ End Property
 Public Property Get ResourceImageHandle(index As Integer) As Long
     ResourceImageHandle = Mems(index).ImgHwnd
 End Property
-Public Function GetImage(ByVal name As String) As Integer
+Public Function GetImage(ByVal Name As String) As Integer
     For i = 1 To UBound(Mems)
         If Mems(i).kind = 0 Then
-            If Mems(i).name = name Then GetImage = i: Exit For
+            If Mems(i).Name = Name Then GetImage = i: Exit For
         End If
     Next
     
     If HotLoad Then
         If GetImage = 0 Then
-            If Dir(AssetsFolder & name) <> "" Then
-                newImage AssetsFolder & name
+            If Dir(AssetsFolder & Name) <> "" Then
+                newImage AssetsFolder & Name
                 GetImage = UBound(Mems)
             End If
         End If
     End If
 End Function
-Public Sub newImage(path As String, Optional arg1, Optional arg2)
+Public Sub newImage(path As String, Optional arg1, Optional arg2, Optional Name As String = "")
     'when arg1 is missing ; i.w = i.w
     'when arg2 is missing but arg1 has content ; i.w = i.w * arg1
     'other ; i.w = arg1
@@ -357,7 +357,7 @@ Public Sub newImage(path As String, Optional arg1, Optional arg2)
     temp = Split(path, "\")
     ReDim Preserve Mems(UBound(Mems) + 1)
     With Mems(UBound(Mems))
-        .name = temp(UBound(temp))
+        .Name = IIf(Name = "", temp(UBound(temp)), Name)
         .Folder = temp(UBound(temp) - 1)
         .w = w
         .h = h
