@@ -17,6 +17,7 @@ Public AssetsFolder As String
 Public SearchIndex As Long
 Dim Mems() As GMem
 Dim effect As Long, effectw As Long, effecth As Long, effectimg As Long, effectindex As Integer
+Dim DisposeMark As Boolean
 Private Sub Class_Initialize()
     ReDim Mems(0)
     SearchIndex = 1
@@ -247,6 +248,7 @@ Public Property Get ImgSize(n, sizeIndex As imgIndex)
     End Select
 End Property
 Public Sub Dispose()
+    If DisposeMark Then Exit Sub
     For i = 1 To UBound(Mems)
         If Not Mems(i).copyed Then
             Select Case Mems(i).kind
@@ -266,6 +268,8 @@ Public Sub Dispose()
             End If
         End If
     Next
+    
+    DisposeMark = True
 End Sub
 Public Property Get ResourceGIFHandle(index As Integer, frame As Integer) As Long
     ResourceGIFHandle = Mems(index).GIF.frames(frame)
