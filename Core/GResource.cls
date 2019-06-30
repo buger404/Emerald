@@ -190,6 +190,27 @@ Private Sub ReDraw(i As Integer)
         GdipDrawImageRect g, Mems(i).ImgHwnd, IIf(s = 1 Or s = 3, Mems(i).w, 0), IIf(s = 2 Or s = 3, Mems(i).h, 0), Mems(i).w * IIf(s = 1 Or s = 3, -1, 1), Mems(i).h * IIf(s = 2 Or s = 3, -1, 1)
         GdipDeleteGraphics g
     Next
+    
+    Dim tempCo As Long, tCo(3) As Byte
+    Dim iW As Long, iH As Long
+
+    ReDim Preserve ColorLists(UBound(ColorLists) + 1)
+    ReDim ColorLists(UBound(ColorLists)).IsAlpha(Mems(i).w + 1, Mems(i).h + 1)
+    
+    DC = Mems(i).Imgs(0)
+    GdipGetImageWidth Mems(i).ImgHwnd, iW: GdipGetImageHeight Mems(i).ImgHwnd, iH
+    For x = 0 To Mems(i).w - 1
+        For y = 0 To Mems(i).h - 1
+            '取得像素点颜色
+            GdipBitmapGetPixel Mems(i).ImgHwnd, x / (Mems(i).w - 1) * iW, y / (Mems(i).h - 1) * iH, tempCo
+            CopyMemory tCo(0), tempCo, 4
+            
+            If tCo(3) = 255 Then ColorLists(UBound(ColorLists)).IsAlpha(x, y) = True
+        Next
+        DoEvents
+    Next
+    
+    Mems(i).CrashIndex = UBound(ColorLists)
 End Sub
 Public Sub Add(mem As Long, kind As Integer, name As String, Optional w, Optional h, Optional Folder As String = "")
     ReDim Preserve Mems(UBound(Mems) + 1)
@@ -359,13 +380,13 @@ Public Sub newImage(path As String, Optional arg1, Optional arg2)
     
     DC = Mems(UBound(Mems)).Imgs(0)
     GdipGetImageWidth i, iW: GdipGetImageHeight i, iH
-    For X = 0 To w - 1
-        For Y = 0 To h - 1
+    For x = 0 To w - 1
+        For y = 0 To h - 1
             '取得像素点颜色
-            GdipBitmapGetPixel i, X / (w - 1) * iW, Y / (h - 1) * iH, tempCo
+            GdipBitmapGetPixel i, x / (w - 1) * iW, y / (h - 1) * iH, tempCo
             CopyMemory tCo(0), tempCo, 4
 
-            If tCo(3) = 255 Then ColorLists(UBound(ColorLists)).IsAlpha(X, Y) = True
+            If tCo(3) = 255 Then ColorLists(UBound(ColorLists)).IsAlpha(x, y) = True
         Next
         DoEvents
     Next

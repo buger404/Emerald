@@ -622,7 +622,7 @@ ReShape:
             GdipDrawLine GG, Pen, x, y - 5, x, y + 5
         End If
     End Sub
-    Public Sub PaintPolygon2(Color As Long, style As Integer, Points())
+    Public Sub PaintPolygon2(Color As Long, style As Integer, Points(), Optional SmoothMode As Boolean = False)
 
         GdipResetPath path
         Dim p() As POINTF
@@ -631,7 +631,11 @@ ReShape:
             p(i / 2).x = Points(i): p(i / 2).y = Points(i + 1)
         Next
         
-        GdipAddPathPolygon path, p(0), UBound(p) + 1
+        If SmoothMode Then
+            GdipAddPathCurve path, p(0), UBound(p) + 1
+        Else
+            GdipAddPathPolygon path, p(0), UBound(p) + 1
+        End If
         
         If style = 0 Then GdipSetSolidFillColor brush, Color
         If style = 1 Then
@@ -647,7 +651,7 @@ ReShape:
             GdipDrawPath GG, Pen, path
         End If
     End Sub
-    Public Sub PaintPolygon(Color As Long, style As Integer, ParamArray Points())
+    Public Sub PaintPolygon(Color As Long, style As Integer, SmoothMode As Boolean, ParamArray Points())
 
         GdipResetPath path
         Dim p() As POINTF
@@ -656,7 +660,11 @@ ReShape:
             p(i / 2).x = Points(i): p(i / 2).y = Points(i + 1)
         Next
         
-        GdipAddPathPolygon path, p(0), UBound(p) + 1
+        If SmoothMode Then
+            GdipAddPathCurve path, p(0), UBound(p) + 1
+        Else
+            GdipAddPathPolygon path, p(0), UBound(p) + 1
+        End If
         
         If style = 0 Then GdipSetSolidFillColor brush, Color
         If style = 1 Then
