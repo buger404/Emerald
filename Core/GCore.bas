@@ -10,6 +10,12 @@ Attribute VB_Name = "GCore"
         x As Single
         y As Single
     End Type
+    Public Enum PlayStateMark
+        musStopped = 0
+        musPlaying = 1
+        musStalled = 2
+        musPaused = 3
+    End Enum
     Public Enum imgIndex
         imgGetWidth = 0
         imgGetHeight = 1
@@ -55,7 +61,7 @@ Attribute VB_Name = "GCore"
         Hwnd As Long
         ImgHwnd As Long
         Imgs(3) As Long
-        name As String
+        Name As String
         Folder As String
         w As Long
         h As Long
@@ -222,9 +228,9 @@ Attribute VB_Name = "GCore"
         TerminateGDIPlus
         If BassInstalled Then BASS_Free
     End Sub
-    Public Sub MakeFont(ByVal name As String)
+    Public Sub MakeFont(ByVal Name As String)
         Set EF = New GFont
-        EF.MakeFont name
+        EF.MakeFont Name
     End Sub
 '========================================================
 '   RunTime

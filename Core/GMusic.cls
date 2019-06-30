@@ -13,26 +13,23 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 'Emerald Ïà¹Ø´úÂë
 
-Public Enum PlayState
-    Stopped = 0
-    Playing = 1
-    Stalled = 2
-    Paused = 3
-End Enum
 Dim FFTData(512) As Single, FFTPeacks(128) As Long, FFTFallOff(128) As Long
 Dim Hwnd As Long, mRate As Long, mVolume As Single
 '========================================================
 '   Properties
+    Public Property Get PlayState() As PlayStateMark
+        PlayState = BASS_ChannelIsActive(Hwnd)
+    End Property
     Public Property Get IsPlaying() As Boolean
         IsPlaying = (BASS_ChannelIsActive(Hwnd) <> 0)
     End Property
     Public Property Get length() As Double
         length = BASS_ChannelBytes2Seconds(Hwnd, BASS_ChannelGetLength(Hwnd, BASS_POS_BYTE))
     End Property
-    Public Property Get Position() As Double
-        Position = BASS_ChannelBytes2Seconds(Hwnd, BASS_ChannelGetPosition(Hwnd, BASS_POS_BYTE))
+    Public Property Get position() As Double
+        position = BASS_ChannelBytes2Seconds(Hwnd, BASS_ChannelGetPosition(Hwnd, BASS_POS_BYTE))
     End Property
-    Public Property Let Position(p As Double)
+    Public Property Let position(p As Double)
         BASS_ChannelSetPosition Hwnd, BASS_ChannelSeconds2Bytes(Hwnd, p), BASS_POS_BYTE
     End Property
     Public Property Get Volume() As Single
@@ -42,10 +39,10 @@ Dim Hwnd As Long, mRate As Long, mVolume As Single
         BASS_ChannelSetAttribute Hwnd, BASS_ATTRIB_VOL, v
         mVolume = v
     End Property
-    Public Property Get Rate() As Single
-        Rate = mRate
+    Public Property Get rate() As Single
+        rate = mRate
     End Property
-    Public Property Let Rate(r As Single)
+    Public Property Let rate(r As Single)
         BASS_ChannelSetAttribute Hwnd, BASS_ATTRIB_FREQ, 44100 * r
         mRate = r
     End Property
@@ -54,14 +51,14 @@ Dim Hwnd As Long, mRate As Long, mVolume As Single
     Private Sub Class_Initialize()
         mVolume = 0.5: mRate = 1
     End Sub
-    Public Sub Create(ByVal Path As String)
+    Public Sub Create(ByVal path As String)
         If Not BassInstalled Then
             BASS_Init -1, 44100, BASS_DEVICE_3D, Hwnd, 0
             BassInstalled = True
         End If
         
         If Hwnd <> 0 Then Call Dispose
-        Hwnd = BASS_StreamCreateFile(BASSFALSE, StrPtr(Path), 0, 0, 0)
+        Hwnd = BASS_StreamCreateFile(BASSFALSE, StrPtr(path), 0, 0, 0)
         BASS_ChannelSetAttribute Hwnd, BASS_ATTRIB_VOL, mVolume
         BASS_ChannelSetAttribute Hwnd, BASS_ATTRIB_FREQ, 44100 * mRate
     End Sub
