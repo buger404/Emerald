@@ -326,7 +326,7 @@ Sub Main()
     If Repaired Then Exit Sub
     
     Cmd = Replace(Command$, """", "")
-    Cmd = "E:\Error 404\Muing III"
+    'Cmd = "E:\Error 404\Muing III"
     'Cmd = "E:\Error 404\Ä§ÊÞ»ìÕ½3"
     'Cmd = "pC:\Users\Error404\Desktop\Project\Ä§ÊÞ»ìÕ½3"
     Dim pmode As Boolean
