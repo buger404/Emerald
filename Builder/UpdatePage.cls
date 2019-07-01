@@ -132,10 +132,10 @@ Public Sub Update2()
     Next
     
     Page.Writes (Int(PIndex / 5) + 1) & " / " & (Int(UBound(FileList) / 5) + 1), GW / 2, GH - 140, 16, argb(150, 27, 27, 27), align:=StringAlignmentCenter
-    If Page.ShowColorButton(2, GW / 2 - 80 - 20, GH - 140, 40, 22, "<", argb(150, 27, 27, 27), argb(255, 222, 222, 222), argb(130, 95, 229, 221), size:=16, Radius:=60) = 3 Then
+    If Page.ShowColorButton(2, GW / 2 - 80 - 20, GH - 140, 40, 22, "<", argb(150, 27, 27, 27), argb(255, 222, 222, 222), argb(130, 95, 229, 221), size:=16, radius:=60) = 3 Then
         If PIndex > 0 Then PIndex = PIndex - 5: ECore.NewTransform
     End If
-    If Page.ShowColorButton(2, GW / 2 + 80 - 20, GH - 140, 40, 22, ">", argb(150, 27, 27, 27), argb(255, 222, 222, 222), argb(130, 95, 229, 221), size:=16, Radius:=60) = 3 Then
+    If Page.ShowColorButton(2, GW / 2 + 80 - 20, GH - 140, 40, 22, ">", argb(150, 27, 27, 27), argb(255, 222, 222, 222), argb(130, 95, 229, 221), size:=16, radius:=60) = 3 Then
         If (Int(PIndex / 5) + 1) < (Int(UBound(FileList) / 5) + 1) Then PIndex = PIndex + 5: ECore.NewTransform
     End If
     
@@ -206,6 +206,21 @@ Public Sub Update2()
         Print #1, NoUpdate
         Close #1
         
+        If Dir(Cmd & "\.git", vbDirectory Or vbHidden) <> "" Then
+            If TestFile(Cmd & "\.gitignore", ".emr\*") = False Then
+                If Dialog("关于Github的建议", "检测到您的工程正在托管于Github，" & vbCrLf & "并且你没有设置Git忽略Emerald文件夹。" & vbCrLf & vbCrLf & "是否自动添加Emerald文件夹到Git忽略名单？", "好", "手动解决") = 1 Then
+                    Open Cmd & "\.gitignore" For Append As #1
+                    Print #1, vbCrLf
+                    Print #1, "# Emerald Cache/Backup Ignore"
+                    Print #1, ".emr\*"
+                    Close #1
+                    Dialog "还没有结束", "请使用 git rm .emr\* 指令，然后重新push。", "好"
+                Else
+                    Dialog "关于Github的建议", "在目录下的.gitignore文件（没有则自己创建）中写入：" & vbCrLf & ".emr\*" & vbCrLf & vbCrLf & "随后使用指令 git rm emr/* ，再重新push。", "好"
+                End If
+            End If
+        End If
+        
         Dialog "完成", "你的工程已经更新了！", "好"
         Unload MainWindow: End
     End If
@@ -236,7 +251,7 @@ Public Sub Update()
         leadstr = leadstr & "，若干项更新"
     End If
     
-    Page.Writes "最新版本：  " & Version & "（领先" & leadstr & "）", 50, 220, 18, argb(220, 27, 27, 27)
+    Page.Writes "安装版本：  " & Version, 50, 220, 18, argb(220, 27, 27, 27)
     Page.Writes "工程版本：  " & Val(AppInfo(0)), 50, 250, 18, argb(130, 27, 27, 27)
     
     If WarnStr <> "" Then

@@ -10,6 +10,16 @@ Public AppInfo() As String
 Public Cmd As String
 Public Abouting As Boolean
 Public SetMode As Boolean, PackPos As Long
+Public Function TestFile(path As String, IncludeText As String) As Boolean
+    Dim temp As String
+    If Dir(path) = "" Then Exit Function
+    Open path For Input As #1
+    Do While Not EOF(1)
+        Line Input #1, temp
+        If InStr(temp, IncludeText) > 0 Then TestFile = True: Exit Do
+    Loop
+    Close #1
+End Function
 Public Sub CheckUpdate()
     On Error GoTo ErrHandle
     
@@ -316,6 +326,7 @@ Sub Main()
     If Repaired Then Exit Sub
     
     Cmd = Replace(Command$, """", "")
+    Cmd = "E:\Error 404\Muing III"
     'Cmd = "E:\Error 404\魔兽混战3"
     'Cmd = "pC:\Users\Error404\Desktop\Project\魔兽混战3"
     Dim pmode As Boolean
@@ -425,7 +436,11 @@ Sub Main()
         Open p & "\" & appn & ".vbp" For Output As #1
         Print #1, f
         Close #1
-            
+        '先下手忽略Emerald文件夹
+        Open p & "\.gitignore" For Output As #1
+        Print #1, ".emr/*"
+        Close #1
+        
 SkipName:
         If Dir(p & "\core", vbDirectory) = "" Then MkDir p & "\core"
         If Dir(p & "\.emr", vbDirectory) = "" Then MkDir p & "\.emr"

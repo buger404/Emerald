@@ -61,7 +61,7 @@ Attribute VB_Name = "GCore"
         Hwnd As Long
         ImgHwnd As Long
         Imgs(3) As Long
-        Name As String
+        name As String
         Folder As String
         w As Long
         h As Long
@@ -104,7 +104,7 @@ Attribute VB_Name = "GCore"
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
-    Public Const Version As Long = 19063006 '
+    Public Const Version As Long = 19070102 '
     Public TextHandle As Long, WaitChr As String
     Dim AssetsTrees() As AssetsTree
     Dim LastKeyUpRet As Boolean
@@ -228,9 +228,9 @@ Attribute VB_Name = "GCore"
         TerminateGDIPlus
         If BassInstalled Then BASS_Free
     End Sub
-    Public Sub MakeFont(ByVal Name As String)
+    Public Sub MakeFont(ByVal name As String)
         Set EF = New GFont
-        EF.MakeFont Name
+        EF.MakeFont name
     End Sub
 '========================================================
 '   RunTime
