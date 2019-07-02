@@ -30,10 +30,10 @@ Attribute VB_Name = "GCore"
     Public Enum PosAlign
         posNormal = 0
         posOnCenter = 1
-        posOnLeft = 2
-        posOnTop = 3
-        posOnRight = 4
-        posOnBottom = 5
+        posOnLeft = 4
+        posOnTop = 5
+        posOnRight = 2
+        posOnBottom = 3
     End Enum
     Public Enum TranslationKind
         transFadeIn = 0
