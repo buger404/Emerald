@@ -104,8 +104,9 @@ Attribute VB_Name = "GCore"
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
-    Public Const Version As Long = 19070102 '
+    Public Const Version As Long = 19070202      'hhhhhhhhh
     Public TextHandle As Long, WaitChr As String
+    
     Dim AssetsTrees() As AssetsTree
     Dim LastKeyUpRet As Boolean
     Dim Wndproc As Long
@@ -206,6 +207,8 @@ Attribute VB_Name = "GCore"
         End If
         
         If DebugMode Then
+            Debuginfo.Show
+            Debuginfo.Hide
             DebugWindow.Show
         End If
         
@@ -427,7 +430,7 @@ sth:
                 data.PutData "UpdateAble", 1
                 If MsgBox("发现Emerald存在新版本，您希望现在前往下载吗？", vbYesNo + 48, "Emerald") = vbNo Then Exit Sub
                 
-                ShellExecuteA 0, "open", "https://github.com/Red-Error404/Emerald", "", "", SW_SHOW
+                ShellExecuteA 0, "open", "https://github.com/Red-Error404/Emerald/release", "", "", SW_SHOW
                 data.PutData "UpdateAble", 0
             End If
         Else

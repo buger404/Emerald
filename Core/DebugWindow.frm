@@ -41,6 +41,7 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 'Emerald Ïà¹Ø´úÂë
 Dim Page As GPage, Charge As GDebug, sh As New aShadow
+Dim WDC As Long
 Private Sub Form_Load()
     Set Page = New GPage
     Set Charge = New GDebug
@@ -52,6 +53,16 @@ Private Sub Form_Load()
     
     Me.Width = 586 * Screen.TwipsPerPixelX: Me.Height = 78 * Screen.TwipsPerPixelY
     Charge.GW = Me.ScaleWidth: Charge.GH = Me.ScaleHeight
+    
+    WDC = CreateCDC(Charge.GW, Charge.GH)
+    DeleteObject Page.CDC
+    Page.CDC = WDC
+    Dim g As Long
+    GdipCreateFromHDC WDC, g
+    GdipSetSmoothingMode g, SmoothingModeAntiAlias
+    GdipSetTextRenderingHint g, TextRenderingHintAntiAlias
+    GdipDeleteGraphics Page.GG
+    Page.GG = g
     
     With sh
         If .Shadow(Me) Then
@@ -88,13 +99,14 @@ Private Sub Form_Load()
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
+    Page.Dispose
     Set sh = Nothing
 End Sub
 
-Private Sub touchArea_Click(index As Integer)
+Public Sub touchArea_Click(index As Integer)
     Select Case index
         Case 1
-            Debuginfo.Show
+            Debuginfo.Visible = Not Debuginfo.Visible
         Case 3
             Debug_focus = Not Debug_focus
         Case 4
