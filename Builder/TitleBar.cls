@@ -57,6 +57,14 @@ Public Sub Update()
             SetMode = True: ECore.NewTransform , 700, "WelcomePage"
         End If
     End If
+    
+    m = CheckMouse(0, 0, GW - 120, 30 + 16 / 0.75)
+    If m >= 1 And Mouse.button = 1 Then
+        ReleaseCapture
+        SendMessageA MainWindow.Hwnd, WM_SYSCOMMAND, SC_MOVE Or HTCAPTION, 0
+        Mouse.state = 0
+    End If
+    If m = 3 Then Mouse.state = 0
 End Sub
 Public Sub Wheel(Direction As Integer, Depth As Single)
     'Êó±ê¹öÂÖÊÂ¼ş

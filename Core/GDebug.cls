@@ -18,7 +18,7 @@ Public PageMark As Long
 
 Public InputingText As String, InputAllow As Boolean
 
-Private Enum Colors
+Private Enum colors
     HighLightText = -18176
     DefaultText = -855310
     ContentText = -5592406
@@ -31,11 +31,10 @@ Dim ConsoleDC As Long, ConsoleGG As Long, Exec As String, Params() As String
 Dim FirstDisplay As Boolean
 Dim HistoryCmd(20) As String, CurrentCmd As Integer, ChooseCmd As Integer
 
-Public SY As Single, NeedScroll As Boolean
+Public sy As Single, NeedScroll As Boolean
 Public CuY As Long, CuX As Long
 Public Sub EndInput()
-    ChooseCmd = CurrentCmd
-    SetConsoleColor Colors.DefaultText
+    SetConsoleColor colors.DefaultText
     WriteWord InputingText
     NewLine
 End Sub
@@ -43,27 +42,30 @@ Public Sub ApplyCmd()
     Call EndInput
     Select Case Exec
         Case ""
-            Dim Param() As String
-            Param = Split(InputingText, " ")
-            If UBound(Param) = 0 Then ReDim Preserve Param(1)
+            Dim param() As String
+            param = Split(InputingText, " ")
+            If UBound(param) = 0 Then ReDim Preserve param(1)
             
             If InputingText = "" Or Exec <> "" Then GoTo SkipRecord
             
-            If CurrentCmd = UBound(HistoryCmd) Then
+            HistoryCmd(CurrentCmd) = InputingText
+            
+            If CurrentCmd < UBound(HistoryCmd) Then
+                CurrentCmd = CurrentCmd + 1
+            Else
                 For i = 1 To UBound(HistoryCmd)
                     HistoryCmd(i - 1) = HistoryCmd(i)
                 Next
+                HistoryCmd(UBound(HistoryCmd)) = ""
             End If
-            
-            HistoryCmd(CurrentCmd) = InputingText
-            If CurrentCmd < UBound(HistoryCmd) Then CurrentCmd = CurrentCmd + 1
     
 SkipRecord:
+            ChooseCmd = CurrentCmd
 
             InputAllow = False
             If InputingText <> "" Then
-                Exec = Param(0)
-                Params = Param
+                Exec = param(0)
+                Params = param
                 Call ReserveExec
             Else
                 Call AllowCmd
@@ -95,6 +97,15 @@ Public Sub ApplyKey(Key As Integer)
                     Call ExitExec
                 End If
             End If
+        Case "backup"
+            If Params(1) = "-clear2" Then
+                If LCase(Chr(Key)) = "y" Then
+                    Params(1) = "-clear3"
+                    InputAllow = False
+                ElseIf LCase(Chr(Key)) = "n" Then
+                    Call ExitExec
+                End If
+            End If
         Case ""
             If Key = vbKeyUp Then
                 ChooseCmd = ChooseCmd - 1
@@ -102,6 +113,7 @@ Public Sub ApplyKey(Key As Integer)
                 InputingText = HistoryCmd(ChooseCmd)
             End If
             If Key = vbKeyDown Then
+                If HistoryCmd(ChooseCmd) = "" Then Exit Sub
                 ChooseCmd = ChooseCmd + 1
                 If ChooseCmd > UBound(HistoryCmd) Then
                     ChooseCmd = UBound(HistoryCmd)
@@ -129,7 +141,7 @@ End Sub
 Private Sub CheckUpdate(force As Boolean)
     On Error Resume Next
     If InternetGetConnectedState(0&, 0&) = 0 And force = False Then
-        SetConsoleColor Colors.ErrText
+        SetConsoleColor colors.ErrText
         WriteLine "Emerald-Error: connect to the Internet first ."
         Exit Sub
     End If
@@ -142,7 +154,7 @@ Private Sub CheckUpdate(force As Boolean)
         
         Dim xmlHttp As Object, Ret As String, Start As Long
         
-        SetConsoleColor Colors.DefaultText
+        SetConsoleColor colors.DefaultText
         WriteLine "Emerald: connecting to the server"
         Start = GetTickCount
         Do While GetTickCount - Start <= 2000
@@ -160,7 +172,7 @@ Private Sub CheckUpdate(force As Boolean)
         
         Do While xmlHttp.ReadyState <> 4
             If GetTickCount - Start >= UpdateTimeOut Then
-                SetConsoleColor Colors.ErrText
+                SetConsoleColor colors.ErrText
                 WriteLine "Emerald-Error: failed to connect , time out ."
                 Exit Sub
             End If
@@ -171,29 +183,185 @@ Private Sub CheckUpdate(force As Boolean)
         Loop
         Ret = xmlHttp.responseText
         Set xmlHttp = Nothing
-        SetConsoleColor Colors.SuccessText
+        SetConsoleColor colors.SuccessText
         WriteLine "Emerald-Success: the lastest version from the server " & Val(Ret)
-        SetConsoleColor Colors.ContentText
+        SetConsoleColor colors.ContentText
         WriteLine "Emerald: current version " & Version
         
         If Val(Ret) > Version And App.LogMode = 0 Then
-            SetConsoleColor Colors.SuccessText
+            SetConsoleColor colors.SuccessText
             WriteLine "Emerald: update available , plz visit 'https://github.com/Red-Error404/Emerald/release' to download ."
             Exit Sub
         End If
     Else
-        SetConsoleColor Colors.HighLightText
+        SetConsoleColor colors.HighLightText
         WriteLine "Emerald-Skip: update has been checked at " & CDate(data.GetData("UpdateTime")) & "."
     End If
     
     Set data = Nothing
 End Sub
+Public Function GetVBIDEPath() As String
+    On Error GoTo ErrHandle
+    
+    Dim WSHShell As Object, temp As String, temp2() As String
+    Set WSHShell = CreateObject("WScript.Shell")
+    
+    temp = WSHShell.RegRead("HKEY_CLASSES_ROOT\VisualBasic.Project\shell\open\command\")
+    temp2 = Split(temp, "vb6.exe")
+    GetVBIDEPath = Replace(temp2(0), """", "")
+    
+ErrHandle:
+    GetVBIDEPath = ""
+End Function
 Public Sub RunExec()
     If Exec = "" Then Exit Sub
 
     Dim MissingParam As Integer
 
     Select Case Exec
+        Case "backup"
+            Select Case Params(1)
+                Case "-help"
+                    WriteLine "Mange your backups ."
+                    WriteLine "-clear : delete all your backups <Danger> ."
+                    WriteLine "-list : list your backups ."
+                    WriteLine "-replace [backupname] : replace your source files with the backup ."
+                    WriteLine "-replace2 [backupname] [filename] : replace single source file with the backup ."
+                    Call ExitExec
+                    Exit Sub
+                Case "-replace2"
+                    If UBound(Params) < 2 Then MissingParam = 2: GoTo MissingParams
+                    If UBound(Params) < 3 Then MissingParam = 3: GoTo MissingParams
+                    Params(1) = "-replace"
+                Case "-replace"
+                    If UBound(Params) < 2 Then MissingParam = 2: GoTo MissingParams
+                    
+                    Params(1) = "-clear2"
+                    
+                    Dim bFile As String, Size1 As Long, Size2 As Long
+                    
+                    If Dir(App.path & "\.emr\backup\" & Params(2), vbDirectory) = "" Then
+                        SetConsoleColor colors.ErrText
+                        WriteWord "backup-Error: the backup not found '" & App.path & "\.emr\backup\" & Params(2) & "'"
+                        Call ExitExec
+                        Exit Sub
+                    End If
+                    Dim bStep As Long, bfo As String, bsfo As String, targetFile As String, targetGet As Boolean
+                    bFile = Dir(App.path & "\.emr\backup\" & Params(2) & "\"): bfo = "core": bsfo = ""
+                    If UBound(Params) = 3 Then targetFile = Params(3): WriteLine "Finding"
+                    
+ReCopy:
+                    On Error Resume Next
+                    Do While bFile <> ""
+                        If targetFile <> "" Then
+                            BackLine
+                            ClearLine
+                            WriteWord "Finding" & IIf(GetTickCount Mod 4000 < 1000, ".", "") & IIf(GetTickCount Mod 4000 < 2000, ".", "") & IIf(GetTickCount Mod 4000 < 3000, ".", "")
+                            NextLine
+                        End If
+                        If (targetFile <> "" And targetFile = bFile) Or (targetFile = "") Then
+                            Size1 = FileLen(App.path & "\.emr\backup\" & Params(2) & "\" & bsfo & "\" & bFile): Size2 = 0
+                            Size2 = FileLen(App.path & "\" & bfo & "\" & bFile)
+                            FileCopy App.path & "\.emr\backup\" & Params(2) & "\" & bsfo & "\" & bFile, App.path & "\" & bfo & "\" & bFile
+                            SetConsoleColor colors.DefaultText
+                            WriteWord "Success : " & bFile & "      "
+                            SetConsoleColor IIf(Size1 = Size2, colors.DefaultText, IIf(Size1 > Size2, colors.SuccessText, colors.ErrText))
+                            WriteWord Size2 & " bytes -> " & Size1 & " bytes"
+                            NewLine
+                            targetGet = True
+                            If targetFile <> "" Then Exit Do
+                        End If
+                        bFile = Dir()
+                        Debuginfo.UpdateTimer_Timer
+                        Sleep 10: DoEvents
+                    Loop
+                    bStep = bStep + 1
+                    If bStep = 1 And (Not targetGet) Then bFile = Dir(App.path & "\.emr\backup\" & Params(2) & "\cache\"): bfo = ".emr\cache": bsfo = "cache"
+                    If bStep = 2 And (Not targetGet) Then bFile = Dir(App.path & "\.emr\backup\" & Params(2) & "\project\"): bfo = "": bsfo = "project"
+                    If bStep <= 2 And (Not targetGet) Then GoTo ReCopy
+                    
+                    If targetFile = "" Then
+                        SetConsoleColor colors.SuccessText
+                        WriteWord "backup-Success: succeed in replacing files with the backup (" & Params(2) & ")"
+                    Else
+                        If targetGet = False Then
+                            SetConsoleColor colors.ErrText
+                            WriteWord "backup-Error: file not found '" & targetFile & "'"
+                        Else
+                            SetConsoleColor colors.SuccessText
+                            WriteWord "backup-Success: succeed in replacing the file with the backup (" & Params(2) & ")"
+                        End If
+                    End If
+                    
+                    Call ExitExec
+                    Exit Sub
+                Case "-clear"
+                    SetConsoleColor colors.ErrText
+                    WriteLine "Danger !"
+                    WriteLine "The consequences are at one's own expense !!!"
+                    WriteLine "All your backups will be erased from your drive forever ."
+                    SetConsoleColor colors.DefaultText
+                    WriteLine "Target folder : " & App.path & "\.emr\backup\"
+                    WriteLine "Erase them any way ? [Y/N]"
+                    AllowInput
+                    Params(1) = "-clear2"
+                Case "-clear2"
+                Case "-clear3"
+                    Dim FSO3 As Object
+                    Set FSO3 = CreateObject("Scripting.FileSystemObject")
+                    FSO3.DeleteFolder App.path & "\.emr\backup"
+                    SetConsoleColor colors.DefaultText
+                    WriteLine "Erasing"
+                    Do While Dir(App.path & "\.emr\backup", vbDirectory) <> ""
+                        Call BackLine: Call ClearLine
+                        WriteWord "Erasing " & IIf(GetTickCount Mod 4000 < 1000, ".", "") & IIf(GetTickCount Mod 4000 < 2000, ".", "") & IIf(GetTickCount Mod 4000 < 3000, ".", "")
+                        Debuginfo.UpdateTimer_Timer
+                        Sleep 10: DoEvents
+                    Loop
+                    SetConsoleColor colors.SuccessText
+                    MkDir App.path & "\.emr\backup"
+                    WriteWord "backup-Success: succeed in erasing all your backup ."
+                    Set FSO3 = Nothing
+                    Call ExitExec
+                    Exit Sub
+                Case "-list"
+                    Dim backupF As String, backupI As Integer, FSO As Object
+                    Set FSO = CreateObject("Scripting.FileSystemObject")
+                    backupF = Dir(App.path & "\.emr\backup\", vbDirectory)
+                    Do While backupF <> ""
+                        If backupF <> "." And backupF <> ".." Then
+                            backupI = backupI + 1
+                            WriteLine backupI & ". " & backupF & "  (" & FSO.GetFolder(App.path & "\.emr\backup\" & backupF).size & " bytes)"
+                        End If
+                        backupF = Dir(, vbDirectory)
+                        'reserve : folder size
+                    Loop
+                    SetConsoleColor colors.ContentText
+                    WriteWord backupI & " backups in total ."
+                    Set FSO = Nothing
+                    Call ExitExec
+                    Exit Sub
+                Case Else: GoTo UnKnownCmd
+            End Select
+        Case "project"
+            Select Case Params(1)
+                Case "-help"
+                    WriteLine "Set your current project ."
+                    WriteLine "-reset : reset your version information ."
+                    Call ExitExec
+                    Exit Sub
+                Case "-reset"
+                    Open App.path & "\.emerald" For Output As #1
+                    Print #1, 0 'version
+                    Print #1, Now 'Update Time
+                    Print #1, False
+                    Close #1
+                    SetConsoleColor colors.SuccessText
+                    WriteWord "project-Success: succeed in reseting the version information ."
+                    Call ExitExec
+                    Exit Sub
+                Case Else: GoTo UnKnownCmd
+            End Select
         Case "info"
             Select Case Params(1)
                 Case "-help"
@@ -201,55 +369,55 @@ Public Sub RunExec()
                     Call ExitExec
                     Exit Sub
                 Case ""
-                    SetConsoleColor Colors.DefaultText
+                    SetConsoleColor colors.DefaultText
                     WriteWord "Project name : "
-                    SetConsoleColor Colors.ContentText
-                    WriteWord App.Title
+                    SetConsoleColor colors.ContentText
+                    WriteWord App.title
                     NewLine
-                    SetConsoleColor Colors.DefaultText
+                    SetConsoleColor colors.DefaultText
                     WriteWord "Save state : "
-                    SetConsoleColor IIf(ESave Is Nothing, Colors.ErrText, Colors.HighLightText)
+                    SetConsoleColor IIf(ESave Is Nothing, colors.ErrText, colors.HighLightText)
                     WriteWord IIf(ESave Is Nothing, "[Nothing] ", "[Safe] ")
                     If Not ESave Is Nothing Then
-                        SetConsoleColor Colors.ContentText
+                        SetConsoleColor colors.ContentText
                         WriteWord ESave.Count & " items in total ."
                         NewLine
-                        SetConsoleColor Colors.DefaultText
+                        SetConsoleColor colors.DefaultText
                         WriteWord "Save key : "
-                        SetConsoleColor Colors.HighLightText
+                        SetConsoleColor colors.HighLightText
                         WriteWord ESave.Key
                         NewLine
-                        SetConsoleColor Colors.DefaultText
+                        SetConsoleColor colors.DefaultText
                         WriteWord "Autosave : " & ESave.AutoSave
                     End If
                     NewLine
                     
                     If Abs(FPSct - 1000) > 60 Then
-                        SetConsoleColor Colors.ErrText
+                        SetConsoleColor colors.ErrText
                         WriteLine "NOTE: It seems that you are using a timer to draw ."
                     End If
                     NewLine
                     
-                    SetConsoleColor Colors.DefaultText
+                    SetConsoleColor colors.DefaultText
                     WriteLine "Active page : " & ECore.ActivePage
                     WriteLine "FPS " & FPS & " , max FPS " & Int(1000 / Int(FPSct / FPS)) & " (per frame " & Int(FPSct / FPS) & " ms)"
                     WriteLine "Button " & Mouse.button & " , click state " & Mouse.state & " , in (" & Mouse.x & "," & Mouse.y & ")"
                     NewLine
-                    SetConsoleColor Colors.HighLightText
+                    SetConsoleColor colors.HighLightText
                     WriteLine "Visual Basic 6.0 IDE"
-                    SetConsoleColor Colors.DefaultText
+                    SetConsoleColor colors.DefaultText
                     WriteLine "ThreadID : " & VB.App.ThreadID
                     WriteLine "hInstance : " & VB.App.hInstance
                     WriteLine "CompanyName : " & VB.App.CompanyName
                     WriteLine "Form counts : " & VB.Forms.Count
-                    SetConsoleColor Colors.HighLightText
+                    SetConsoleColor colors.HighLightText
                     WriteLine "Screen Information"
-                    SetConsoleColor Colors.DefaultText
+                    SetConsoleColor colors.DefaultText
                     WriteLine "Size : " & Screen.Width / Screen.TwipsPerPixelX & "x" & Screen.Height / Screen.TwipsPerPixelY
                     WriteLine "DPI : " & 15 / Screen.TwipsPerPixelX * 96 & "(" & Int(15 / Screen.TwipsPerPixelX * 100) & "%)"
-                    SetConsoleColor Colors.HighLightText
+                    SetConsoleColor colors.HighLightText
                     WriteLine "Creation Information"
-                    SetConsoleColor Colors.DefaultText
+                    SetConsoleColor colors.DefaultText
                     WriteLine "Save : " & IIf(ESave Is Nothing, "[Missing]", ObjPtr(ESave))
                     WriteLine "Page Manager : " & IIf(ECore Is Nothing, "[Missing]", ObjPtr(ECore))
                     WriteLine "Font : " & IIf(EF Is Nothing, "[Missing]", ObjPtr(EF))
@@ -257,7 +425,7 @@ Public Sub RunExec()
                     WriteLine "Music List : " & IIf(EAni Is Nothing, "[Missing]", ObjPtr(EMusic))
                     WriteLine "Assets Tree : " & UBound(AssetsTrees) & " trees in total ."
                     For i = 1 To UBound(AssetsTrees)
-                        WriteLine i & ". " & AssetsTrees(i).path & " (" & AssetsTrees(i).arg1 & "," & AssetsTrees(i).arg2 & ") , " & UBound(AssetsTrees(i).files) & " files in total ."
+                        WriteLine i & ". " & AssetsTrees(i).path & " (" & IIf(IsMissing(AssetsTrees(i).arg1), "[Missing]", AssetsTrees(i).arg1) & "," & IIf(IsMissing(AssetsTrees(i).arg2), "[Missing]", AssetsTrees(i).arg2) & ") , " & UBound(AssetsTrees(i).files) & " files in total ."
                     Next
                     WriteLine "Current EditBox : " & TextHandle
                     WriteLine "Bass : " & BassInstalled
@@ -279,7 +447,7 @@ Public Sub RunExec()
                 Case "-change"
                     If UBound(Params) < 2 Then MissingParam = 2: GoTo MissingParams
                     ECore.ActivePage = Params(2)
-                    SetConsoleColor Colors.SuccessText
+                    SetConsoleColor colors.SuccessText
                     WriteWord "page-Success: change success ."
                     Call ExitExec
                     Exit Sub
@@ -291,7 +459,7 @@ Public Sub RunExec()
             End Select
         Case "save"
             If ESave Is Nothing Then
-                SetConsoleColor Colors.ErrText
+                SetConsoleColor colors.ErrText
                 WriteWord "save-Error: create your save first ."
                 Call ExitExec
                 Exit Sub
@@ -314,11 +482,11 @@ Public Sub RunExec()
                 Case "-changekey"
                     If UBound(Params) < 2 Then MissingParam = 2: GoTo MissingParams
                     If Params(2) = "" Then MissingParam = 2: GoTo MissingParams
-                    SetConsoleColor Colors.ErrText
+                    SetConsoleColor colors.ErrText
                     WriteLine "Danger !"
                     WriteLine "The consequences are at one's own expense !!!"
                     WriteLine "Your save will may be lost !"
-                    SetConsoleColor Colors.DefaultText
+                    SetConsoleColor colors.DefaultText
                     WriteLine "New key : " & Params(2)
                     WriteLine "Change your save key any way ? [Y/N]"
                     AllowInput
@@ -326,46 +494,46 @@ Public Sub RunExec()
                 Case "-changekey2"
                 Case "-changekey3"
                     ESave.Key = Params(2)
-                    SetConsoleColor Colors.ContentText
+                    SetConsoleColor colors.ContentText
                     For i = 1 To ESave.Count
                         ESave.PutData ESave.GetName(Val(i)), ESave.GetData(ESave.GetName(Val(i)))
                         WriteLine "Rewriting : " & ESave.GetName(Val(i)) & "(item " & i & ")"
                     Next
-                    SetConsoleColor Colors.ErrText
+                    SetConsoleColor colors.ErrText
                     WriteWord "NOTE : Remember to change your key in your code !"
                     Call ExitExec
                     Exit Sub
                 Case "-save"
                     ESave.Save
-                    SetConsoleColor Colors.SuccessText
+                    SetConsoleColor colors.SuccessText
                     WriteWord "save-Success:saved ."
                     Call ExitExec
                     Exit Sub
                 Case "-count"
-                    SetConsoleColor Colors.DefaultText
+                    SetConsoleColor colors.DefaultText
                     WriteWord ESave.Count & " items in total ."
                     Call ExitExec
                     Exit Sub
                 Case "-getkey"
-                    SetConsoleColor Colors.DefaultText
+                    SetConsoleColor colors.DefaultText
                     WriteWord GetBMKey
                     Call ExitExec
                     Exit Sub
                 Case "-list"
-                    SetConsoleColor Colors.DefaultText
+                    SetConsoleColor colors.DefaultText
                     WriteLine ESave.Count & " items in total ."
                     Dim savestr As String
                     For i = 1 To ESave.Count
                         savestr = ESave.GetData(ESave.GetName(Val(i)))
-                        SetConsoleColor IIf(savestr = "", Colors.ContentText, Colors.DefaultText)
+                        SetConsoleColor IIf(savestr = "", colors.ContentText, colors.DefaultText)
                         WriteLine i & ". " & IIf(savestr = "", "[Removed]", "[Safe]") & "    " & ESave.GetName(Val(i)) & "    " & savestr
                     Next
                     Call ExitExec
                     Exit Sub
                 Case "-key"
-                    SetConsoleColor Colors.DefaultText
+                    SetConsoleColor colors.DefaultText
                     WriteLine "Save key : " & ESave.Key
-                    SetConsoleColor Colors.ErrText
+                    SetConsoleColor colors.ErrText
                     WriteWord "NOTE : Please keep your key properly ."
                     Call ExitExec
                     Exit Sub
@@ -373,7 +541,7 @@ Public Sub RunExec()
                     If UBound(Params) < 2 Then MissingParam = 2: GoTo MissingParams
                     If Params(2) = "" Then MissingParam = 2: GoTo MissingParams
                     ESave.PutData Params(2), ""
-                    SetConsoleColor Colors.SuccessText
+                    SetConsoleColor colors.SuccessText
                     WriteWord "save-Success: succeed in removing data ."
                     Call ExitExec
                 Case "-add"
@@ -381,7 +549,7 @@ Public Sub RunExec()
                     If Params(2) = "" Then MissingParam = 2: GoTo MissingParams
                     If UBound(Params) < 3 Then MissingParam = 3: GoTo MissingParams
                     ESave.PutData Params(2), Params(3)
-                    SetConsoleColor Colors.SuccessText
+                    SetConsoleColor colors.SuccessText
                     WriteWord "save-Success: succeed in adding data ."
                     Call ExitExec
                 Case "-edit"
@@ -389,7 +557,7 @@ Public Sub RunExec()
                     If Params(2) = "" Then MissingParam = 2: GoTo MissingParams
                     If UBound(Params) < 3 Then MissingParam = 3: GoTo MissingParams
                     ESave.PutData Params(2), Params(3)
-                    SetConsoleColor Colors.SuccessText
+                    SetConsoleColor colors.SuccessText
                     WriteWord "save-Success: succeed in writting data ."
                     Call ExitExec
                 Case "-saveswitch"
@@ -397,16 +565,16 @@ Public Sub RunExec()
                     If Params(2) = "" Then MissingParam = 2: GoTo MissingParams
                     If Params(2) = "true" Then
                         ESave.AutoSave = True
-                        SetConsoleColor Colors.SuccessText
+                        SetConsoleColor colors.SuccessText
                         WriteWord "save-Success: AutoSave " & ESave.AutoSave
                         Call ExitExec
                     ElseIf Params(2) = "false" Then
                         ESave.AutoSave = False
-                        SetConsoleColor Colors.SuccessText
+                        SetConsoleColor colors.SuccessText
                         WriteWord "save-Success: AutoSave " & ESave.AutoSave
                         Call ExitExec
                     Else
-                        SetConsoleColor Colors.ErrText
+                        SetConsoleColor colors.ErrText
                         WriteWord "save-Error: use 'true' or 'false' instead ."
                         Call ExitExec
                     End If
@@ -449,7 +617,7 @@ Public Sub RunExec()
                                 Case 3: Debug_focus = False
                             End Select
                             DebugWindow.touchArea_Click (3 - Val(Params(1))) + 3
-                            SetConsoleColor Colors.SuccessText
+                            SetConsoleColor colors.SuccessText
                             WriteWord "switchdebug-Success: alright ."
                             Call ExitExec
                         ElseIf Params(2) = "false" Then
@@ -459,16 +627,16 @@ Public Sub RunExec()
                                 Case 3: Debug_focus = True
                             End Select
                             DebugWindow.touchArea_Click (3 - Val(Params(1))) + 3
-                            SetConsoleColor Colors.SuccessText
+                            SetConsoleColor colors.SuccessText
                             WriteWord "switchdebug-Success: alright ."
                             Call ExitExec
                         Else
-                            SetConsoleColor Colors.ErrText
+                            SetConsoleColor colors.ErrText
                             WriteWord "switchdebug-Error: use 'true' or 'false' instead ."
                             Call ExitExec
                         End If
                     ElseIf Params(1) = CStr(Val(Params(1))) Then
-                        SetConsoleColor Colors.ErrText
+                        SetConsoleColor colors.ErrText
                         WriteWord "switchdebug-Error: the index must be between 1 and 3 ."
                         Call ExitExec
                     Else
@@ -477,7 +645,7 @@ Public Sub RunExec()
             End Select
         Case "showfps"
             Call BackLine: Call ClearLine
-            SetConsoleColor Colors.DefaultText
+            SetConsoleColor colors.DefaultText
             Select Case Params(1)
                 Case "-detail":  WriteWord "FPS " & FPS & " , max FPS " & Int(1000 / Int(FPSct / FPS)) & " (per frame " & Int(FPSct / FPS) & " ms)"
                 Case "-nomax": WriteWord "FPS " & FPS & " ."
@@ -496,7 +664,7 @@ Public Sub RunExec()
             WriteWord "Press [x] to exit ."
         Case "mousestate"
             Call BackLine: Call ClearLine
-            SetConsoleColor Colors.DefaultText
+            SetConsoleColor colors.DefaultText
             Select Case Params(1)
                 Case "": WriteWord "Button " & Mouse.button & " , click state " & Mouse.state & " , in (" & Mouse.x & "," & Mouse.y & ")"
                 Case "-help"
@@ -508,28 +676,26 @@ Public Sub RunExec()
             Call NextLine: Call ClearLine
             WriteWord "Press [x] to exit ."
         Case Else
-            SetConsoleColor Colors.DefaultText
+            SetConsoleColor colors.DefaultText
             WriteWord "Error: No such a command as '"
-            SetConsoleColor Colors.HighLightText
+            SetConsoleColor colors.HighLightText
             WriteWord Exec
-            SetConsoleColor Colors.DefaultText
+            SetConsoleColor colors.DefaultText
             WriteWord "' ."
-            NewLine
-            Call AllowCmd
-            Exec = ""
+            Call ExitExec
             Exit Sub
     End Select
     
     Exit Sub
     
 UnKnownCmd:
-    SetConsoleColor Colors.ErrText
+    SetConsoleColor colors.ErrText
     WriteWord "Error: Unknown command '" & Params(1) & "' , type '" & Exec & " -help' for help ."
     Call ExitExec
     Exit Sub
     
 MissingParams:
-    SetConsoleColor Colors.ErrText
+    SetConsoleColor colors.ErrText
     WriteWord Exec & "-Error: param " & MissingParam & " not found , type '" & Exec & " -help' for help ."
     Call ExitExec
 End Sub
@@ -539,14 +705,14 @@ Public Sub AllowInput()
 End Sub
 Public Sub AllowCmd()
     Call AllowInput
-    SetConsoleColor Colors.SuccessText
+    SetConsoleColor colors.SuccessText
     WriteWord "Emr>"
-    SetConsoleColor Colors.ErrText
+    SetConsoleColor colors.ErrText
     WriteWord "VB>"
-    SetConsoleColor Colors.HighLightText
-    WriteWord App.Title & ">"
+    SetConsoleColor colors.HighLightText
+    WriteWord App.title & ">"
     If Exec <> "" Then
-        SetConsoleColor Colors.DefaultText
+        SetConsoleColor colors.DefaultText
         WriteWord Exec & ">"
     End If
 End Sub
@@ -593,8 +759,8 @@ Public Sub NewLine()
         BitBlt ConsoleDC, 0, 0, GW - 20, 3222 - 25, ConsoleDC, 0, 25, vbSrcCopy
         ClearLine
     End If
-    If CuY - SY * 3222 >= GH - 80 Then
-        SY = (CuY - GH + 80) / 3222
+    If CuY - sy * 3222 >= GH - 80 Then
+        sy = (CuY - GH + 80) / 3222
     End If
     CuX = 0
 End Sub
@@ -612,35 +778,35 @@ Public Sub Update2()
     
     If FirstDisplay = False Then
         NewLine
-        SetConsoleColor Colors.DefaultText
+        SetConsoleColor colors.DefaultText
         WriteWord "Emerald Console Version "
-        SetConsoleColor Colors.HighLightText
+        SetConsoleColor colors.HighLightText
         WriteLine Version
-        SetConsoleColor Colors.ContentText
+        SetConsoleColor colors.ContentText
         WriteLine "Copyright (C) 2019 Error404 all rights reserved ."
         NewLine
-        SetConsoleColor Colors.DefaultText
+        SetConsoleColor colors.DefaultText
         WriteWord "Project name : "
-        SetConsoleColor Colors.ContentText
-        WriteWord App.Title
+        SetConsoleColor colors.ContentText
+        WriteWord App.title
         NewLine
-        SetConsoleColor Colors.DefaultText
+        SetConsoleColor colors.DefaultText
         WriteWord "Save state : "
-        SetConsoleColor IIf(ESave Is Nothing, Colors.ErrText, Colors.HighLightText)
+        SetConsoleColor IIf(ESave Is Nothing, colors.ErrText, colors.HighLightText)
         WriteWord IIf(ESave Is Nothing, "[Nothing] ", "[Safe] ")
         If Not ESave Is Nothing Then
-            SetConsoleColor Colors.ContentText
+            SetConsoleColor colors.ContentText
             WriteWord ESave.Count & " items in total ."
             NewLine
-            SetConsoleColor Colors.DefaultText
+            SetConsoleColor colors.DefaultText
             WriteWord "Save key : "
-            SetConsoleColor Colors.HighLightText
+            SetConsoleColor colors.HighLightText
             WriteWord ESave.Key
         End If
         NewLine
         
         If Abs(FPSct - 1000) > 60 Then
-            SetConsoleColor Colors.ErrText
+            SetConsoleColor colors.ErrText
             WriteLine "NOTE: It seems that you are using a timer to draw ."
         End If
         NewLine
@@ -650,7 +816,7 @@ Public Sub Update2()
     
     Call RunExec
     
-    PaintDC ConsoleDC, Page.CDC, 20, 40, 0, SY * 3222, GW - 40, IIf(3222 - SY * 3222 < GH, 3222 - SY * 3222, GH), 1
+    PaintDC ConsoleDC, Page.CDC, 20, 40, 0, sy * 3222, GW - 40, IIf(3222 - sy * 3222 < GH, 3222 - sy * 3222, GH), 1
     
     Dim pro As Long, alpha As Single
 
@@ -660,14 +826,14 @@ Public Sub Update2()
     Else
         alpha = Cubic((pro - 700) / 300, 0, 1, 1, 1)
     End If
-    Page.Writes InputingText, CuX + 20, CuY - SY * 3222 + 40, 16, argb(255, 242, 242, 242)
+    Page.Writes InputingText, CuX + 20, CuY - sy * 3222 + 40, 16, argb(255, 242, 242, 242)
     
-    If GetActiveWindow = Debuginfo.Hwnd Then Page.Paint 0, CuX + 20 + EF.GetWidth(Page.GG, InputingText, 16, StringAlignmentNear, FontStyleRegular), CuY - SY * 3222 + 40, 3, 20, argb(alpha * 255, 255, 255, 255)
+    If GetActiveWindow = Debuginfo.Hwnd Then Page.Paint 0, CuX + 20 + EF.GetWidth(Page.GG, InputingText, 16, StringAlignmentNear, FontStyleRegular), CuY - sy * 3222 + 40, 3, 20, argb(alpha * 255, 255, 255, 255)
     
     If CuY + 80 >= GH Then
         Dim MaxY As Single
         MaxY = (CuY - GH + 80) / 3220
-        Page.Paint 2, GW - 17, 60 + (SY / MaxY) * (GH - 60 - 20 - (80 - CuY / 3222 * 60)), 4, 80 - CuY / 3222 * 60, argb(255, 128, 128, 128), 20
+        Page.Paint 2, GW - 17, 60 + (sy / MaxY) * (GH - 60 - 20 - (80 - CuY / 3222 * 60)), 4, 80 - CuY / 3222 * 60, argb(255, 128, 128, 128), 20
         NeedScroll = True
     End If
     
@@ -710,7 +876,7 @@ End Sub
 Public Sub Lostfocus()
 
 End Sub
-Public Sub AnimationDone(id As Integer)
+Public Sub AnimationDone(ID As Integer)
 
 End Sub
 

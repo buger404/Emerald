@@ -419,7 +419,7 @@ Public Sub NewImages(path As String, Optional arg1, Optional arg2)
     If index = 0 Then
         PreLoadCount = PreLoadCount + c
     Else
-        Tree = GetAssetsTree(path)
+        Tree = AssetsTrees(index)
         For i = 1 To UBound(Tree.files)
             ReDim Preserve Mems(UBound(Mems) + 1)
             Mems(UBound(Mems)) = Tree.files(i)
@@ -446,6 +446,5 @@ Public Sub NewImages(path As String, Optional arg1, Optional arg2)
         LoadedCount = LoadedCount + 1
     Loop
     
-    If index = 0 Then AddAssetsTree Tree, IIf(IsMissing(arg1), "[Missing]", arg1), IIf(IsMissing(arg2), "[Missing]", arg2)
+    If index = 0 Then AddAssetsTree Tree, arg1, arg2
 End Sub
-

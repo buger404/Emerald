@@ -143,6 +143,7 @@ Private Sub Form_MouseUp(button As Integer, Shift As Integer, x As Single, y As 
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
+    Page.Dispose
     Set sh = Nothing
 End Sub
 

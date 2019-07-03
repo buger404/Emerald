@@ -104,7 +104,7 @@ Attribute VB_Name = "GCore"
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
-    Public Const Version As Long = 19070202      'hhhhhhhhh
+    Public Const Version As Long = 19070311      'hhhhhhhhhhhhhhhh
     Public TextHandle As Long, WaitChr As String
     
     Public AssetsTrees() As AssetsTree
@@ -222,6 +222,7 @@ Attribute VB_Name = "GCore"
     End Sub
     Public Sub EndEmerald()
         If DebugMode Then
+            Unload Debuginfo
             Unload DebugWindow
         End If
         
