@@ -128,7 +128,7 @@ Public Sub ReserveExec()
 End Sub
 Private Sub CheckUpdate(force As Boolean)
     On Error Resume Next
-    If InternetGetConnectedState(0&, 0&) = 0 Then
+    If InternetGetConnectedState(0&, 0&) = 0 And force = False Then
         SetConsoleColor Colors.ErrText
         WriteLine "Emerald-Error: connect to the Internet first ."
         Exit Sub
@@ -194,6 +194,80 @@ Public Sub RunExec()
     Dim MissingParam As Integer
 
     Select Case Exec
+        Case "info"
+            Select Case Params(1)
+                Case "-help"
+                    WriteLine "Show detail Emerald Information ."
+                    Call ExitExec
+                    Exit Sub
+                Case ""
+                    SetConsoleColor Colors.DefaultText
+                    WriteWord "Project name : "
+                    SetConsoleColor Colors.ContentText
+                    WriteWord App.Title
+                    NewLine
+                    SetConsoleColor Colors.DefaultText
+                    WriteWord "Save state : "
+                    SetConsoleColor IIf(ESave Is Nothing, Colors.ErrText, Colors.HighLightText)
+                    WriteWord IIf(ESave Is Nothing, "[Nothing] ", "[Safe] ")
+                    If Not ESave Is Nothing Then
+                        SetConsoleColor Colors.ContentText
+                        WriteWord ESave.Count & " items in total ."
+                        NewLine
+                        SetConsoleColor Colors.DefaultText
+                        WriteWord "Save key : "
+                        SetConsoleColor Colors.HighLightText
+                        WriteWord ESave.Key
+                        NewLine
+                        SetConsoleColor Colors.DefaultText
+                        WriteWord "Autosave : " & ESave.AutoSave
+                    End If
+                    NewLine
+                    
+                    If Abs(FPSct - 1000) > 60 Then
+                        SetConsoleColor Colors.ErrText
+                        WriteLine "NOTE: It seems that you are using a timer to draw ."
+                    End If
+                    NewLine
+                    
+                    SetConsoleColor Colors.DefaultText
+                    WriteLine "Active page : " & ECore.ActivePage
+                    WriteLine "FPS " & FPS & " , max FPS " & Int(1000 / Int(FPSct / FPS)) & " (per frame " & Int(FPSct / FPS) & " ms)"
+                    WriteLine "Button " & Mouse.button & " , click state " & Mouse.state & " , in (" & Mouse.x & "," & Mouse.y & ")"
+                    NewLine
+                    SetConsoleColor Colors.HighLightText
+                    WriteLine "Visual Basic 6.0 IDE"
+                    SetConsoleColor Colors.DefaultText
+                    WriteLine "ThreadID : " & VB.App.ThreadID
+                    WriteLine "hInstance : " & VB.App.hInstance
+                    WriteLine "CompanyName : " & VB.App.CompanyName
+                    WriteLine "Form counts : " & VB.Forms.Count
+                    SetConsoleColor Colors.HighLightText
+                    WriteLine "Screen Information"
+                    SetConsoleColor Colors.DefaultText
+                    WriteLine "Size : " & Screen.Width / Screen.TwipsPerPixelX & "x" & Screen.Height / Screen.TwipsPerPixelY
+                    WriteLine "DPI : " & 15 / Screen.TwipsPerPixelX * 96 & "(" & Int(15 / Screen.TwipsPerPixelX * 100) & "%)"
+                    SetConsoleColor Colors.HighLightText
+                    WriteLine "Creation Information"
+                    SetConsoleColor Colors.DefaultText
+                    WriteLine "Save : " & IIf(ESave Is Nothing, "[Missing]", ObjPtr(ESave))
+                    WriteLine "Page Manager : " & IIf(ECore Is Nothing, "[Missing]", ObjPtr(ECore))
+                    WriteLine "Font : " & IIf(EF Is Nothing, "[Missing]", ObjPtr(EF))
+                    WriteLine "Animation : " & IIf(EAni Is Nothing, "[Missing]", ObjPtr(EAni))
+                    WriteLine "Music List : " & IIf(EAni Is Nothing, "[Missing]", ObjPtr(EMusic))
+                    WriteLine "Assets Tree : " & UBound(AssetsTrees) & " trees in total ."
+                    For i = 1 To UBound(AssetsTrees)
+                        WriteLine i & ". " & AssetsTrees(i).path & " (" & AssetsTrees(i).arg1 & "," & AssetsTrees(i).arg2 & ") , " & UBound(AssetsTrees(i).files) & " files in total ."
+                    Next
+                    WriteLine "Current EditBox : " & TextHandle
+                    WriteLine "Bass : " & BassInstalled
+                    WriteLine "GDI+ : " & EmeraldInstalled
+                    WriteLine LoadedCount & " images loaded (" & ReLoadCount & " reload ) ."
+                    WriteLine "CrashMap : " & UBound(ColorLists)
+                    Call ExitExec
+                    Exit Sub
+                Case Else: GoTo UnKnownCmd
+            End Select
         Case "page"
             Select Case Params(1)
                 Case "-help"
@@ -342,14 +416,14 @@ Public Sub RunExec()
             Select Case Params(1)
                 Case "-help"
                     WriteLine "Check online update for Emerald ."
-                    WriteWord "-focus : Ignore update settings ."
+                    WriteWord "-force : Ignore update settings ."
                     Call ExitExec
                     Exit Sub
                 Case ""
                     Params(1) = "-wait"
                     Call CheckUpdate(False)
                     Call ExitExec
-                Case "-focus"
+                Case "-force"
                     Params(1) = "-wait"
                     Call CheckUpdate(True)
                     Call ExitExec

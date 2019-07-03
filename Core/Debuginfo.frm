@@ -111,39 +111,38 @@ Private Sub Form_Load()
 
 End Sub
 
-Private Sub Form_MouseDown(Button As Integer, Shift As Integer, X As Single, Y As Single)
-    If Y <= 40 And Button = 1 Then
+Private Sub Form_MouseDown(button As Integer, Shift As Integer, x As Single, y As Single)
+    If y <= 40 And button = 1 Then
         ReleaseCapture
         SendMessageA Me.Hwnd, WM_SYSCOMMAND, SC_MOVE Or HTCAPTION, 0
     End If
-    Call Form_MouseMove(Button, Shift, X, Y)
-    If Button = 1 Then
-        If Console.NeedScroll And X >= Console.GW - 20 And X <= Console.GW - 10 And Y >= 40 Then
+    Call Form_MouseMove(button, Shift, x, y)
+    If button = 1 Then
+        If Console.NeedScroll And x >= Console.GW - 20 And x <= Console.GW - 10 And y >= 40 Then
             SetCapture Me.Hwnd
             ScrollMode = True
         End If
     End If
 End Sub
 
-Private Sub Form_MouseMove(Button As Integer, Shift As Integer, X As Single, Y As Single)
-    If Button = 1 Then
+Private Sub Form_MouseMove(button As Integer, Shift As Integer, x As Single, y As Single)
+    If button = 1 Then
         If Console.NeedScroll And ScrollMode Then
             Dim MaxY As Single
             MaxY = (Console.CuY - Console.GH + 80) / 3220
-            Console.SY = (Y - 60) / (Console.GH - 60 - 20) * MaxY
+            Console.SY = (y - 60) / (Console.GH - 60 - 20) * MaxY
             If Console.SY < 0 Then Console.SY = 0
             If Console.SY > MaxY Then Console.SY = MaxY
         End If
     End If
 End Sub
 
-Private Sub Form_MouseUp(Button As Integer, Shift As Integer, X As Single, Y As Single)
-    Call Form_MouseMove(Button, Shift, X, Y)
+Private Sub Form_MouseUp(button As Integer, Shift As Integer, x As Single, y As Single)
+    Call Form_MouseMove(button, Shift, x, y)
     If ScrollMode Then ReleaseCapture: ScrollMode = False
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
-    Page.Dispose
     Set sh = Nothing
 End Sub
 

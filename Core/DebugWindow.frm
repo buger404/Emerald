@@ -99,7 +99,6 @@ Private Sub Form_Load()
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
-    Page.Dispose
     Set sh = Nothing
 End Sub
 

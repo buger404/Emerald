@@ -61,7 +61,7 @@ Public Key As String
         
         sToken = Create
         
-        Set ESave = Me
+        If ESave Is Nothing Then Set ESave = Me
     End Function
 '========================================================
 '   RunTime
