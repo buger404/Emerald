@@ -36,7 +36,18 @@ Public Sub DrawSetup()
     
     Page.Writes "简介：" & vbCrLf & SPackage.GameDescribe, 50, 250, 18, argb(150, 27, 27, 27)
     
-    Page.Writes "Powered by Emerald", 20, GH - 40, 16, argb(120, 27, 27, 27)
+    Page.Writes "安装路径", 49, GH - 110, 16, argb(150, 27, 27, 27)
+    If Page.ShowEdit(SSetupPath, 0, 130, GH - 110, 450, 25, argb(120, 27, 27, 27), argb(0, 0, 0, 0), argb(255, 242, 242, 242), argb(255, 85, 219, 211), size:=16) = 4 Then
+        If Right(SSetupPath, 1) = "\" Then SSetupPath = Left(SSetupPath, Len(SSetupPath) - 1)
+        Dim DadPath As String
+        DadPath = Left(SSetupPath, Len(SSetupPath) - Len(Split(SSetupPath, "\")(UBound(Split(SSetupPath, "\")))))
+        If Dir(DadPath, vbDirectory) = "" Then
+            SSetupPath = "C:\Program Files\" & SPackage.GameName
+            Dialog "错误", "指定的安装位置无效，因为父级目录不存在。", "哦"
+        End If
+    End If
+    
+    Page.ShowColorCheckBox LnkSwitch, 50, GH - 70, 100, 23, "创建桌面快捷方式", argb(255, 158, 158, 158), argb(255, 85, 219, 211), argb(150, 27, 27, 27), 16, FontStyleRegular
     
     If Page.ShowColorButton(0, GW - 170, GH - 80, 130, 40, "安装", argb(255, 255, 255, 255), argb(255, 85, 219, 211), argb(255, 55, 189, 181), size:=16) = 3 Then
         ECore.NewTransform transFadeIn, 700, "SetupPage"

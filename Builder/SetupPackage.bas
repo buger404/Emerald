@@ -13,6 +13,7 @@ Public Type EPackage
     files() As EFile
 End Type
 Public SPackage As EPackage, SetupMode As Boolean
+Public SSetupPath As String
 Public Function FindPackage(ByVal File As String, Start As Long) As Long
     Dim Package As EPackage, pos As Long
     With Package                    '设置文件头
@@ -169,8 +170,11 @@ End Sub
 Sub UninPack()
     On Error Resume Next
 
-    Dim path As String, te As String
+    Dim path As String, te As String, LogPath As String
     path = App.path
+    
+    Randomize
+    LogPath = VBA.Environ("temp") & "\Emerald_Setup_" & Int(Rnd * 999999999 + 1111111111) & ".txt"
     
     Set WSHShell = CreateObject("WScript.Shell")
     
@@ -179,7 +183,13 @@ Sub UninPack()
     SPackage.GameName = te
     Close #1
     
+    Open LogPath For Output As #2
+    Print #2, "Emerald 卸载程序报告"
+    Print #2, "游戏名称：" & SPackage.GameName
+    Print #2, ""
+    
     SetupPage.SetupInfo = "正在删除：软件信息"
+    Print #2, Now & "    " & "RegDelete: HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & SPackage.GameName
     WSHShell.RegDelete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & SPackage.GameName & "\DisplayIcon"
     WSHShell.RegDelete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & SPackage.GameName & "\DisplayName"
     WSHShell.RegDelete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & SPackage.GameName & "\DisplayVersion"
@@ -196,18 +206,30 @@ Sub UninPack()
     
     For i = 1 To UBound(files)
         SetupPage.SetupInfo = "正在删除：" & Replace(files(i), App.path & "\", "")
+        Print #2, Now & "    " & "Delete: " & files(i)
         If files(i) <> "Uninstall.exe" Then Kill files(i)
         SetupPage.Progress = i / UBound(files)
         Call FakeSleep(1)
     Next
         
     SetupErr = Err.Number
+    
+    Close #2
+    
+    ShellExecuteA 0, "open", LogPath, "", "", SW_SHOW
 End Sub
 Sub SetupPack()
     On Error Resume Next
 
-    Dim path As String
-    path = "C:\Program Files\" & SPackage.GameName & "\"
+    Dim path As String, LogPath As String
+    path = SSetupPath & "\"
+    
+    Randomize
+    LogPath = VBA.Environ("temp") & "\Emerald_Setup_" & Int(Rnd * 999999999 + 1111111111) & ".txt"
+    Open LogPath For Output As #2
+    Print #2, "Emerald 安装程序报告"
+    Print #2, "游戏名称：" & SPackage.GameName
+    Print #2, ""
     
     Set WSHShell = CreateObject("WScript.Shell")
     
@@ -218,14 +240,17 @@ Sub SetupPack()
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & SPackage.GameName & "\Publisher", SPackage.Maker
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & SPackage.GameName & "\InstallLocation", path
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & SPackage.GameName & "\URLInfoAbout", ""
-    WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & SPackage.GameName & "\UninstallString", """" & path & "Uninstall.exe" & """ ""-uninstallgame"""
+    WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & SPackage.GameName & "\UninstallString", """" & path & "Uninstall.exe" & """"
+    Print #2, Now & "    " & "RegWrite: HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & SPackage.GameName
     
     Call FakeSleep
     
     CreateFolder path
+    Print #2, Now & "    " & "Create: " & path
     
     For i = 1 To UBound(SPackage.files)
         SetupPage.SetupInfo = "正在写入：" & SPackage.files(i).path
+        Print #2, Now & "    " & "Write: " & path & SPackage.files(i).path
         CreateFolder path & SPackage.files(i).path
         Open path & SPackage.files(i).path For Binary As #1
         Put #1, , SPackage.files(i).data
@@ -234,32 +259,58 @@ Sub SetupPack()
         Call FakeSleep(1)
     Next
     
+    Print #2, Now & "    " & "Copy: " & VBA.Environ("temp") & "\emrtempUninstall.exe" & " -> " & path & "Uninstall.exe"
     FileCopy VBA.Environ("temp") & "\emrtempUninstall.exe", path & "Uninstall.exe"
     
-    Open path & "setup.config" For Output As #1
+    Dim RandomFolder As String
+    Randomize
+    RandomFolder = Hex(Int(Rnd * 999999999 + 100000000))
+    MkDir path & RandomFolder
+    Print #2, Now & "    " & "Create: " & path & RandomFolder
+    
+    Open path & RandomFolder & "\setup.config" For Output As #1
     Print #1, SPackage.GameName
     Close #1
+    Print #2, Now & "    " & "Write: " & path & RandomFolder & "\setup.config"
+    MakePackage path & RandomFolder, "none", "none", "none", "none", 0
+    Print #2, Now & "    " & "Package: " & path & RandomFolder
+    
+    Open VBA.Environ("temp") & "\copyemr.cmd" For Output As #1
+    Print #1, "@echo off"
+    Print #1, "copy """ & VBA.Environ("temp") & "\emrtempUninstall.exe" & """ /b + """ & VBA.Environ("temp") & "\emrpack"" /b """ & path & "Uninstall.exe" & """"
+    Close #1
+    Print #2, Now & "    " & "Command: " & "copy """ & VBA.Environ("temp") & "\emrtempUninstall.exe" & """ /b + """ & VBA.Environ("temp") & "\emrpack"" /b """ & path & "Uninstall.exe" & """"
+    ShellExecuteA 0, "open", VBA.Environ("temp") & "\copyemr.cmd", "", "", SW_SHOW
+    Print #2, Now & "    " & "Run: " & VBA.Environ("temp") & "\copyemr.cmd"
     
     On Error Resume Next
-    Dim objShell As Object, objShortcut As Object, strStart As String
-    Set objShell = CreateObject("WScript.Shell")
-    strStart = objShell.SpecialFolders("Desktop") & "\"
-    If Dir(strStart & "\" & SPackage.GameName & ".lnk") <> "" Then Exit Sub
-    Set objShortcut = objShell.CreateShortcut(strStart & "\" & SPackage.GameName & ".lnk")
-    objShortcut.TargetPath = path & "app.exe"
-    objShortcut.Arguments = ""
-    objShortcut.WindowStyle = 1
-    objShortcut.Hotkey = ""
-    objShortcut.IconLocation = path & "app.exe"
-    objShortcut.Description = SPackage.GameDescribe
-    objShortcut.WorkingDirectory = path
-    objShortcut.Save
-    Set objShell = Nothing
-    Set objShortcut = Nothing
+    If LnkSwitch Then
+        Dim objShell As Object, objShortcut As Object, strStart As String
+        Set objShell = CreateObject("WScript.Shell")
+        strStart = objShell.SpecialFolders("Desktop") & "\"
+        If Dir(strStart & "\" & SPackage.GameName & ".lnk") <> "" Then GoTo last
+        Set objShortcut = objShell.CreateShortcut(strStart & "\" & SPackage.GameName & ".lnk")
+        objShortcut.TargetPath = path & "app.exe"
+        objShortcut.Arguments = ""
+        objShortcut.WindowStyle = 1
+        objShortcut.Hotkey = ""
+        objShortcut.IconLocation = path & "app.exe"
+        objShortcut.Description = SPackage.GameDescribe
+        objShortcut.WorkingDirectory = path
+        objShortcut.Save
+        Set objShell = Nothing
+        Set objShortcut = Nothing
+        Print #2, Now & "    " & "Create: " & strStart & "\" & SPackage.GameName & ".lnk"
+        SetupPage.SetupInfo = "正在创建：桌面快捷方式"
+    End If
     
-    SetupPage.SetupInfo = "正在创建：桌面快捷方式"
+last:
+    
     Call FakeSleep(100)
     
     SetupErr = Err.Number
     
+    Close #2
+    
+    ShellExecuteA 0, "open", LogPath, "", "", SW_SHOW
 End Sub

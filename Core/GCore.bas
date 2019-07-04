@@ -104,7 +104,7 @@ Attribute VB_Name = "GCore"
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
-    Public Const Version As Long = 19070311      'hhhhhhhhhhhhhhhh
+    Public Const Version As Long = 19070404      'hhhhhhhhhhhhhhhhffff
     Public TextHandle As Long, WaitChr As String
     
     Public AssetsTrees() As AssetsTree

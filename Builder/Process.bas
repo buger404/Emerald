@@ -10,6 +10,7 @@ Public AppInfo() As String
 Public Cmd As String
 Public Abouting As Boolean
 Public SetMode As Boolean, PackPos As Long
+Public LnkSwitch As Boolean
 Public Function TestFile(path As String, IncludeText As String) As Boolean
     Dim temp As String
     If Dir(path) = "" Then Exit Function
@@ -268,6 +269,7 @@ End Sub
 Sub Main()
     Dim targetEXE As String
     targetEXE = App.path & "\" & App.EXEName & ".exe"
+    targetEXE = "C:\Program Files\Minesweeper\Uninstall.exe"
     'targetEXE = "D:\MyDoc\Emerald\Export\Minesweeper - 安装包.exe"
     
     PackPos = FindPackage(targetEXE, 598000)
@@ -276,7 +278,10 @@ Sub Main()
     ECore.Display
     DoEvents
     
+    LnkSwitch = True
+    
     If LCase(Trim(Replace(Command$, """", ""))) = "-uninstallgame" Then
+UninstallGame:
         If Dialog("卸载", "确实要卸载该游戏吗？", "是", "手滑") <> 1 Then Unload MainWindow: End
         CmdMark = "Uninstall"
         SetupMode = True
@@ -306,6 +311,16 @@ Sub Main()
         Open tempPath & "\setuppack.emrpack" For Binary As #1
         Get #1, , SPackage
         Close #1
+        If UBound(SPackage.files) = 1 Then
+            If SPackage.files(1).path = "setup.config" Then
+                '执行卸载程序
+                Open App.path & "\setup.config" For Binary As #1
+                Put #1, , SPackage.files(1).data
+                Close #1
+                GoTo UninstallGame
+            End If
+        End If
+        
         If SPackage.files(0).path <> "" Then
             Open tempPath & "\setupappicon.png" For Binary As #1
             Put #1, , SPackage.files(0).data
@@ -313,6 +328,7 @@ Sub Main()
             WelcomePage.Page.Res.newImage tempPath & "\setupappicon.png", 128, 128
         End If
         SetupMode = True
+        SSetupPath = "C:\Program Files\" & SPackage.GameName
         Kill tempPath & "\setuppack.emrpack"
         ECore.NewTransform , 700, "WelcomePage"
         Exit Sub
