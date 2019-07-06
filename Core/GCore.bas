@@ -104,7 +104,7 @@ Attribute VB_Name = "GCore"
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
-    Public Const Version As Long = 19070404      'hhhhhhhhhhhhhhhhffff
+    Public Const Version As Long = 19070608      'hhhhhhhhxxxhhhhhhhhffff
     Public TextHandle As Long, WaitChr As String
     
     Public AssetsTrees() As AssetsTree
@@ -113,6 +113,15 @@ Attribute VB_Name = "GCore"
 '================================================================================
     '读取INI
     Private Declare Function GetPrivateProfileString Lib "kernel32" Alias "GetPrivateProfileStringW" (ByVal lpApplicationName As Long, ByVal lpKeyName As Long, ByVal lpDefault As Long, ByVal lpReturnedString As Long, ByVal nSize As Long, ByVal lpFileName As Long) As Long
+    Public Function IsExitAFile(filespec As String) As Boolean
+            Dim FSO As Object
+            Set FSO = CreateObject("Scripting.FileSystemObject")
+            If FSO.fileExists(filespec) Then
+            IsExitAFile = True
+            Else: IsExitAFile = False
+            End If
+            Set FSO = Nothing
+    End Function
 '================================================================================
 '   运行时
 '   读取INI文件

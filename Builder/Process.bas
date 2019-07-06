@@ -269,7 +269,7 @@ End Sub
 Sub Main()
     Dim targetEXE As String
     targetEXE = App.path & "\" & App.EXEName & ".exe"
-    targetEXE = "C:\Program Files\Minesweeper\Uninstall.exe"
+    'targetEXE = "C:\Program Files\Minesweeper\Uninstall.exe"
     'targetEXE = "D:\MyDoc\Emerald\Export\Minesweeper - °²×°°ü.exe"
     
     PackPos = FindPackage(targetEXE, 598000)

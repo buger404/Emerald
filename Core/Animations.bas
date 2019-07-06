@@ -20,6 +20,7 @@ Attribute VB_Name = "Animations"
         sounds() As EAniSound
         tick As Long
         msg As String
+        disposed As Boolean
     End Type
     Public Type EAniChannel
         name As String
@@ -78,6 +79,7 @@ Attribute VB_Name = "Animations"
                             temp3 = Split(temp2(i), " ")
                             If temp3(0) = "tick" Then .frames(UBound(.frames)).tick = Val(temp3(1))
                             If temp3(0) = "stay" Then .frames(UBound(.frames)).tick = 0
+                            If temp3(0) = "dispose" Then .frames(UBound(.frames)).disposed = True
                             If temp3(0) = "msg" Then .frames(UBound(.frames)).msg = Split(temp2(i), """")(1)
                         Next
                     End If
