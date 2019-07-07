@@ -70,7 +70,7 @@ Attribute VB_Name = "GCore"
     End Type
     Public Type AssetsTree
         files() As GMem
-        path As String
+        Path As String
         arg1 As Variant
         arg2 As Variant
     End Type
@@ -104,7 +104,7 @@ Attribute VB_Name = "GCore"
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
-    Public Const Version As Long = 19070608      'hhhhhhhhxxxhhhhhhhhffff
+    Public Const Version As Long = 19070706      'hhhhhdfgdfhhhxxxhhhhhhhhffff
     Public TextHandle As Long, WaitChr As String
     
     Public AssetsTrees() As AssetsTree
@@ -133,9 +133,9 @@ Attribute VB_Name = "GCore"
         strBuf = Left(strBuf, InStr(strBuf, Chr(0)))
         ReadINI = strBuf
     End Function
-    Public Sub OutPutDebug(str As String)
-        Open App.path & "\debug.txt" For Append As #1
-        Print #1, Now & "    " & str
+    Public Sub OutPutDebug(Str As String)
+        Open App.Path & "\debug.txt" For Append As #1
+        Print #1, Now & "    " & Str
         Close #1
     End Sub
 '================================================================================
@@ -281,8 +281,8 @@ sth:
         
         GetWinNTVersion = Left(strOSversion, 3)
     End Function
-    Public Sub BlurTo(DC As Long, srcDC As Long, buffWin As Form, Optional radius As Long = 60)
-        Dim i As Long, G As Long, e As Long, b As BlurParams, w As Long, h As Long
+    Public Sub BlurTo(DC As Long, srcDC As Long, buffWin As Form, Optional Radius As Long = 60)
+        Dim i As Long, g As Long, e As Long, b As BlurParams, w As Long, h As Long
         '粘贴到缓冲窗口
         buffWin.AutoRedraw = True
         BitBlt buffWin.hdc, 0, 0, GW, GH, srcDC, 0, 0, vbSrcCopy: buffWin.Refresh
@@ -291,22 +291,22 @@ sth:
         GdipCreateBitmapFromHBITMAP buffWin.Image.handle, buffWin.Image.hpal, i
         
         '模糊操作
-        PoolCreateEffect2 GdipEffectType.Blur, e: b.radius = radius: GdipSetEffectParameters e, b, LenB(b)
+        PoolCreateEffect2 GdipEffectType.Blur, e: b.Radius = Radius: GdipSetEffectParameters e, b, LenB(b)
         GdipGetImageWidth i, w: GdipGetImageHeight i, h
         GdipBitmapApplyEffect i, e, NewRectL(0, 0, w, h), 0, 0, 0
         
         '画~
-        PoolCreateFromHdc DC, G
-        GdipDrawImage G, i, 0, 0
-        PoolDisposeImage i: PoolDeleteGraphics G: PoolDeleteEffect e '垃圾处理
+        PoolCreateFromHdc DC, g
+        GdipDrawImage g, i, 0, 0
+        PoolDisposeImage i: PoolDeleteGraphics g: PoolDeleteEffect e '垃圾处理
         buffWin.AutoRedraw = False
     End Sub
-    Public Sub BlurImg(img As Long, radius As Long)
+    Public Sub BlurImg(img As Long, Radius As Long)
         Dim b As BlurParams, e As Long, w As Long, h As Long
         
         '模糊操作
 
-        PoolCreateEffect2 GdipEffectType.Blur, e: b.radius = radius: GdipSetEffectParameters e, b, LenB(b)
+        PoolCreateEffect2 GdipEffectType.Blur, e: b.Radius = Radius: GdipSetEffectParameters e, b, LenB(b)
         GdipGetImageWidth img, w: GdipGetImageHeight img, h
         GdipBitmapApplyEffect img, e, NewRectL(0, 0, w, h), 0, 0, 0
         
@@ -443,10 +443,10 @@ sth:
         AssetsTrees(UBound(AssetsTrees)).arg1 = arg1
         AssetsTrees(UBound(AssetsTrees)).arg2 = arg2
     End Function
-    Public Function FindAssetsTree(path As String, arg1 As Variant, arg2 As Variant) As Integer
+    Public Function FindAssetsTree(Path As String, arg1 As Variant, arg2 As Variant) As Integer
         On Error Resume Next
         For i = 1 To UBound(AssetsTrees)
-            If AssetsTrees(i).path = path And AssetsTrees(i).arg1 = arg1 And AssetsTrees(i).arg2 = arg2 Then
+            If AssetsTrees(i).Path = Path And AssetsTrees(i).arg1 = arg1 And AssetsTrees(i).arg2 = arg2 Then
                 If Err.Number <> 0 Then
                     Err.Clear
                 Else
@@ -455,9 +455,9 @@ sth:
             End If
         Next
     End Function
-    Public Function GetAssetsTree(path As String) As AssetsTree
+    Public Function GetAssetsTree(Path As String) As AssetsTree
         For i = 1 To UBound(AssetsTrees)
-            If AssetsTrees(i).path = path Then GetAssetsTree = AssetsTrees(i): Exit For
+            If AssetsTrees(i).Path = Path Then GetAssetsTree = AssetsTrees(i): Exit For
         Next
     End Function
 '========================================================

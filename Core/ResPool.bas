@@ -168,7 +168,7 @@ Public Sub PoolCreateFont(fam As Long, ByVal size As Single, style As FontStyle,
     gdiplus.GdipCreateFont fam, size, style, unit, Font
     PoolAddFont Font
 End Sub
-Public Sub PoolCreateEffect(eff As GdipEffectType, Effect As Long)
+Public Sub PoolCreateEffect2(eff As GdipEffectType, Effect As Long)
     gdiplus.GdipCreateEffect2 eff, Effect
     PoolAddEffect Effect
 End Sub
