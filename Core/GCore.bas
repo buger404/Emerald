@@ -115,7 +115,7 @@ Attribute VB_Name = "GCore"
     Private Declare Function GetPrivateProfileString Lib "kernel32" Alias "GetPrivateProfileStringW" (ByVal lpApplicationName As Long, ByVal lpKeyName As Long, ByVal lpDefault As Long, ByVal lpReturnedString As Long, ByVal nSize As Long, ByVal lpFileName As Long) As Long
     Public Function IsExitAFile(filespec As String) As Boolean
             Dim FSO As Object
-            Set FSO = CreateObject("Scripting.FileSystemObject")
+            Set FSO = PoolCreateObject("Scripting.FileSystemObject")
             If FSO.fileExists(filespec) Then
             IsExitAFile = True
             Else: IsExitAFile = False
@@ -133,9 +133,9 @@ Attribute VB_Name = "GCore"
         strBuf = Left(strBuf, InStr(strBuf, Chr(0)))
         ReadINI = strBuf
     End Function
-    Public Sub OutPutDebug(Str As String)
+    Public Sub OutPutDebug(str As String)
         Open App.path & "\debug.txt" For Append As #1
-        Print #1, Now & "    " & Str
+        Print #1, Now & "    " & str
         Close #1
     End Sub
 '================================================================================
@@ -171,6 +171,8 @@ Attribute VB_Name = "GCore"
     Public Sub StartEmerald(Hwnd As Long, w As Long, h As Long)
         ReDim ColorLists(0)
             
+        Call InitPool
+        
         Dim strComputer, objWMIService, colItems, objItem, strOSversion As String
         strComputer = "."
         Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\cimv2")
@@ -236,8 +238,10 @@ Attribute VB_Name = "GCore"
         End If
         
         If App.LogMode <> 0 Then SetWindowLongA GHwnd, GWL_WNDPROC, Wndproc
-        If Not (ECore Is Nothing) Then ECore.Dispose
-        If Not (EF Is Nothing) Then EF.Dispose
+        'If Not (ECore Is Nothing) Then ECore.Dispose
+        'If Not (EF Is Nothing) Then EF.Dispose
+        Call DestroyPool
+        
         TerminateGDIPlus
         If BassInstalled Then BASS_Free
     End Sub
@@ -278,7 +282,7 @@ sth:
         GetWinNTVersion = Left(strOSversion, 3)
     End Function
     Public Sub BlurTo(DC As Long, srcDC As Long, buffWin As Form, Optional radius As Long = 60)
-        Dim i As Long, g As Long, e As Long, b As BlurParams, w As Long, h As Long
+        Dim i As Long, G As Long, e As Long, b As BlurParams, w As Long, h As Long
         '粘贴到缓冲窗口
         buffWin.AutoRedraw = True
         BitBlt buffWin.hdc, 0, 0, GW, GH, srcDC, 0, 0, vbSrcCopy: buffWin.Refresh
@@ -287,14 +291,14 @@ sth:
         GdipCreateBitmapFromHBITMAP buffWin.Image.handle, buffWin.Image.hpal, i
         
         '模糊操作
-        GdipCreateEffect2 GdipEffectType.Blur, e: b.radius = radius: GdipSetEffectParameters e, b, LenB(b)
+        PoolCreateEffect2 GdipEffectType.Blur, e: b.radius = radius: GdipSetEffectParameters e, b, LenB(b)
         GdipGetImageWidth i, w: GdipGetImageHeight i, h
         GdipBitmapApplyEffect i, e, NewRectL(0, 0, w, h), 0, 0, 0
         
         '画~
-        GdipCreateFromHDC DC, g
-        GdipDrawImage g, i, 0, 0
-        GdipDisposeImage i: GdipDeleteGraphics g: GdipDeleteEffect e '垃圾处理
+        PoolCreateFromHdc DC, G
+        GdipDrawImage G, i, 0, 0
+        PoolDisposeImage i: PoolDeleteGraphics G: PoolDeleteEffect e '垃圾处理
         buffWin.AutoRedraw = False
     End Sub
     Public Sub BlurImg(img As Long, radius As Long)
@@ -302,31 +306,13 @@ sth:
         
         '模糊操作
 
-        GdipCreateEffect2 GdipEffectType.Blur, e: b.radius = radius: GdipSetEffectParameters e, b, LenB(b)
+        PoolCreateEffect2 GdipEffectType.Blur, e: b.radius = radius: GdipSetEffectParameters e, b, LenB(b)
         GdipGetImageWidth img, w: GdipGetImageHeight img, h
         GdipBitmapApplyEffect img, e, NewRectL(0, 0, w, h), 0, 0, 0
         
         '画~
-        GdipDeleteEffect e '垃圾处理
+        PoolDeleteEffect e '垃圾处理
     End Sub
-    Public Function CreateCDC(w As Long, h As Long) As Long
-        Dim bm As BITMAPINFOHEADER, DC As Long, DIB As Long
-    
-        With bm
-            .biBitCount = 32
-            .biHeight = h
-            .biWidth = w
-            .biPlanes = 1
-            .biSizeImage = (.biWidth * .biBitCount + 31) / 32 * 4 * .biHeight
-            .biSize = Len(bm)
-        End With
-        
-        DC = CreateCompatibleDC(GDC)
-        DIB = CreateDIBSection(DC, bm, DIB_RGB_COLORS, ByVal 0, 0, 0)
-        DeleteObject SelectObject(DC, DIB)
-        
-        CreateCDC = DC
-    End Function
     Public Sub PaintDC(DC As Long, destDC As Long, Optional x As Long = 0, Optional y As Long = 0, Optional cx As Long = 0, Optional cy As Long = 0, Optional cw, Optional ch, Optional alpha)
         Dim b As BLENDFUNCTION, index As Integer, bl As Long
         
@@ -420,7 +406,7 @@ sth:
             data.PutData "UpdateTime", Now
             
             Dim xmlHttp As Object, Ret As String, Start As Long
-            Set xmlHttp = CreateObject("Microsoft.XMLHTTP")
+            Set xmlHttp = PoolCreateObject("Microsoft.XMLHTTP")
             xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
             xmlHttp.send
                          

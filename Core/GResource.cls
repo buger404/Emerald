@@ -15,7 +15,7 @@ Private Declare Function CLSIDFromString Lib "ole32.dll" (ByVal lpszProgID As Lo
 Public HotLoad As Boolean
 Dim AssetsFolder() As String, FolderParam1() As Variant, FolderParam2() As Variant
 Public SearchIndex As Long
-Public NoLoadCrash As Boolean
+Public NoLoadCrash As Boolean, NoLoadDirection As Boolean
 Dim Mems() As GMem
 Dim Effect As Long, effectw As Long, effecth As Long, effectimg As Long, effectindex As Integer
 Dim DisposeMark As Boolean
@@ -23,6 +23,7 @@ Private Sub Class_Initialize()
     ReDim Mems(0)
     ReDim AssetsFolder(0): ReDim FolderParam1(0): ReDim FolderParam2(0)
     SearchIndex = 1
+    NoLoadDirection = True
 End Sub
 Public Sub ClipCircle(n)
     Dim index As Integer
@@ -33,7 +34,7 @@ Public Sub ClipCircle(n)
         index = n
     End If
 
-    Dim path As Long, bmpGraph As Long, BMP As Long, BMP2 As Long, tempGraph As Long
+    Dim Path As Long, bmpGraph As Long, BMP As Long, BMP2 As Long, tempGraph As Long
     Dim w As Long, h As Long
     
     GdipGetImageWidth Mems(index).ImgHwnd, w
@@ -47,9 +48,9 @@ Public Sub ClipCircle(n)
     GdipSetSmoothingMode tempGraph, SmoothingModeAntiAlias
     GdipSetSmoothingMode bmpGraph, SmoothingModeAntiAlias
     
-    GdipCreatePath FillModeWinding, path
-    GdipAddPathEllipseI path, 1, 1, w * 2 - 2, h * 2 - 2
-    GdipSetClipPath bmpGraph, path, CombineModeReplace
+    PoolCreatePath FillModeWinding, Path
+    GdipAddPathEllipseI Path, 1, 1, w * 2 - 2, h * 2 - 2
+    GdipSetClipPath bmpGraph, Path, CombineModeReplace
     
     GdipDrawImageRectI bmpGraph, Mems(index).ImgHwnd, 0, 0, w * 2, h * 2
     GdipResetClip bmpGraph
@@ -58,11 +59,11 @@ Public Sub ClipCircle(n)
     
     GdipDrawImageRectI tempGraph, BMP, 0, 0, w - 1, h - 1
 
-    GdipDeletePath path
-    GdipDeleteGraphics bmpGraph
-    GdipDisposeImage BMP
-    GdipDeleteGraphics tempGraph
-    GdipDisposeImage Mems(index).ImgHwnd
+    GdipDeletePath Path
+    PoolDeleteGraphics bmpGraph
+    PoolDisposeImage BMP
+    PoolDeleteGraphics tempGraph
+    PoolDisposeImage Mems(index).ImgHwnd
     
     Mems(index).ImgHwnd = BMP2
     
@@ -79,7 +80,7 @@ Private Sub ApplyEffect(n, kind As GdipEffectType)
     
     effectimg = Mems(index).ImgHwnd
     
-    GdipCreateEffect2 kind, Effect
+    PoolCreateEffect2 kind, Effect
     
     effectindex = index
 End Sub
@@ -87,7 +88,7 @@ Private Sub ApplyEffectStep2()
     GdipGetImageWidth effectimg, effectw: GdipGetImageHeight effectimg, effecth
     GdipBitmapApplyEffect effectimg, Effect, NewRectL(0, 0, effectw, effecth), 0, 0, 0
     
-    GdipDeleteEffect Effect '垃圾处理
+    PoolDeleteEffect Effect '垃圾处理
     
     Call ReDraw(effectindex)
 End Sub
@@ -100,18 +101,18 @@ Public Sub ApplyTintEffect(n, amount As Long, hue As Long)
     GdipSetEffectParameters Effect, e, LenB(e)
     ApplyEffectStep2
 End Sub
-Public Sub ApplySharpenEffect(n, amount As Single, radius As Single)
+Public Sub ApplySharpenEffect(n, amount As Single, Radius As Single)
     Dim e As SharpenParams
     e.amount = amount
-    e.radius = radius
+    e.Radius = Radius
 
     ApplyEffect n, Sharpen
     GdipSetEffectParameters Effect, e, LenB(e)
     ApplyEffectStep2
 End Sub
-Public Sub ApplyBlurEffect(n, radius As Long, edge As Integer)
+Public Sub ApplyBlurEffect(n, Radius As Long, edge As Integer)
     Dim e As BlurParams
-    e.radius = radius
+    e.Radius = Radius
     e.expandEdge = edge
 
     ApplyEffect n, Blur
@@ -182,18 +183,18 @@ Private Sub ReDraw(i As Integer)
     If Mems(i).GIF.Count > 0 Then Exit Sub
     
     Dim g As Long
-    GdipCreateFromHDC Mems(i).Hwnd, g
+    PoolCreateFromHdc Mems(i).Hwnd, g
     GdipSetSmoothingMode g, SmoothingModeAntiAlias
     GdipGraphicsClear g, 0
     GdipDrawImageRect g, Mems(i).ImgHwnd, 0, 0, Mems(i).w, Mems(i).h
-    GdipDeleteGraphics g
+    PoolDeleteGraphics g
     
     For s = 0 To 3
-        GdipCreateFromHDC Mems(i).Imgs(s), g
+        PoolCreateFromHdc Mems(i).Imgs(s), g
         GdipSetSmoothingMode g, SmoothingModeAntiAlias
         GdipGraphicsClear g, 0
         GdipDrawImageRect g, Mems(i).ImgHwnd, IIf(s = 1 Or s = 3, Mems(i).w, 0), IIf(s = 2 Or s = 3, Mems(i).h, 0), Mems(i).w * IIf(s = 1 Or s = 3, -1, 1), Mems(i).h * IIf(s = 2 Or s = 3, -1, 1)
-        GdipDeleteGraphics g
+        PoolDeleteGraphics g
     Next
     
     Dim tempCo As Long, tCo(3) As Byte
@@ -251,17 +252,18 @@ Public Property Get ImgSize(n, sizeIndex As imgIndex)
 End Property
 Public Sub Dispose()
     If DisposeMark Then Exit Sub
+    Exit Sub
     For i = 1 To UBound(Mems)
         If Not Mems(i).copyed Then
             Select Case Mems(i).kind
                 Case 0 'DC
                     If Mems(i).Hwnd <> 0 Then DeleteObject Mems(i).Hwnd
-                    If Mems(i).ImgHwnd <> 0 Then GdipDisposeImage Mems(i).ImgHwnd
+                    If Mems(i).ImgHwnd <> 0 Then PoolDisposeImage Mems(i).ImgHwnd
                     For s = 0 To 3
                         If Mems(i).Imgs(s) <> 0 Then DeleteObject Mems(i).Imgs(s)
                     Next
                 Case 1 'Graphics
-                    GdipDeleteGraphics Mems(i).Hwnd
+                    PoolDeleteGraphics Mems(i).Hwnd
             End Select
             If Mems(i).GIF.Count > 0 Then
                 For s = 0 To Mems(i).GIF.Count
@@ -326,7 +328,7 @@ Public Function GetImage(ByVal name As String) As Integer
         End If
     End If
 End Function
-Public Sub newImage(path As String, Optional arg1, Optional arg2, Optional name As String = "")
+Public Sub newImage(Path As String, Optional arg1, Optional arg2, Optional name As String = "")
     'when arg1 is missing ; i.w = i.w
     'when arg2 is missing but arg1 has content ; i.w = i.w * arg1
     'other ; i.w = arg1
@@ -335,7 +337,7 @@ Public Sub newImage(path As String, Optional arg1, Optional arg2, Optional name 
     If IsMissing(arg2) And (Not IsMissing(arg1)) Then si = 1
     If (Not IsMissing(arg2)) And (Not IsMissing(arg1)) Then si = 2
     
-    GdipCreateBitmapFromFile StrPtr(path), i
+    PoolCreateBitmapFromFile StrPtr(Path), i
     GdipGetImageWidth i, w: GdipGetImageHeight i, h
     
     If si = 1 Then w = Round(w * arg1): h = Round(h * arg1)
@@ -346,7 +348,7 @@ Public Sub newImage(path As String, Optional arg1, Optional arg2, Optional name 
     GdipImageGetFrameCount i, gC, gL
     
     If gL > 0 Then  '动态GIF支持
-        temp = Split(path, "\")
+        temp = Split(Path, "\")
         Add 0, 0, temp(UBound(temp)), w, h, temp(UBound(temp) - 1)
         With Mems(UBound(Mems))
             .GIF.Count = gL
@@ -354,9 +356,9 @@ Public Sub newImage(path As String, Optional arg1, Optional arg2, Optional name 
             For index = 0 To gL
                 GdipImageSelectActiveFrame i, gC, index
                 DC = CreateCDC(w, h)
-                GdipCreateFromHDC DC, g
+                PoolCreateFromHdc DC, g
                 GdipDrawImageRect g, i, 0, 0, w, h
-                GdipDeleteGraphics g
+                PoolDeleteGraphics g
                 .GIF.frames(index) = DC
             Next
         End With
@@ -365,7 +367,7 @@ Public Sub newImage(path As String, Optional arg1, Optional arg2, Optional name 
         Exit Sub
     End If
     
-    temp = Split(path, "\")
+    temp = Split(Path, "\")
     ReDim Preserve Mems(UBound(Mems) + 1)
     With Mems(UBound(Mems))
         .name = IIf(name = "", temp(UBound(temp)), name)
@@ -376,10 +378,11 @@ Public Sub newImage(path As String, Optional arg1, Optional arg2, Optional name 
     End With
     
     For s = 0 To 3
+        If NoLoadDirection And s > 0 Then Exit For
         DC = CreateCDC(w, h)
-        GdipCreateFromHDC DC, g
+        PoolCreateFromHdc DC, g
         GdipDrawImageRect g, i, IIf(s = 1 Or s = 3, w, 0), IIf(s = 2 Or s = 3, h, 0), w * IIf(s = 1 Or s = 3, -1, 1), h * IIf(s = 2 Or s = 3, -1, 1)
-        GdipDeleteGraphics g
+        PoolDeleteGraphics g
         Mems(UBound(Mems)).Imgs(s) = DC
     Next
     
@@ -406,27 +409,27 @@ Public Sub newImage(path As String, Optional arg1, Optional arg2, Optional name 
     
     Mems(UBound(Mems)).CrashIndex = UBound(ColorLists)
 End Sub
-Public Sub NewImages(path As String, Optional arg1, Optional arg2)
+Public Sub NewImages(Path As String, Optional arg1, Optional arg2)
 
     If HotLoad Then
         ReDim Preserve AssetsFolder(UBound(AssetsFolder) + 1)
         ReDim Preserve FolderParam1(UBound(FolderParam1) + 1)
         ReDim Preserve FolderParam2(UBound(FolderParam2) + 1)
-        If Right(path, 1) <> "\" Then path = path & "\"
-        AssetsFolder(UBound(AssetsFolder)) = path
+        If Right(Path, 1) <> "\" Then Path = Path & "\"
+        AssetsFolder(UBound(AssetsFolder)) = Path
         FolderParam1(UBound(FolderParam1)) = arg1
         FolderParam2(UBound(FolderParam2)) = arg2
         Exit Sub
     End If
     
     Dim f As String, c As Long
-    If Right(path, 1) <> "\" Then path = path & "\"
+    If Right(Path, 1) <> "\" Then Path = Path & "\"
     
     Dim index As Integer, Tree As AssetsTree
-    Tree.path = path: ReDim Tree.files(0)
-    index = FindAssetsTree(path, arg1, arg2)
+    Tree.Path = Path: ReDim Tree.files(0)
+    index = FindAssetsTree(Path, arg1, arg2)
     
-    f = Dir(path)
+    f = Dir(Path)
     Do While f <> ""
         c = c + 1
         ReDim Preserve Tree.files(UBound(Tree.files) + 1)
@@ -445,15 +448,15 @@ Public Sub NewImages(path As String, Optional arg1, Optional arg2)
         Exit Sub
     End If
     
-    f = Dir(path)
+    f = Dir(Path)
     i = 1
     Do While f <> ""
         If IsMissing(arg1) Then
-            newImage path & f
+            newImage Path & f
         ElseIf IsMissing(arg2) Then
-            newImage path & f, arg1
+            newImage Path & f, arg1
         Else
-            newImage path & f, arg1, arg2
+            newImage Path & f, arg1, arg2
         End If
         Tree.files(i) = Mems(UBound(Mems))
         i = i + 1

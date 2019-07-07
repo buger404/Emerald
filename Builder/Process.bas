@@ -25,7 +25,7 @@ Public Sub CheckUpdate()
     On Error GoTo ErrHandle
     
     Dim WSHShell As Object, temp As String
-    Set WSHShell = CreateObject("WScript.Shell")
+    Set WSHShell = PoolCreateObject("WScript.Shell")
     
     temp = WSHShell.RegRead("HKEY_CLASSES_ROOT\Directory\shell\emerald\version")
     IsUpdate = (Val(temp) <> Version)
@@ -37,7 +37,7 @@ Public Sub GetInstalledPath()
     On Error GoTo ErrHandle
     
     Dim WSHShell As Object, temp As String
-    Set WSHShell = CreateObject("WScript.Shell")
+    Set WSHShell = PoolCreateObject("WScript.Shell")
     
     temp = WSHShell.RegRead("HKEY_CLASSES_ROOT\Directory\shell\emerald\icon")
     InstalledPath = Replace(temp, """", "")
@@ -49,7 +49,7 @@ Public Sub GetVBIDEPath()
     On Error GoTo ErrHandle
     
     Dim WSHShell As Object, temp As String, temp2() As String
-    Set WSHShell = CreateObject("WScript.Shell")
+    Set WSHShell = PoolCreateObject("WScript.Shell")
     
     temp = WSHShell.RegRead("HKEY_CLASSES_ROOT\VisualBasic.Project\shell\open\command\")
     temp2 = Split(temp, "vb6.exe")
@@ -65,7 +65,7 @@ Public Function CheckFileName(name As String) As Boolean
     CheckFileName = ((InStr(name, "*") Or InStr(name, "\") Or InStr(name, "/") Or InStr(name, ":") Or InStr(name, "?") Or InStr(name, """") Or InStr(name, "<") Or InStr(name, ">") Or InStr(name, "|") Or InStr(name, " ") Or InStr(name, "!") Or InStr(name, "-") Or InStr(name, "+") Or InStr(name, "#") Or InStr(name, "@") Or InStr(name, "$") Or InStr(name, "^") Or InStr(name, "&") Or InStr(name, "(") Or InStr(name, ")")) = 0)
     Dim t As String
     If name <> "" Then t = Left(name, 1)
-    CheckFileName = CheckFileName And (Trim(Str(Val(t))) <> t)
+    CheckFileName = CheckFileName And (Trim(str(Val(t))) <> t)
 End Function
 Sub Uninstall()
     'If Dialog("卸载", "Emerald Builder 已经安装，你希望删除它吗？", "卸载", "手滑") <> 1 Then End
@@ -75,7 +75,7 @@ Sub Uninstall()
     SetupPage.Progress = 0.1
     Call FakeSleep
     
-    Set WSHShell = CreateObject("WScript.Shell")
+    Set WSHShell = PoolCreateObject("WScript.Shell")
     
     SetupPage.SetupInfo = "正在删除：资源管理器背景菜单项"
     SetupPage.Progress = 0.4
@@ -142,7 +142,7 @@ Sub Setup()
     
     SetupPage.SetupInfo = "正在创建：WScript.Shell对象"
     SetupPage.Progress = 0.1
-    Set WSHShell = CreateObject("WScript.Shell")
+    Set WSHShell = PoolCreateObject("WScript.Shell")
 
     Call FakeSleep
 
@@ -204,7 +204,7 @@ Sub CheckVersion()
     On Error Resume Next
     Dim exeP As String, sh As String
     exeP = """" & App.path & "\Builder.exe" & """"
-    Set WSHShell = CreateObject("WScript.Shell")
+    Set WSHShell = PoolCreateObject("WScript.Shell")
     
     sh = WSHShell.RegRead("HKEY_CLASSES_ROOT\Directory\shell\emerald\version")
     
@@ -241,7 +241,7 @@ Public Sub CheckOnLineUpdate()
         data.PutData "UpdateTime", Now
         
         Dim xmlHttp As Object, Ret As String, Start As Long
-        Set xmlHttp = CreateObject("Microsoft.XMLHTTP")
+        Set xmlHttp = PoolCreateObject("Microsoft.XMLHTTP")
         xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
         xmlHttp.send
         

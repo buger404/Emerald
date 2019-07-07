@@ -28,7 +28,7 @@ Public Key As String
 '========================================================
 '   Init
     Public Function Create(name As String, Optional BMKey) As Boolean
-        path = "C:\Users\" & CreateObject("Wscript.Network").Username & "\AppData\Local\" & name
+        path = "C:\Users\" & PoolCreateObject("Wscript.Network").Username & "\AppData\Local\" & name
         AutoSave = True
         
         If Not IsMissing(BMKey) Then Key = BMKey

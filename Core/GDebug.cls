@@ -164,7 +164,7 @@ Private Sub CheckUpdate(force As Boolean)
             Sleep 10: DoEvents
         Loop
         
-        Set xmlHttp = CreateObject("Microsoft.XMLHTTP")
+        Set xmlHttp = PoolCreateObject("Microsoft.XMLHTTP")
         xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
         xmlHttp.send
                      
@@ -204,7 +204,7 @@ Public Function GetVBIDEPath() As String
     On Error GoTo ErrHandle
     
     Dim WSHShell As Object, temp As String, temp2() As String
-    Set WSHShell = CreateObject("WScript.Shell")
+    Set WSHShell = PoolCreateObject("WScript.Shell")
     
     temp = WSHShell.RegRead("HKEY_CLASSES_ROOT\VisualBasic.Project\shell\open\command\")
     temp2 = Split(temp, "vb6.exe")
@@ -219,6 +219,22 @@ Public Sub RunExec()
     Dim MissingParam As Integer
 
     Select Case Exec
+        Case "poolinfo"
+            Select Case Params(1)
+                Case "-help"
+                    WriteWord "Show pool information ."
+                    Call ExitExec
+                    Exit Sub
+                Case ""
+                    Dim poolinfo() As String
+                    poolinfo = Split(GetCountStr, vbCrLf)
+                    For i = 0 To UBound(poolinfo)
+                        WriteLine poolinfo(i)
+                    Next
+                    Call ExitExec
+                    Exit Sub
+                Case Else: GoTo UnKnownCmd
+            End Select
         Case "backup"
             Select Case Params(1)
                 Case "-help"
@@ -240,14 +256,14 @@ Public Sub RunExec()
                     
                     Dim bFile As String, Size1 As Long, Size2 As Long
                     
-                    If Dir(App.path & "\.emr\backup\" & Params(2), vbDirectory) = "" Then
+                    If Dir(App.Path & "\.emr\backup\" & Params(2), vbDirectory) = "" Then
                         SetConsoleColor colors.ErrText
-                        WriteWord "backup-Error: the backup not found '" & App.path & "\.emr\backup\" & Params(2) & "'"
+                        WriteWord "backup-Error: the backup not found '" & App.Path & "\.emr\backup\" & Params(2) & "'"
                         Call ExitExec
                         Exit Sub
                     End If
                     Dim bStep As Long, bfo As String, bsfo As String, targetFile As String, targetGet As Boolean
-                    bFile = Dir(App.path & "\.emr\backup\" & Params(2) & "\"): bfo = "core": bsfo = ""
+                    bFile = Dir(App.Path & "\.emr\backup\" & Params(2) & "\"): bfo = "core": bsfo = ""
                     If UBound(Params) = 3 Then targetFile = Params(3): WriteLine "Finding"
                     
 ReCopy:
@@ -260,9 +276,9 @@ ReCopy:
                             NextLine
                         End If
                         If (targetFile <> "" And targetFile = bFile) Or (targetFile = "") Then
-                            Size1 = FileLen(App.path & "\.emr\backup\" & Params(2) & "\" & bsfo & "\" & bFile): Size2 = 0
-                            Size2 = FileLen(App.path & "\" & bfo & "\" & bFile)
-                            FileCopy App.path & "\.emr\backup\" & Params(2) & "\" & bsfo & "\" & bFile, App.path & "\" & bfo & "\" & bFile
+                            Size1 = FileLen(App.Path & "\.emr\backup\" & Params(2) & "\" & bsfo & "\" & bFile): Size2 = 0
+                            Size2 = FileLen(App.Path & "\" & bfo & "\" & bFile)
+                            FileCopy App.Path & "\.emr\backup\" & Params(2) & "\" & bsfo & "\" & bFile, App.Path & "\" & bfo & "\" & bFile
                             SetConsoleColor colors.DefaultText
                             WriteWord "Success : " & bFile & "      "
                             SetConsoleColor IIf(Size1 = Size2, colors.DefaultText, IIf(Size1 > Size2, colors.SuccessText, colors.ErrText))
@@ -276,8 +292,8 @@ ReCopy:
                         Sleep 10: DoEvents
                     Loop
                     bStep = bStep + 1
-                    If bStep = 1 And (Not targetGet) Then bFile = Dir(App.path & "\.emr\backup\" & Params(2) & "\cache\"): bfo = ".emr\cache": bsfo = "cache"
-                    If bStep = 2 And (Not targetGet) Then bFile = Dir(App.path & "\.emr\backup\" & Params(2) & "\project\"): bfo = "": bsfo = "project"
+                    If bStep = 1 And (Not targetGet) Then bFile = Dir(App.Path & "\.emr\backup\" & Params(2) & "\cache\"): bfo = ".emr\cache": bsfo = "cache"
+                    If bStep = 2 And (Not targetGet) Then bFile = Dir(App.Path & "\.emr\backup\" & Params(2) & "\project\"): bfo = "": bsfo = "project"
                     If bStep <= 2 And (Not targetGet) Then GoTo ReCopy
                     
                     If targetFile = "" Then
@@ -301,37 +317,37 @@ ReCopy:
                     WriteLine "The consequences are at one's own expense !!!"
                     WriteLine "All your backups will be erased from your drive forever ."
                     SetConsoleColor colors.DefaultText
-                    WriteLine "Target folder : " & App.path & "\.emr\backup\"
+                    WriteLine "Target folder : " & App.Path & "\.emr\backup\"
                     WriteLine "Erase them any way ? [Y/N]"
                     AllowInput
                     Params(1) = "-clear2"
                 Case "-clear2"
                 Case "-clear3"
                     Dim FSO3 As Object
-                    Set FSO3 = CreateObject("Scripting.FileSystemObject")
-                    FSO3.DeleteFolder App.path & "\.emr\backup"
+                    Set FSO3 = PoolCreateObject("Scripting.FileSystemObject")
+                    FSO3.DeleteFolder App.Path & "\.emr\backup"
                     SetConsoleColor colors.DefaultText
                     WriteLine "Erasing"
-                    Do While Dir(App.path & "\.emr\backup", vbDirectory) <> ""
+                    Do While Dir(App.Path & "\.emr\backup", vbDirectory) <> ""
                         Call BackLine: Call ClearLine
                         WriteWord "Erasing " & IIf(GetTickCount Mod 4000 < 1000, ".", "") & IIf(GetTickCount Mod 4000 < 2000, ".", "") & IIf(GetTickCount Mod 4000 < 3000, ".", "")
                         Debuginfo.UpdateTimer_Timer
                         Sleep 10: DoEvents
                     Loop
                     SetConsoleColor colors.SuccessText
-                    MkDir App.path & "\.emr\backup"
+                    MkDir App.Path & "\.emr\backup"
                     WriteWord "backup-Success: succeed in erasing all your backup ."
                     Set FSO3 = Nothing
                     Call ExitExec
                     Exit Sub
                 Case "-list"
                     Dim backupF As String, backupI As Integer, FSO As Object
-                    Set FSO = CreateObject("Scripting.FileSystemObject")
-                    backupF = Dir(App.path & "\.emr\backup\", vbDirectory)
+                    Set FSO = PoolCreateObject("Scripting.FileSystemObject")
+                    backupF = Dir(App.Path & "\.emr\backup\", vbDirectory)
                     Do While backupF <> ""
                         If backupF <> "." And backupF <> ".." Then
                             backupI = backupI + 1
-                            WriteLine backupI & ". " & backupF & "  (" & FSO.GetFolder(App.path & "\.emr\backup\" & backupF).size & " bytes)"
+                            WriteLine backupI & ". " & backupF & "  (" & FSO.GetFolder(App.Path & "\.emr\backup\" & backupF).size & " bytes)"
                         End If
                         backupF = Dir(, vbDirectory)
                         'reserve : folder size
@@ -351,7 +367,7 @@ ReCopy:
                     Call ExitExec
                     Exit Sub
                 Case "-reset"
-                    Open App.path & "\.emerald" For Output As #1
+                    Open App.Path & "\.emerald" For Output As #1
                     Print #1, 0 'version
                     Print #1, Now 'Update Time
                     Print #1, False
@@ -372,7 +388,7 @@ ReCopy:
                     SetConsoleColor colors.DefaultText
                     WriteWord "Project name : "
                     SetConsoleColor colors.ContentText
-                    WriteWord App.title
+                    WriteWord App.Title
                     NewLine
                     SetConsoleColor colors.DefaultText
                     WriteWord "Save state : "
@@ -425,7 +441,7 @@ ReCopy:
                     WriteLine "Music List : " & IIf(EAni Is Nothing, "[Missing]", ObjPtr(EMusic))
                     WriteLine "Assets Tree : " & UBound(AssetsTrees) & " trees in total ."
                     For i = 1 To UBound(AssetsTrees)
-                        WriteLine i & ". " & AssetsTrees(i).path & " (" & IIf(IsMissing(AssetsTrees(i).arg1), "[Missing]", AssetsTrees(i).arg1) & "," & IIf(IsMissing(AssetsTrees(i).arg2), "[Missing]", AssetsTrees(i).arg2) & ") , " & UBound(AssetsTrees(i).files) & " files in total ."
+                        WriteLine i & ". " & AssetsTrees(i).Path & " (" & IIf(IsMissing(AssetsTrees(i).arg1), "[Missing]", AssetsTrees(i).arg1) & "," & IIf(IsMissing(AssetsTrees(i).arg2), "[Missing]", AssetsTrees(i).arg2) & ") , " & UBound(AssetsTrees(i).files) & " files in total ."
                     Next
                     WriteLine "Current EditBox : " & TextHandle
                     WriteLine "Bass : " & BassInstalled
@@ -710,7 +726,7 @@ Public Sub AllowCmd()
     SetConsoleColor colors.ErrText
     WriteWord "VB>"
     SetConsoleColor colors.HighLightText
-    WriteWord App.title & ">"
+    WriteWord App.Title & ">"
     If Exec <> "" Then
         SetConsoleColor colors.DefaultText
         WriteWord Exec & ">"
@@ -769,7 +785,7 @@ Public Sub SetConsoleColor(c As Long)
 End Sub
 Public Sub InitConsole()
     ConsoleDC = CreateCDC(GW - 20, 3222)
-    GdipCreateFromHDC ConsoleDC, ConsoleGG
+    PoolCreateFromHdc ConsoleDC, ConsoleGG
     GdipSetSmoothingMode ConsoleGG, SmoothingModeAntiAlias
     GdipSetTextRenderingHint ConsoleGG, TextRenderingHintAntiAlias
 End Sub
@@ -788,7 +804,7 @@ Public Sub Update2()
         SetConsoleColor colors.DefaultText
         WriteWord "Project name : "
         SetConsoleColor colors.ContentText
-        WriteWord App.title
+        WriteWord App.Title
         NewLine
         SetConsoleColor colors.DefaultText
         WriteWord "Save state : "
@@ -837,6 +853,7 @@ Public Sub Update2()
         NeedScroll = True
     End If
     
+    Page.Paint 0, 1, 1, GW - 1, GH - 1, argb(255, 0, 183, 195), size:=2, style:=1
     Page.Paint 0, 0, 0, GW + 1, 40, argb(255, 0, 183, 195)
     Page.Writes "Emerald Console", 20, 9, 16, argb(255, 27, 27, 27)
     
@@ -846,6 +863,7 @@ Public Sub Update()
 
     On Error Resume Next
     
+    Page.Paint 0, 1, 1, GW - 1, GH - 1, argb(255, 214, 206, 209), size:=2, style:=1
     Page.Writes FPS & "/" & Int(1000 / Int(FPSct / FPS)), 15, 14, 34, argb(205, 182, 174, 173)
     
     Page.DrawImage "mouse" & Mouse.button & ".png", GW - 138, 78 / 2 - 64 / 2, alpha:=1
@@ -876,7 +894,7 @@ End Sub
 Public Sub Lostfocus()
 
 End Sub
-Public Sub AnimationDone(ID As Integer)
+Public Sub AnimationDone(id As Integer)
 
 End Sub
 

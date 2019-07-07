@@ -20,7 +20,7 @@ Attribute VB_Exposed = False
 Public Sub DrawSetup()
 
     Page.Clear argb(255 * 0.85, 242, 242, 249) '清空画布
-    
+
     Page.Paint 0, 0, 150, GW, GH - 150, argb(255, 255, 255, 255)
     
     If Page.Res.GetImage("setupappicon.png") = 0 Then
@@ -59,7 +59,7 @@ End Sub
 Public Sub DrawSet()
 
     Page.Clear argb(255 * 0.85, 242, 242, 249) '清空画布
-    
+
     Page.Writes "设置", GW / 2, 100, Color:=argb(255, 27, 27, 27), size:=32, align:=StringAlignmentCenter, animation:=1
     Page.Writes "在这里管理全局设置", GW / 2, 150, Color:=argb(150, 27, 27, 27), size:=18, align:=StringAlignmentCenter, animation:=2
     
@@ -91,7 +91,7 @@ Public Sub Update()
     Dim BtnStr As String
     
     Page.Clear argb(255 * 0.85, 242, 242, 249) '清空画布
-    
+
     If Repaired Then
         Page.Writes "Something Wrong", GW / 2, 200, Color:=argb(255, 27, 27, 27), size:=36, align:=StringAlignmentCenter, animation:=1
         Page.Writes "There is something wrong with your Builder .", GW / 2, 260, Color:=argb(150, 27, 27, 27), size:=18, align:=StringAlignmentCenter, animation:=2
@@ -226,8 +226,8 @@ Private Sub Class_Initialize()
     Page.Create Me
     '导入游戏资源
     If PackPos = -1 Then
-        Page.Res.NewImages App.path & "\assets"
-        Page.Res.NewImages App.path & "\assets\debug"
+        Page.Res.NewImages App.Path & "\assets"
+        Page.Res.NewImages App.Path & "\assets\debug"
         '导入动画
         'Page.LoadAnimationsFromDir App.path & "\animation"
         'Page.CreatePlayAnimation   "test", "test", "Default"

@@ -176,7 +176,7 @@ Sub UninPack()
     Randomize
     LogPath = VBA.Environ("temp") & "\Emerald_Setup_" & Int(Rnd * 999999999 + 1111111111) & ".txt"
     
-    Set WSHShell = CreateObject("WScript.Shell")
+    Set WSHShell = PoolCreateObject("WScript.Shell")
     
     Open path & "\setup.config" For Input As #1
     Line Input #1, te
@@ -231,7 +231,7 @@ Sub SetupPack()
     Print #2, "游戏名称：" & SPackage.GameName
     Print #2, ""
     
-    Set WSHShell = CreateObject("WScript.Shell")
+    Set WSHShell = PoolCreateObject("WScript.Shell")
     
     SetupPage.SetupInfo = "正在注册：软件信息"
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & SPackage.GameName & "\DisplayIcon", """" & path & "App.exe" & """"
@@ -286,7 +286,7 @@ Sub SetupPack()
     On Error Resume Next
     If LnkSwitch Then
         Dim objShell As Object, objShortcut As Object, strStart As String
-        Set objShell = CreateObject("WScript.Shell")
+        Set objShell = PoolCreateObject("WScript.Shell")
         strStart = objShell.SpecialFolders("Desktop") & "\"
         If Dir(strStart & "\" & SPackage.GameName & ".lnk") <> "" Then GoTo last
         Set objShortcut = objShell.CreateShortcut(strStart & "\" & SPackage.GameName & ".lnk")

@@ -1,4 +1,4 @@
-Attribute VB_Name = "modBass"
+Attribute VB_Name = "Bass"
 ' BASS 2.4 Visual Basic module
 ' Copyright (c) 1999-2019 Un4seen Developments Ltd.
 '
@@ -131,17 +131,17 @@ Global Const BASS_DEVICE_ENABLED = 1
 Global Const BASS_DEVICE_DEFAULT = 2
 Global Const BASS_DEVICE_INIT = 4
 
-Global Const BASS_DEVICE_TYPE_MASK = &Hff000000
-Global Const BASS_DEVICE_TYPE_NETWORK = &H01000000
-Global Const BASS_DEVICE_TYPE_SPEAKERS = &H02000000
-Global Const BASS_DEVICE_TYPE_LINE = &H03000000
-Global Const BASS_DEVICE_TYPE_HEADPHONES = &H04000000
-Global Const BASS_DEVICE_TYPE_MICROPHONE = &H05000000
-Global Const BASS_DEVICE_TYPE_HEADSET = &H06000000
-Global Const BASS_DEVICE_TYPE_HANDSET = &H07000000
-Global Const BASS_DEVICE_TYPE_DIGITAL = &H08000000
-Global Const BASS_DEVICE_TYPE_SPDIF = &H09000000
-Global Const BASS_DEVICE_TYPE_HDMI = &H0a000000
+Global Const BASS_DEVICE_TYPE_MASK = &HFF000000
+Global Const BASS_DEVICE_TYPE_NETWORK = &H1000000
+Global Const BASS_DEVICE_TYPE_SPEAKERS = &H2000000
+Global Const BASS_DEVICE_TYPE_LINE = &H3000000
+Global Const BASS_DEVICE_TYPE_HEADPHONES = &H4000000
+Global Const BASS_DEVICE_TYPE_MICROPHONE = &H5000000
+Global Const BASS_DEVICE_TYPE_HEADSET = &H6000000
+Global Const BASS_DEVICE_TYPE_HANDSET = &H7000000
+Global Const BASS_DEVICE_TYPE_DIGITAL = &H8000000
+Global Const BASS_DEVICE_TYPE_SPDIF = &H9000000
+Global Const BASS_DEVICE_TYPE_HDMI = &HA000000
 Global Const BASS_DEVICE_TYPE_DISPLAYPORT = &H40000000
 
 Type BASS_INFO
@@ -174,7 +174,7 @@ Global Const DSCAPS_SECONDARY16BIT = 2048  ' 16 bit
 Type BASS_RECORDINFO
     flags As Long         ' device capabilities (DSCCAPS_xxx flags)
     formats As Long       ' supported standard formats (WAVE_FORMAT_xxx flags)
-    inputs As Long        ' number of inputs
+    Inputs As Long        ' number of inputs
     singlein As Long      ' BASSTRUE = only 1 input can be set at a time
     freq As Long          ' current input rate
 End Type
@@ -200,7 +200,7 @@ Global Const WAVE_FORMAT_4S16 = &H800        ' 44.1   kHz, Stereo, 16-bit
 ' Sample info structure
 Type BASS_SAMPLE
     freq As Long          ' default playback rate
-    volume As Single      ' default volume (0-100)
+    Volume As Single      ' default volume (0-100)
     pan As Single         ' default pan (-100=left, 0=middle, 100=right)
     flags As Long         ' BASS_SAMPLE_xxx flags
     length As Long        ' length (in samples, not bytes)
@@ -342,8 +342,8 @@ End Type
 
 ' 3D vector (for 3D positions/velocities/orientations)
 Type BASS_3DVECTOR
-    X As Single           ' +=right, -=left
-    Y As Single           ' +=up, -=down
+    x As Single           ' +=right, -=left
+    y As Single           ' +=up, -=down
     z As Single           ' +=front, -=behind
 End Type
 
@@ -531,7 +531,7 @@ Global Const BASS_TAG_MUSIC_SAMPLE = &H10300 ' + sample #, MOD sample name : ANS
 ' ID3v1 tag structure
 Type TAG_ID3
     id As String * 3
-    title As String * 30
+    Title As String * 30
     artist As String * 30
     album As String * 30
     year As String * 4
@@ -541,7 +541,7 @@ End Type
 
 ' Binary APEv2 tag structure
 Type TAG_APE_BINARY
-    key As Long
+    Key As Long
     data As Long
     length As Long
 End Type
@@ -697,7 +697,7 @@ End Type
 
 Type GUID       ' used with BASS_Init - use VarPtr(guid) in clsid parameter
     Data1 As Long
-    Data2 As Integer
+    data2 As Integer
     Data3 As Integer
     Data4(0 To 7) As Byte
 End Type
@@ -710,7 +710,7 @@ Declare Function BASS_GetConfigPtr Lib "bass.dll" (ByVal opt As Long) As Long
 Declare Function BASS_GetVersion Lib "bass.dll" () As Long
 Declare Function BASS_ErrorGetCode Lib "bass.dll" () As Long
 Declare Function BASS_GetDeviceInfo Lib "bass.dll" (ByVal device As Long, ByRef info As BASS_DEVICEINFO) As Long
-Declare Function BASS_Init Lib "bass.dll" (ByVal device As Long, ByVal freq As Long, ByVal flags As Long, ByVal win As Long, ByVal clsid As Long) As Long
+Declare Function BASS_Init Lib "bass.dll" (ByVal device As Long, ByVal freq As Long, ByVal flags As Long, ByVal Win As Long, ByVal clsid As Long) As Long
 Declare Function BASS_SetDevice Lib "bass.dll" (ByVal device As Long) As Long
 Declare Function BASS_GetDevice Lib "bass.dll" () As Long
 Declare Function BASS_Free Lib "bass.dll" () As Long
@@ -722,7 +722,7 @@ Declare Function BASS_Start Lib "bass.dll" () As Long
 Declare Function BASS_Stop Lib "bass.dll" () As Long
 Declare Function BASS_Pause Lib "bass.dll" () As Long
 Declare Function BASS_IsStarted Lib "bass.dll" () As Long
-Declare Function BASS_SetVolume Lib "bass.dll" (ByVal volume As Single) As Long
+Declare Function BASS_SetVolume Lib "bass.dll" (ByVal Volume As Single) As Long
 Declare Function BASS_GetVolume Lib "bass.dll" () As Single
 
 Declare Function BASS_PluginLoad Lib "bass.dll" (ByVal filename As String, ByVal flags As Long) As Long
@@ -737,10 +737,10 @@ Declare Function BASS_Apply3D Lib "bass.dll" () As Long
 Declare Function BASS_SetEAXParameters Lib "bass.dll" (ByVal env As Long, ByVal vol As Single, ByVal decay As Single, ByVal damp As Single) As Long
 Declare Function BASS_GetEAXParameters Lib "bass.dll" (ByRef env As Long, ByRef vol As Single, ByRef decay As Single, ByRef damp As Single) As Long
 
-Declare Function BASS_MusicLoad64 Lib "bass.dll" Alias "BASS_MusicLoad" (ByVal mem As Long, ByVal file As Any, ByVal offset As Long, ByVal offsethigh As Long, ByVal length As Long, ByVal flags As Long, ByVal freq As Long) As Long
+Declare Function BASS_MusicLoad64 Lib "bass.dll" Alias "BASS_MusicLoad" (ByVal mem As Long, ByVal File As Any, ByVal offset As Long, ByVal offsethigh As Long, ByVal length As Long, ByVal flags As Long, ByVal freq As Long) As Long
 Declare Function BASS_MusicFree Lib "bass.dll" (ByVal handle As Long) As Long
 
-Declare Function BASS_SampleLoad64 Lib "bass.dll" Alias "BASS_SampleLoad" (ByVal mem As Long, ByVal file As Any, ByVal offset As Long, ByVal offsethigh As Long, ByVal length As Long, ByVal max As Long, ByVal flags As Long) As Long
+Declare Function BASS_SampleLoad64 Lib "bass.dll" Alias "BASS_SampleLoad" (ByVal mem As Long, ByVal File As Any, ByVal offset As Long, ByVal offsethigh As Long, ByVal length As Long, ByVal max As Long, ByVal flags As Long) As Long
 Declare Function BASS_SampleCreate Lib "bass.dll" (ByVal length As Long, ByVal freq As Long, ByVal chans As Long, ByVal max As Long, ByVal flags As Long) As Long
 Declare Function BASS_SampleFree Lib "bass.dll" (ByVal handle As Long) As Long
 Declare Function BASS_SampleSetData Lib "bass.dll" (ByVal handle As Long, ByRef buffer As Any) As Long
@@ -752,7 +752,7 @@ Declare Function BASS_SampleGetChannels Lib "bass.dll" (ByVal handle As Long, By
 Declare Function BASS_SampleStop Lib "bass.dll" (ByVal handle As Long) As Long
 
 Declare Function BASS_StreamCreate Lib "bass.dll" (ByVal freq As Long, ByVal chans As Long, ByVal flags As Long, ByVal proc As Long, ByVal user As Long) As Long
-Declare Function BASS_StreamCreateFile64 Lib "bass.dll" Alias "BASS_StreamCreateFile" (ByVal mem As Long, ByVal file As Any, ByVal offset As Long, ByVal offsethigh As Long, ByVal length As Long, ByVal lengthhigh As Long, ByVal flags As Long) As Long
+Declare Function BASS_StreamCreateFile64 Lib "bass.dll" Alias "BASS_StreamCreateFile" (ByVal mem As Long, ByVal File As Any, ByVal offset As Long, ByVal offsethigh As Long, ByVal length As Long, ByVal lengthhigh As Long, ByVal flags As Long) As Long
 Declare Function BASS_StreamCreateURL Lib "bass.dll" (ByVal url As String, ByVal offset As Long, ByVal flags As Long, ByVal proc As Long, ByVal user As Long) As Long
 Declare Function BASS_StreamCreateFileUser Lib "bass.dll" (ByVal system As Long, ByVal flags As Long, ByVal procs As Long, ByVal user As Long) As Long
 Declare Function BASS_StreamFree Lib "bass.dll" (ByVal handle As Long) As Long
@@ -767,8 +767,8 @@ Declare Function BASS_RecordGetDevice Lib "bass.dll" () As Long
 Declare Function BASS_RecordFree Lib "bass.dll" () As Long
 Declare Function BASS_RecordGetInfo Lib "bass.dll" (ByRef info As BASS_RECORDINFO) As Long
 Declare Function BASS_RecordGetInputName Lib "bass.dll" (ByVal inputn As Long) As Long
-Declare Function BASS_RecordSetInput Lib "bass.dll" (ByVal inputn As Long, ByVal flags As Long, ByVal volume As Single) As Long
-Declare Function BASS_RecordGetInput Lib "bass.dll" (ByVal inputn As Long, ByRef volume As Single) As Long
+Declare Function BASS_RecordSetInput Lib "bass.dll" (ByVal inputn As Long, ByVal flags As Long, ByVal Volume As Single) As Long
+Declare Function BASS_RecordGetInput Lib "bass.dll" (ByVal inputn As Long, ByRef Volume As Single) As Long
 Declare Function BASS_RecordStart Lib "bass.dll" (ByVal freq As Long, ByVal chans As Long, ByVal flags As Long, ByVal proc As Long, ByVal user As Long) As Long
 
 Declare Function BASS_ChannelBytes2Seconds64 Lib "bass.dll" Alias "BASS_ChannelBytes2Seconds" (ByVal handle As Long, ByVal pos As Long, ByVal poshigh As Long) As Double
@@ -821,16 +821,16 @@ BASS_SPEAKER_N = n * (2 ^ 24)
 End Function
 
 ' 32-bit wrappers for 64-bit BASS functions
-Function BASS_MusicLoad(ByVal mem As Long, ByVal file As Long, ByVal offset As Long, ByVal length As Long, ByVal flags As Long, ByVal freq As Long) As Long
-BASS_MusicLoad = BASS_MusicLoad64(mem, file, offset, 0, length, flags Or BASS_UNICODE, freq)
+Function BASS_MusicLoad(ByVal mem As Long, ByVal File As Long, ByVal offset As Long, ByVal length As Long, ByVal flags As Long, ByVal freq As Long) As Long
+BASS_MusicLoad = BASS_MusicLoad64(mem, File, offset, 0, length, flags Or BASS_UNICODE, freq)
 End Function
 
-Function BASS_SampleLoad(ByVal mem As Long, ByVal file As Long, ByVal offset As Long, ByVal length As Long, ByVal max As Long, ByVal flags As Long) As Long
-BASS_SampleLoad = BASS_SampleLoad64(mem, file, offset, 0, length, max, flags Or BASS_UNICODE)
+Function BASS_SampleLoad(ByVal mem As Long, ByVal File As Long, ByVal offset As Long, ByVal length As Long, ByVal max As Long, ByVal flags As Long) As Long
+BASS_SampleLoad = BASS_SampleLoad64(mem, File, offset, 0, length, max, flags Or BASS_UNICODE)
 End Function
 
-Function BASS_StreamCreateFile(ByVal mem As Long, ByVal file As Long, ByVal offset As Long, ByVal length As Long, ByVal flags As Long) As Long
-BASS_StreamCreateFile = BASS_StreamCreateFile64(mem, file, offset, 0, length, 0, flags Or BASS_UNICODE)
+Function BASS_StreamCreateFile(ByVal mem As Long, ByVal File As Long, ByVal offset As Long, ByVal length As Long, ByVal flags As Long) As Long
+BASS_StreamCreateFile = BASS_StreamCreateFile64(mem, File, offset, 0, length, 0, flags Or BASS_UNICODE)
 End Function
 
 Function BASS_ChannelBytes2Seconds(ByVal handle As Long, ByVal pos As Long) As Double
@@ -1018,20 +1018,20 @@ Select Case preset
 End Select
 End Function
 
-Public Function LoByte(ByVal lparam As Long) As Long
-LoByte = lparam And &HFF&
+Public Function LoByte(ByVal lParam As Long) As Long
+LoByte = lParam And &HFF&
 End Function
-Public Function HiByte(ByVal lparam As Long) As Long
-HiByte = (lparam And &HFF00&) / &H100&
+Public Function HiByte(ByVal lParam As Long) As Long
+HiByte = (lParam And &HFF00&) / &H100&
 End Function
-Public Function LoWord(ByVal lparam As Long) As Long
-LoWord = lparam And &HFFFF&
+Public Function LoWord(ByVal lParam As Long) As Long
+LoWord = lParam And &HFFFF&
 End Function
-Public Function HiWord(ByVal lparam As Long) As Long
-If lparam < 0 Then
-    HiWord = (lparam \ &H10000 - 1) And &HFFFF&
+Public Function HiWord(ByVal lParam As Long) As Long
+If lParam < 0 Then
+    HiWord = (lParam \ &H10000 - 1) And &HFFFF&
 Else
-    HiWord = lparam \ &H10000
+    HiWord = lParam \ &H10000
 End If
 End Function
 Function MakeWord(ByVal LoByte As Long, ByVal HiByte As Long) As Long

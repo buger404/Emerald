@@ -31,7 +31,6 @@ Attribute VB_Exposed = False
 '==================================================
 '   页面管理器
     Dim EC As GMan
-    Dim oShadow As New aShadow
 '==================================================
 Private Sub DrawTimer_Timer()
     '绘制
@@ -62,16 +61,8 @@ Private Sub Form_Load()
     
     '创建音乐列表
     Set MusicList = New GMusicList
-    MusicList.Create App.path & "\music"
+    MusicList.Create App.Path & "\music"
 
-    '开始显示
-    With oShadow
-        If .Shadow(Me) Then
-            .Depth = 20
-            .Transparency = 16
-        End If
-    End With
-    
     '在此处初始化你的页面
     Set WelcomePage = New WelcomePage
     Set SetupPage = New SetupPage

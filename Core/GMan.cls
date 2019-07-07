@@ -36,10 +36,10 @@ Dim IsLayered As Boolean
         ReDim Pages(0)
         CDC = CreateCDC(GW, GH)
         ODC = CreateCDC(GW, GH)
-        GdipCreateFromHDC CDC, GG
+        PoolCreateFromHdc CDC, GG
         GdipSetSmoothingMode GG, SmoothingModeAntiAlias
         GdipSetTextRenderingHint GG, TextRenderingHintAntiAlias
-        GdipCreateSolidFill argb(255, 255, 255, 255), pB
+        PoolCreateSolidFill argb(255, 255, 255, 255), pB
     End Sub
     Public Sub Layered(Optional WithAero As Boolean = False)
         SetWindowLongA GHwnd, GWL_EXSTYLE, GetWindowLongA(GHwnd, GWL_EXSTYLE) Or WS_EX_LAYERED
@@ -47,13 +47,13 @@ Dim IsLayered As Boolean
         IsLayered = True
     End Sub
     Public Sub Dispose()
-        GdipDeleteGraphics GG
-        GdipDeleteBrush pB
+        PoolDeleteGraphics GG
+        PoolDeleteBrush pB
         For i = 1 To UBound(Pages)
             Pages(i).p.Dispose
         Next
-        DeleteObject CDC
-        DeleteObject ODC
+        'DeleteObject CDC
+        'DeleteObject ODC
     End Sub
 '========================================================
 '   Manager

@@ -40,14 +40,14 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 'Emerald Ïà¹Ø´úÂë
-Dim Page As GPage, Charge As GDebug, sh As New aShadow
+Dim Page As GPage, Charge As GDebug
 Dim WDC As Long
 Private Sub Form_Load()
     Set Page = New GPage
     Set Charge = New GDebug
     
     Page.Create Charge
-    Page.Res.NewImages App.path & "\assets\debug", 64, 64
+    Page.Res.NewImages App.Path & "\assets\debug", 64, 64
     
     Set Charge.Page = Page
     
@@ -55,22 +55,14 @@ Private Sub Form_Load()
     Charge.GW = Me.ScaleWidth: Charge.GH = Me.ScaleHeight
     
     WDC = CreateCDC(Charge.GW, Charge.GH)
-    DeleteObject Page.CDC
+    DeleteDC Page.CDC
     Page.CDC = WDC
     Dim g As Long
-    GdipCreateFromHDC WDC, g
+    PoolCreateFromHdc WDC, g
     GdipSetSmoothingMode g, SmoothingModeAntiAlias
     GdipSetTextRenderingHint g, TextRenderingHintAntiAlias
-    GdipDeleteGraphics Page.GG
+    PoolDeleteGraphics Page.GG
     Page.GG = g
-    
-    With sh
-        If .Shadow(Me) Then
-            .Color = RGB(0, 0, 0)
-            .Depth = 12
-            .Transparency = 18
-        End If
-    End With
     
     Me.Move Screen.Width / 2 - Me.ScaleWidth * Screen.TwipsPerPixelX / 2, 0
     
@@ -100,7 +92,6 @@ End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
     Page.Dispose
-    Set sh = Nothing
 End Sub
 
 Public Sub touchArea_Click(index As Integer)
