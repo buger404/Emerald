@@ -203,7 +203,7 @@ Public TopPage As Boolean
         
         If DisposeMark Then DisposePlayAnimation playname
     End Sub
-    Public Sub DrawImageEx(n, x As Long, y As Long, Optional w, Optional h, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0)
+    Public Sub DrawImageEx(n, x As Long, y As Long, Optional w, Optional h, Optional pos As PosAlign = posNormal, Optional angle As Long = 0, Optional animation As Integer = 0)
         Dim index As Integer
         
         Dim OX As Long, OY As Long, ow As Long, oh As Long
@@ -246,7 +246,15 @@ Public TopPage As Boolean
             If Not Ret Then OutOfScroll = True: Exit Sub
         End If
         
-        GdipDrawImageRect GG, Res.ResourceImageHandle(index), OX, OY, ow, oh
+        
+        If angle <> 0 Then
+            GdipRotateWorldTransform GG, angle, MatrixOrderAppend
+            GdipTranslateWorldTransform GG, OX, OY, MatrixOrderAppend
+            GdipDrawImageRect GG, Res.ResourceImageHandle(index), -ow / 2, -oh / 2, ow, oh
+            GdipResetWorldTransform GG
+        Else
+            GdipDrawImageRect GG, Res.ResourceImageHandle(index), OX, OY, ow, oh
+        End If
         
         With DrawF
             .x = OX

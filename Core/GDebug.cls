@@ -863,7 +863,7 @@ Public Sub Update()
 
     On Error Resume Next
     
-    Page.Paint 0, 1, 1, GW - 1, GH - 1, argb(255, 214, 206, 209), size:=2, style:=1
+    Page.PaintLine -1, GH - 1, GW, GH - 1, argb(255, 0, 183, 195), 2
     Page.Writes FPS & "/" & Int(1000 / Int(FPSct / FPS)), 15, 14, 34, argb(205, 182, 174, 173)
     
     Page.DrawImage "mouse" & Mouse.button & ".png", GW - 138, 78 / 2 - 64 / 2, alpha:=1

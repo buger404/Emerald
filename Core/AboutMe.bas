@@ -46,6 +46,7 @@ Attribute VB_Name = "AboutMe"
 '   -现在可以选择不加载图片的多个方向
 '   -移除阴影
 '   -控制台添加poolinfo指令
+'   -添加图片旋转
 '   更新内容(ver.706)
 '   -现在碰撞地图可以选择不加载
 '   -完善HotLoad模式
