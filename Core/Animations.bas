@@ -45,6 +45,7 @@ Attribute VB_Name = "Animations"
         Do While Not EOF(1)
             Line Input #1, temp
             temp = Trim(temp)
+            If temp = "" Then GoTo AirFile
             '设置动画信息
             If ani.name = "" Then
                 temp2 = Split(temp, "|")
@@ -123,7 +124,7 @@ Attribute VB_Name = "Animations"
 DoWithDone:
         Loop
         Close #1
-        
+AirFile:
         LoadAnimation = ani
     End Function
     
