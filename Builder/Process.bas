@@ -1,20 +1,21 @@
 Attribute VB_Name = "Process"
 'Emerald 相关代码
 
-Public VBIDEPath As String, InstalledPath As String, IsUpdate As Boolean
-Public WelcomePage As New WelcomePage, TitleBar As New TitleBar, SetupPage As SetupPage, WaitPage As WaitPage, DialogPage As DialogPage, UpdatePage As UpdatePage
+Public InstalledPath As String, IsUpdate As Boolean
+Public WelcomePage As WelcomePage, TitleBar As TitleBar, SetupPage As SetupPage, WaitPage As WaitPage, DialogPage As DialogPage, UpdatePage As UpdatePage
+Public ToNewPage As ToNewPage
+
 Public Tasks() As String
-Public NewVersion As Long
 Public CmdMark As String, SetupErr As Long, Repaired As Boolean
 Public AppInfo() As String
 Public Cmd As String
 Public Abouting As Boolean
 Public SetMode As Boolean, PackPos As Long
 Public LnkSwitch As Boolean
-Public Function TestFile(path As String, IncludeText As String) As Boolean
+Public Function TestFile(Path As String, IncludeText As String) As Boolean
     Dim temp As String
-    If Dir(path) = "" Then Exit Function
-    Open path For Input As #1
+    If Dir(Path) = "" Then Exit Function
+    Open Path For Input As #1
     Do While Not EOF(1)
         Line Input #1, temp
         If InStr(temp, IncludeText) > 0 Then TestFile = True: Exit Do
@@ -45,27 +46,11 @@ Public Sub GetInstalledPath()
 ErrHandle:
     
 End Sub
-Public Sub GetVBIDEPath()
-    On Error GoTo ErrHandle
-    
-    Dim WSHShell As Object, temp As String, temp2() As String
-    Set WSHShell = PoolCreateObject("WScript.Shell")
-    
-    temp = WSHShell.RegRead("HKEY_CLASSES_ROOT\VisualBasic.Project\shell\open\command\")
-    temp2 = Split(temp, "vb6.exe")
-    VBIDEPath = Replace(temp2(0), """", "")
-    
-ErrHandle:
-    If Err.Number <> 0 Then
-        Dialog "迷路", "获取VB6路径失败，请确认您的电脑上已经安装VB6（非精简版）。" & vbCrLf & vbCrLf & _
-               "注意：Emerald只适用于VB6", "好吧"
-    End If
-End Sub
-Public Function CheckFileName(name As String) As Boolean
-    CheckFileName = ((InStr(name, "*") Or InStr(name, "\") Or InStr(name, "/") Or InStr(name, ":") Or InStr(name, "?") Or InStr(name, """") Or InStr(name, "<") Or InStr(name, ">") Or InStr(name, "|") Or InStr(name, " ") Or InStr(name, "!") Or InStr(name, "-") Or InStr(name, "+") Or InStr(name, "#") Or InStr(name, "@") Or InStr(name, "$") Or InStr(name, "^") Or InStr(name, "&") Or InStr(name, "(") Or InStr(name, ")")) = 0)
+Public Function CheckFileName(Name As String) As Boolean
+    CheckFileName = ((InStr(Name, "*") Or InStr(Name, "\") Or InStr(Name, "/") Or InStr(Name, ":") Or InStr(Name, "?") Or InStr(Name, """") Or InStr(Name, "<") Or InStr(Name, ">") Or InStr(Name, "|") Or InStr(Name, " ") Or InStr(Name, "!") Or InStr(Name, "-") Or InStr(Name, "+") Or InStr(Name, "#") Or InStr(Name, "@") Or InStr(Name, "$") Or InStr(Name, "^") Or InStr(Name, "&") Or InStr(Name, "(") Or InStr(Name, ")")) = 0)
     Dim t As String
-    If name <> "" Then t = Left(name, 1)
-    CheckFileName = CheckFileName And (Trim(str(Val(t))) <> t)
+    If Name <> "" Then t = Left(Name, 1)
+    CheckFileName = CheckFileName And (Trim(Str(Val(t))) <> t)
 End Function
 Sub Uninstall()
     'If Dialog("卸载", "Emerald Builder 已经安装，你希望删除它吗？", "卸载", "手滑") <> 1 Then End
@@ -129,7 +114,7 @@ Sub Uninstall()
     SetupErr = Err.Number
 End Sub
 Sub FakeSleep(Optional Counts As Long = 10)
-    For i = 1 To Counts
+    For I = 1 To Counts
         Sleep 10: DoEvents
         ECore.Display
     Next
@@ -138,7 +123,7 @@ Sub Setup()
     On Error Resume Next
     
     Dim exeP As String
-    exeP = """" & App.path & "\Builder.exe" & """"
+    exeP = """" & App.Path & "\Builder.exe" & """"
     
     SetupPage.SetupInfo = "正在创建：WScript.Shell对象"
     SetupPage.Progress = 0.1
@@ -177,7 +162,7 @@ Sub Setup()
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\DisplayName", "Emerald"
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\DisplayVersion", "Indev " & Version
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\Publisher", "Error 404"
-    WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\InstallLocation", App.path
+    WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\InstallLocation", App.Path
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\URLInfoAbout", "http://red-error404.github.io/233"
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\UninstallString", exeP & " ""-uninstall"""
     
@@ -185,13 +170,13 @@ Sub Setup()
     
     SetupPage.SetupInfo = "正在复制：Visual Basic 6 模板文件（1/2）"
     SetupPage.Progress = 0.8
-    FileCopy App.path & "\Example\Emerald 游戏窗口.frm", VBIDEPath & "Template\Forms\Emerald 游戏窗口.frm"
+    FileCopy App.Path & "\Example\Emerald 游戏窗口.frm", VBIDEPath & "Template\Forms\Emerald 游戏窗口.frm"
     
     Call FakeSleep
     
     SetupPage.SetupInfo = "正在复制：Visual Basic 6 模板文件（2/2）"
     SetupPage.Progress = 0.9
-    FileCopy App.path & "\Example\Emerald 页面.cls", VBIDEPath & "Template\Classes\Emerald 页面.cls"
+    FileCopy App.Path & "\Example\Emerald 页面.cls", VBIDEPath & "Template\Classes\Emerald 页面.cls"
     
     Call FakeSleep
     
@@ -203,7 +188,7 @@ End Sub
 Sub CheckVersion()
     On Error Resume Next
     Dim exeP As String, sh As String
-    exeP = """" & App.path & "\Builder.exe" & """"
+    exeP = """" & App.Path & "\Builder.exe" & """"
     Set WSHShell = PoolCreateObject("WScript.Shell")
     
     sh = WSHShell.RegRead("HKEY_CLASSES_ROOT\Directory\shell\emerald\version")
@@ -224,51 +209,9 @@ Sub Repair()
         ECore.NewTransform transFadeIn, 700, "WelcomePage": Repaired = True
     End If
 End Sub
-Public Sub CheckOnLineUpdate()
-    On Error Resume Next
-    
-    Call FakeSleep(300)
-    
-    If InternetGetConnectedState(0&, 0&) = 0 Then
-        NewVersion = 3
-        Exit Sub
-    End If
-    
-    Dim data As New GSaving
-    data.Create "Emerald.Core"
-    data.AutoSave = True
-    If Now - CDate(data.GetData("UpdateTime")) >= UpdateCheckInterval Or data.GetData("UpdateAble") = 1 Then
-        data.PutData "UpdateTime", Now
-        
-        Dim xmlHttp As Object, Ret As String, Start As Long
-        Set xmlHttp = PoolCreateObject("Microsoft.XMLHTTP")
-        xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
-        xmlHttp.send
-        
-        Start = GetTickCount
-        Do While xmlHttp.ReadyState <> 4
-            If GetTickCount - Start >= UpdateTimeOut Then
-                NewVersion = 3
-                Exit Sub
-            End If
-            ECore.Display
-            Sleep 10: DoEvents
-        Loop
-        Ret = xmlHttp.responseText
-        Set xmlHttp = Nothing
-
-        NewVersion = Val(Ret)
-        data.PutData "UpdateAble", 1
-
-    Else
-    
-        NewVersion = Version
-        
-    End If
-End Sub
-Sub Main()
+Sub Main2()
     Dim targetEXE As String
-    targetEXE = App.path & "\" & App.EXEName & ".exe"
+    targetEXE = App.Path & "\" & App.EXEName & ".exe"
     'targetEXE = "C:\Program Files\Minesweeper\Uninstall.exe"
     'targetEXE = "D:\MyDoc\Emerald\Export\Minesweeper - 安装包.exe"
     
@@ -292,38 +235,38 @@ UninstallGame:
     
     If PackPos <> -1 Then
         '从指定位置把安装包分离出来
-        Dim tempPath As String, data() As Byte, data2() As Byte
+        Dim tempPath As String, Data() As Byte, data2() As Byte
         tempPath = VBA.Environ("temp")
         If Dir(tempPath & "\setuppack.emrpack") <> "" Then Kill tempPath & "\setuppack.emrpack"
-        ReDim data(FileLen(targetEXE) - 1)
-        ReDim data2(UBound(data) - PackPos)
+        ReDim Data(FileLen(targetEXE) - 1)
+        ReDim data2(UBound(Data) - PackPos)
         Open targetEXE For Binary As #1
-        Get #1, , data
+        Get #1, , Data
         Close #1
-        CopyMemory data2(0), data(PackPos), UBound(data) - PackPos + 1
-        ReDim Preserve data(PackPos - 1)
+        CopyMemory data2(0), Data(PackPos), UBound(Data) - PackPos + 1
+        ReDim Preserve Data(PackPos - 1)
         Open tempPath & "\setuppack.emrpack" For Binary As #1
         Put #1, , data2
         Close #1
         Open tempPath & "\emrtempUninstall.exe" For Binary As #1
-        Put #1, , data
+        Put #1, , Data
         Close #1
         Open tempPath & "\setuppack.emrpack" For Binary As #1
         Get #1, , SPackage
         Close #1
-        If UBound(SPackage.files) = 1 Then
-            If SPackage.files(1).path = "setup.config" Then
+        If UBound(SPackage.Files) = 1 Then
+            If SPackage.Files(1).Path = "setup.config" Then
                 '执行卸载程序
-                Open App.path & "\setup.config" For Binary As #1
-                Put #1, , SPackage.files(1).data
+                Open App.Path & "\setup.config" For Binary As #1
+                Put #1, , SPackage.Files(1).Data
                 Close #1
                 GoTo UninstallGame
             End If
         End If
         
-        If SPackage.files(0).path <> "" Then
+        If SPackage.Files(0).Path <> "" Then
             Open tempPath & "\setupappicon.png" For Binary As #1
-            Put #1, , SPackage.files(0).data
+            Put #1, , SPackage.Files(0).Data
             Close #1
             WelcomePage.Page.Res.newImage tempPath & "\setupappicon.png", 128, 128
         End If
@@ -396,12 +339,12 @@ UninstallGame:
                         Dialog "警告", "找不到游戏主程序：app.exe，请设置。", "行"
                         Unload MainWindow: End
                     End If
-                    Dim QQ As Long, Maker As String, name As String, Describe As String, GVersion As String
+                    Dim QQ As Long, Maker As String, Name As String, Describe As String, GVersion As String
                     Dim tempr As String
                     Open Cmd & "\" & Dir(Cmd & "\*.vbp") For Input As #1
                     Do While Not EOF(1)
                         Line Input #1, tempr
-                        If InStr(tempr, "VersionProductName") = 1 Then name = Split(tempr, """")(1)
+                        If InStr(tempr, "VersionProductName") = 1 Then Name = Split(tempr, """")(1)
                         If InStr(tempr, "VersionFileDescription") = 1 Then Describe = Split(tempr, """")(1)
                         If InStr(tempr, "VersionCompanyName") = 1 Then Maker = Split(tempr, """")(1)
                         If InStr(tempr, "MajorVer") = 1 Then GVersion = GVersion & Split(tempr, "=")(1) & "."
@@ -409,27 +352,27 @@ UninstallGame:
                         If InStr(tempr, "RevisionVer") = 1 Then GVersion = GVersion & Split(tempr, "=")(1)
                     Loop
                     Close #1
-                    If name = "" Then
+                    If Name = "" Then
                         Dialog "警告", "游戏名称不能为空。", "行"
                         Unload MainWindow: End
                     End If
-                    MakePackage Cmd, Maker, name, GVersion, Describe, QQ
+                    MakePackage Cmd, Maker, Name, GVersion, Describe, QQ
                     CreateFolder GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\"
-                    If Dir(GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & name & " - 安装包.exe") <> "" Then Kill GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & name & " - 安装包.exe"
+                    If Dir(GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & Name & " - 安装包.exe") <> "" Then Kill GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & Name & " - 安装包.exe"
                     Open VBA.Environ("temp") & "\copyemr.cmd" For Output As #1
                     Print #1, "@echo off"
                     Print #1, "echo Emerald Package Toolkit , Version: " & Version
                     Print #1, "echo Building Installer..."
                     Print #1, "ping localhost -n 3 > nul"
-                    Print #1, "copy """ & targetEXE & """ /b + """ & VBA.Environ("temp") & "\emrpack"" /b """ & GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & name & " - 安装包.exe"""
+                    Print #1, "copy """ & targetEXE & """ /b + """ & VBA.Environ("temp") & "\emrpack"" /b """ & GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & Name & " - 安装包.exe"""
                     Close #1
                     ShellExecuteA 0, "open", VBA.Environ("temp") & "\copyemr.cmd", "", "", SW_SHOW
-                    Do While Dir(GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & name & " - 安装包.exe") = ""
+                    Do While Dir(GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & Name & " - 安装包.exe") = ""
                         Sleep 10: DoEvents
                         ECore.Display
                     Loop
                     Dialog "恭喜", "安装包制作成功", "好的"
-                    ShellExecuteA 0, "open", "explorer.exe", "/select,""" & GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & name & " - 安装包.exe" & """", "", SW_SHOW
+                    ShellExecuteA 0, "open", "explorer.exe", "/select,""" & GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & Name & " - 安装包.exe" & """", "", SW_SHOW
                     Unload MainWindow: End
                 End If
                 Dialog "无操作", "你的工程已经在使用最新的Emerald了。", "手滑"
@@ -440,7 +383,7 @@ UninstallGame:
         appn = InputAsk("创建工程", "输入你的可爱的工程名称(*^▽^*)~", "完成", "取消")
         If CheckFileName(appn) = False Or appn = "" Then Dialog "愤怒", "错误的工程名称。", "诶？": Unload MainWindow: End
         
-        Open App.path & "\Example\example.vbp" For Input As #1
+        Open App.Path & "\Example\example.vbp" For Input As #1
         Do While Not EOF(1)
         Line Input #1, t
         f = f & t & vbCrLf
@@ -466,9 +409,9 @@ SkipName:
         If Dir(p & "\assets\debug", vbDirectory) = "" Then MkDir p & "\assets\debug"
         If Dir(p & "\music", vbDirectory) = "" Then MkDir p & "\music"
         
-        CopyInto App.path & "\core", p & "\core", True
-        CopyInto App.path & "\assets\debug", p & "\assets\debug"
-        CopyInto App.path & "\framework", p
+        CopyInto App.Path & "\core", p & "\core", True
+        CopyInto App.Path & "\assets\debug", p & "\assets\debug"
+        CopyInto App.Path & "\framework", p
         
         Open p & "\.emerald" For Output As #1
         Print #1, Version 'version
@@ -494,15 +437,15 @@ SkipName:
     
     Unload MainWindow: End
 End Sub
-Function InputAsk(t As String, c As String, ParamArray b()) As String
-    InputAsk = InputBox(c, t)
+Function InputAsk(t As String, C As String, ParamArray B()) As String
+    InputAsk = InputBox(C, t)
 End Function
-Function Dialog(t As String, c As String, ParamArray b()) As Integer
+Function Dialog(t As String, C As String, ParamArray B()) As Integer
     Dim b2(), last As String
-    b2 = b
+    b2 = B
     
     last = ECore.ActivePage
-    DialogPage.NewDialog t, c, b2
+    DialogPage.NewDialog t, C, b2
     
     Do While DialogPage.Key = 0
         ECore.Display
@@ -512,26 +455,6 @@ Function Dialog(t As String, c As String, ParamArray b()) As Integer
     Dialog = DialogPage.Key
     ECore.NewTransform transFadeIn, 700, last
 End Function
-Sub CopyInto(Src As String, Dst As String, Optional WriteCache As Boolean = False)
-    Dim f As String, p As Boolean
-    p = Dir(Dst & "\Core.bas") <> ""
-    f = Dir(Src & "\")
-    Do While f <> ""
-        If f = "Core.bas" Then
-            If p Then GoTo skip
-        End If
-        FileCopy Src & "\" & f, Dst & "\" & f
-        If WriteCache Then
-            Open Cmd & "\.emr\cache\" & f For Output As #1
-            Print #1, FileLen(Dst & "\" & f)
-            Close #1
-        End If
-        
-        DoEvents
-skip:
-        f = Dir()
-    Loop
-End Sub
 Function CompareFolder(Src As String, Dst As String) As String
     Dim f As String, fs() As String
     f = Dir(Src & "\")
@@ -544,9 +467,9 @@ Function CompareFolder(Src As String, Dst As String) As String
         f = Dir()
     Loop
     
-    For i = 1 To UBound(fs)
-        If Dir(Dst & "\" & fs(i)) = "" Then
-            CompareFolder = CompareFolder & fs(i) & vbCrLf
+    For I = 1 To UBound(fs)
+        If Dir(Dst & "\" & fs(I)) = "" Then
+            CompareFolder = CompareFolder & fs(I) & vbCrLf
         End If
     Next
 End Function

@@ -44,19 +44,21 @@ End Sub
 
 Private Sub Form_Load()
     '初始化Emerald
-    StartEmerald Me.Hwnd, 805, 556
+    StartEmerald Me.Hwnd, 991, 754
     DebugSwitch.HideLOGO = 1
     DebugSwitch.DisableLOGO = 1
      
     '创建字体
-    MakeFont "微软雅黑"
+    Set EF = New GFont
+    EF.AddFont App.Path & "\Builder.UI.otf"
+    EF.MakeFont "Abadi MT Extra Light"
     '创建页面管理器
     Set EC = New GMan
-    EC.Layered True
+    EC.Layered False
     
     '创建存档（可选）
     Set ESave = New GSaving
-    ESave.Create "Emerald.builder", "Emerald.builder"
+    ESave.Create "Emerald.Core"
     ESave.AutoSave = True
     
     '创建音乐列表
@@ -69,31 +71,32 @@ Private Sub Form_Load()
     Set WaitPage = New WaitPage
     Set DialogPage = New DialogPage
     Set UpdatePage = New UpdatePage
+    Set ToNewPage = New ToNewPage
     
     Set TitleBar = New TitleBar
 
     '设置活动页面
-    EC.ActivePage = "WaitPage"
+    EC.ActivePage = "WelcomePage"
     
     DrawTimer.Enabled = True
 End Sub
 
-Private Sub Form_MouseDown(button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseDown(button As Integer, Shift As Integer, X As Single, y As Single)
     '发送鼠标信息
-    UpdateMouse x, y, 1, button
+    UpdateMouse X, y, 1, button
 End Sub
 
-Private Sub Form_MouseMove(button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseMove(button As Integer, Shift As Integer, X As Single, y As Single)
     '发送鼠标信息
-    If Mouse.state = 0 Then
-        UpdateMouse x, y, 0, button
+    If Mouse.State = 0 Then
+        UpdateMouse X, y, 0, button
     Else
-        Mouse.x = x: Mouse.y = y
+        Mouse.X = X: Mouse.y = y
     End If
 End Sub
-Private Sub Form_MouseUp(button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseUp(button As Integer, Shift As Integer, X As Single, y As Single)
     '发送鼠标信息
-    UpdateMouse x, y, 2, button
+    UpdateMouse X, y, 2, button
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
