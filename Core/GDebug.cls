@@ -53,8 +53,8 @@ Public Sub ApplyCmd()
             If CurrentCmd < UBound(HistoryCmd) Then
                 CurrentCmd = CurrentCmd + 1
             Else
-                For i = 1 To UBound(HistoryCmd)
-                    HistoryCmd(i - 1) = HistoryCmd(i)
+                For I = 1 To UBound(HistoryCmd)
+                    HistoryCmd(I - 1) = HistoryCmd(I)
                 Next
                 HistoryCmd(UBound(HistoryCmd)) = ""
             End If
@@ -146,11 +146,11 @@ Private Sub CheckUpdate(force As Boolean)
         Exit Sub
     End If
     
-    Dim data As New GSaving
-    data.Create "Emerald.Core"
-    data.AutoSave = True
-    If Now - CDate(data.GetData("UpdateTime")) >= UpdateCheckInterval Or force Or data.GetData("UpdateAble") = 1 Then
-        data.PutData "UpdateTime", Now
+    Dim Data As New GSaving
+    Data.Create "Emerald.Core"
+    Data.AutoSave = True
+    If Now - CDate(Data.GetData("UpdateTime")) >= UpdateCheckInterval Or force Or Data.GetData("UpdateAble") = 1 Then
+        Data.PutData "UpdateTime", Now
         
         Dim xmlHttp As Object, Ret As String, Start As Long
         
@@ -195,10 +195,10 @@ Private Sub CheckUpdate(force As Boolean)
         End If
     Else
         SetConsoleColor colors.HighLightText
-        WriteLine "Emerald-Skip: update has been checked at " & CDate(data.GetData("UpdateTime")) & "."
+        WriteLine "Emerald-Skip: update has been checked at " & CDate(Data.GetData("UpdateTime")) & "."
     End If
     
-    Set data = Nothing
+    Set Data = Nothing
 End Sub
 Public Function GetVBIDEPath() As String
     On Error GoTo ErrHandle
@@ -228,14 +228,17 @@ Public Sub RunExec()
                 Case ""
                     Dim poolinfo() As String
                     poolinfo = Split(GetCountStr, vbCrLf)
-                    For i = 0 To UBound(poolinfo)
-                        WriteLine poolinfo(i)
+                    For I = 0 To UBound(poolinfo)
+                        WriteLine poolinfo(I)
                     Next
                     Call ExitExec
                     Exit Sub
                 Case Else: GoTo UnKnownCmd
             End Select
         Case "backup"
+            SetConsoleColor colors.ErrText
+            WriteLine "Note£ºThis function will be removed on 7.20 ."
+            SetConsoleColor colors.DefaultText
             Select Case Params(1)
                 Case "-help"
                     WriteLine "Mange your backups ."
@@ -417,7 +420,7 @@ ReCopy:
                     SetConsoleColor colors.DefaultText
                     WriteLine "Active page : " & ECore.ActivePage
                     WriteLine "FPS " & FPS & " , max FPS " & Int(1000 / Int(FPSct / FPS)) & " (per frame " & Int(FPSct / FPS) & " ms)"
-                    WriteLine "Button " & Mouse.button & " , click state " & Mouse.state & " , in (" & Mouse.x & "," & Mouse.y & ")"
+                    WriteLine "Button " & Mouse.button & " , click state " & Mouse.State & " , in (" & Mouse.X & "," & Mouse.y & ")"
                     NewLine
                     SetConsoleColor colors.HighLightText
                     WriteLine "Visual Basic 6.0 IDE"
@@ -440,8 +443,8 @@ ReCopy:
                     WriteLine "Animation : " & IIf(EAni Is Nothing, "[Missing]", ObjPtr(EAni))
                     WriteLine "Music List : " & IIf(EAni Is Nothing, "[Missing]", ObjPtr(EMusic))
                     WriteLine "Assets Tree : " & UBound(AssetsTrees) & " trees in total ."
-                    For i = 1 To UBound(AssetsTrees)
-                        WriteLine i & ". " & AssetsTrees(i).Path & " (" & IIf(IsMissing(AssetsTrees(i).arg1), "[Missing]", AssetsTrees(i).arg1) & "," & IIf(IsMissing(AssetsTrees(i).arg2), "[Missing]", AssetsTrees(i).arg2) & ") , " & UBound(AssetsTrees(i).files) & " files in total ."
+                    For I = 1 To UBound(AssetsTrees)
+                        WriteLine I & ". " & AssetsTrees(I).Path & " (" & IIf(IsMissing(AssetsTrees(I).arg1), "[Missing]", AssetsTrees(I).arg1) & "," & IIf(IsMissing(AssetsTrees(I).arg2), "[Missing]", AssetsTrees(I).arg2) & ") , " & UBound(AssetsTrees(I).Files) & " files in total ."
                     Next
                     WriteLine "Current EditBox : " & TextHandle
                     WriteLine "Bass : " & BassInstalled
@@ -511,9 +514,9 @@ ReCopy:
                 Case "-changekey3"
                     ESave.Key = Params(2)
                     SetConsoleColor colors.ContentText
-                    For i = 1 To ESave.Count
-                        ESave.PutData ESave.GetName(Val(i)), ESave.GetData(ESave.GetName(Val(i)))
-                        WriteLine "Rewriting : " & ESave.GetName(Val(i)) & "(item " & i & ")"
+                    For I = 1 To ESave.Count
+                        ESave.PutData ESave.GetName(Val(I)), ESave.GetData(ESave.GetName(Val(I)))
+                        WriteLine "Rewriting : " & ESave.GetName(Val(I)) & "(item " & I & ")"
                     Next
                     SetConsoleColor colors.ErrText
                     WriteWord "NOTE : Remember to change your key in your code !"
@@ -539,10 +542,10 @@ ReCopy:
                     SetConsoleColor colors.DefaultText
                     WriteLine ESave.Count & " items in total ."
                     Dim savestr As String
-                    For i = 1 To ESave.Count
-                        savestr = ESave.GetData(ESave.GetName(Val(i)))
+                    For I = 1 To ESave.Count
+                        savestr = ESave.GetData(ESave.GetName(Val(I)))
                         SetConsoleColor IIf(savestr = "", colors.ContentText, colors.DefaultText)
-                        WriteLine i & ". " & IIf(savestr = "", "[Removed]", "[Safe]") & "    " & ESave.GetName(Val(i)) & "    " & savestr
+                        WriteLine I & ". " & IIf(savestr = "", "[Removed]", "[Safe]") & "    " & ESave.GetName(Val(I)) & "    " & savestr
                     Next
                     Call ExitExec
                     Exit Sub
@@ -682,7 +685,7 @@ ReCopy:
             Call BackLine: Call ClearLine
             SetConsoleColor colors.DefaultText
             Select Case Params(1)
-                Case "": WriteWord "Button " & Mouse.button & " , click state " & Mouse.state & " , in (" & Mouse.x & "," & Mouse.y & ")"
+                Case "": WriteWord "Button " & Mouse.button & " , click state " & Mouse.State & " , in (" & Mouse.X & "," & Mouse.y & ")"
                 Case "-help"
                     WriteWord "No any commands ."
                     Call ExitExec
@@ -780,8 +783,8 @@ Public Sub NewLine()
     End If
     CuX = 0
 End Sub
-Public Sub SetConsoleColor(c As Long)
-    Color = c
+Public Sub SetConsoleColor(C As Long)
+    Color = C
 End Sub
 Public Sub InitConsole()
     ConsoleDC = CreateCDC(GW - 20, 3222)

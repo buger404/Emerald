@@ -13,111 +13,159 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '======================================
 '   页面绘制器
-    Dim Page As GPage
-    Public Progress As Single, SetupInfo As String, DoneMark As Boolean
-    Dim DisplayProgress As Single, ChangeTime As Long
+    Public Page As GPage
+    Public Step As Long, SetupInfo As String
+    Public Progress As Single
+    Public ShowLog As Boolean, LaunchNow As Boolean
 '======================================
-Public Sub UpdateDone2()
+Public Sub DrawStep5()
+    Page.ShowColorCheckBox ShowLog, GW / 2 - 100, GH / 2 - 20, 200, 20, "Show installer report", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
+
+    If Page.ShowColorButton(2, GW / 2 - 70, GH - 150, 140, 40, "Finish", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18) = 3 Then
+        If ShowLog Then ShellExecuteA 0, "open", LogPath, "", "", SW_SHOW
+        Unload MainWindow
+        End
+    End If
+    'ShellExecuteA 0, "open", LogPath, "", "", SW_SHOW
+End Sub
+Public Sub DrawStep4()
+    Page.ShowLoading GW / 2 - 100, GH / 2 - 160, 200, 200, 9, argb(255, 100, 62, 255), argb(255, 0, 176, 240), argb(255, 64, 218, 208)
+    Page.Writes SetupInfo, GW / 2, GH / 2 + 160, 24, argb(255, 64, 64, 64), align:=StringAlignmentCenter
+    Page.Writes format(Int(Progress * 1000) / 10, "0.0") & "%", GW / 2, GH / 2 + 210, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter
+End Sub
+Public Sub DrawStep3()
+    Page.ShowColorCheckBox LaunchNow, GW / 2 - 100, GH / 2 - 60, 200, 20, "Launch right now", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
+    Page.ShowColorCheckBox ShowLog, GW / 2 - 100, GH / 2 - 20, 200, 20, "Show installer report", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
+
+    If Page.ShowColorButton(2, GW / 2 - 70, GH - 150, 140, 40, "Finish", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18) = 3 Then
+        If LaunchNow Then ShellExecuteA 0, "open", SSetupPath & "\app.exe", "", "", SW_SHOW
+        If ShowLog Then ShellExecuteA 0, "open", LogPath, "", "", SW_SHOW
+        Unload MainWindow
+        End
+    End If
+    'ShellExecuteA 0, "open", LogPath, "", "", SW_SHOW
+End Sub
+Public Sub DrawStep2()
+    Page.ShowLoading GW / 2 - 100, GH / 2 - 160, 200, 200, 9, argb(255, 100, 62, 255), argb(255, 0, 176, 240), argb(255, 64, 218, 208)
+    Page.Writes SetupInfo, GW / 2, GH / 2 + 160, 24, argb(255, 64, 64, 64), align:=StringAlignmentCenter
+    Page.Writes format(Int(Progress * 1000) / 10, "0.0") & "%", GW / 2, GH / 2 + 210, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter
+End Sub
+Public Sub DrawStep1()
+    Dim Points(), y As Long
+    ReDim Points(3)
     
-    Page.Clear argb(255 * 0.85, 242, 242, 249) '清空画布
+    y = GH / 2 - 75
     
-    If CmdMark = "Uninstall" Then GoTo uninpage
+    Points(0) = 0: Points(1) = 0
+    Points(2) = 0: Points(3) = y
     
-    If SetupErr = 0 Then
-        Page.Writes "安装成功", GW / 2, GH / 2 - 40, 30, argb(255, 27, 27, 27), align:=StringAlignmentCenter
-    Else
-        Page.Writes "安装已经完成，但是发生了一些错误。", GW / 2, 200, 20, argb(255, 254, 84, 57), align:=StringAlignmentCenter
-        Page.Writes "错误代码：0x" & format(Hex(SetupErr), "000000"), GW / 2, 230, 16, argb(150, 254, 84, 57), align:=StringAlignmentCenter
-        Page.Writes Error(SetupErr), GW / 2, 250, 16, argb(150, 254, 84, 57), align:=StringAlignmentCenter
-        
-        Page.Writes "请联系游戏开发者", GW / 2, 400, 16, argb(150, 27, 27, 27), align:=StringAlignmentCenter
+    Dim Step2 As Long
+    Step2 = Int(GW / 14)
+    
+    For X = 0 To (GW + Step2) Step Step2
+        ReDim Preserve Points(UBound(Points) + 2)
+        Points(UBound(Points) - 1) = X
+        Points(UBound(Points)) = y + Sin(GetTickCount / 200 + X / 10) * (GH * 0.2 / 12)
+    Next
+    
+    ReDim Preserve Points(UBound(Points) + 4)
+    Points(UBound(Points) - 3) = GW: Points(UBound(Points) - 2) = y
+    Points(UBound(Points) - 1) = GW: Points(UBound(Points)) = 0
+    
+    Page.PaintPolygon2 argb(255, 27, 27, 27), 0, Points(), True
+    
+    Page.Writes "Install Path", 100, GH / 2 + 50, 18, argb(255, 100, 62, 255)
+    
+    If Page.ShowEdit(SSetupPath, 2, 88, GH / 2 + 85, GW - 88 * 2, 40, argb(255, 96, 96, 96), argb(255, 255, 255, 255), argb(255, 242, 242, 242), argb(255, 100, 62, 255), 90, size:=18) = 4 Then
+        On Error GoTo ErrHandler
+        CreateFolder SSetupPath
+ErrHandler:
+        If Err.Number <> 0 Then SSetupPath = "C:\Program Files\" & SPackage.GameName: MsgBox "Please try another folder .", 48
     End If
     
-    If Page.ShowColorButton(0, GW / 2 - 130 / 2, GH - 80, 130, 40, "OK", argb(255, 255, 255, 255), argb(255, 85, 219, 211), argb(255, 55, 189, 181), size:=16) = 3 Then
-        Unload MainWindow: End
-    End If
-    
-    Exit Sub
-    
-uninpage:
-    If SetupErr = 0 Then
-        Page.Writes "卸载完成", GW / 2, GH / 2, 30, argb(255, 27, 27, 27), align:=StringAlignmentCenter
-    Else
-        Page.Writes "卸载已经完成，但是发生了一些错误。", GW / 2, 200, 20, argb(255, 254, 84, 57), align:=StringAlignmentCenter
-        Page.Writes "错误代码：0x" & format(Hex(SetupErr), "000000"), GW / 2, 230, 16, argb(150, 254, 84, 57), align:=StringAlignmentCenter
-        Page.Writes Error(SetupErr), GW / 2, 250, 16, argb(150, 254, 84, 57), align:=StringAlignmentCenter
-        
-        Page.Writes "请联系开发者", GW / 2, 400, 16, argb(150, 27, 27, 27), align:=StringAlignmentCenter
+    Page.ShowColorCheckBox LnkSwitch, 98, GH / 2 + 260, 200, 20, "Create a desktop shortcut", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
+
+    If Page.ShowColorButton(2, GW - 200, GH - 130, 140, 40, "Start", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18) = 3 Then
+        SetupInfo = "Begining ..."
+        Step = 2
+        ECore.NewTransform transDarkTo, 1000
+        Dim ret As String
+        ret = SetupPack
+        If ret <> "" Then
+            MsgBox "Fail to install ." & vbCrLf & ret, 16, MainWindow.Caption
+        End If
+        ECore.NewTransform transDarkTo, 1000
+        Step = 3
     End If
 End Sub
-Public Sub UpdateDone()
-    If SetupMode Then Call UpdateDone2: Exit Sub
+Public Sub DrawStep0()
+    Dim Points(), y As Long
+    ReDim Points(3)
     
-    Page.Clear argb(255 * 0.85, 242, 242, 249) '清空画布
+    y = GH / 2 - 75
     
-    If CmdMark = "Uninstall" Then GoTo uninpage
+    Points(0) = 0: Points(1) = 0
+    Points(2) = 0: Points(3) = y
     
-    If SetupErr = 0 Then
-        Page.Writes "Emerald Builder 安装成功", GW / 2, 100, 30, argb(255, 27, 27, 27), align:=StringAlignmentCenter
-        Page.Writes "在资源管理器中右键创建你的工程吧！", GW / 2, 140, 16, argb(150, 27, 27, 27), align:=StringAlignmentCenter, animation:=1
-        
-        Page.Paint 0, GW / 2, 160 + (GH - 160 - 80) / 2, GW + 1, 270, argb(255, 255, 255, 255), pos:=posOnCenter, animation:=2
-        Page.DrawImage "tip.png", GW / 2, 160 + (GH - 160 - 80) / 2, alpha:=1, pos:=posOnCenter, animation:=2
-    Else
-        Page.Writes "安装已经完成，但是发生了一些错误。", GW / 2, 200, 20, argb(255, 254, 84, 57), align:=StringAlignmentCenter
-        Page.Writes "错误代码：0x" & format(Hex(SetupErr), "000000"), GW / 2, 230, 16, argb(150, 254, 84, 57), align:=StringAlignmentCenter
-        Page.Writes Error(SetupErr), GW / 2, 250, 16, argb(150, 254, 84, 57), align:=StringAlignmentCenter
-        
-        Page.Writes "请联系QQ 1361778219 或者在Github上提交Issue", GW / 2, 400, 16, argb(150, 27, 27, 27), align:=StringAlignmentCenter
-    End If
+    Dim Step2 As Long
+    Step2 = Int(GW / 14)
     
-    If Page.ShowColorButton(0, GW / 2 - 130 / 2, GH - 80, 130, 40, "OK", argb(255, 255, 255, 255), argb(255, 85, 219, 211), argb(255, 55, 189, 181), size:=16) = 3 Then
-        Unload MainWindow: End
-    End If
+    For X = 0 To (GW + Step2) Step Step2
+        ReDim Preserve Points(UBound(Points) + 2)
+        Points(UBound(Points) - 1) = X
+        Points(UBound(Points)) = y + Sin(GetTickCount / 200 + X / 10) * (GH * 0.2 / 12)
+    Next
     
-    Exit Sub
+    ReDim Preserve Points(UBound(Points) + 4)
+    Points(UBound(Points) - 3) = GW: Points(UBound(Points) - 2) = y
+    Points(UBound(Points) - 1) = GW: Points(UBound(Points)) = 0
     
-uninpage:
-    If SetupErr = 0 Then
-        Page.Writes "Emerald Builder 卸载完成", GW / 2, GH / 2, 30, argb(255, 27, 27, 27), align:=StringAlignmentCenter
-    Else
-        Page.Writes "卸载已经完成，但是发生了一些错误。", GW / 2, 200, 20, argb(255, 254, 84, 57), align:=StringAlignmentCenter
-        Page.Writes "错误代码：0x" & format(Hex(SetupErr), "000000"), GW / 2, 230, 16, argb(150, 254, 84, 57), align:=StringAlignmentCenter
-        Page.Writes Error(SetupErr), GW / 2, 250, 16, argb(150, 254, 84, 57), align:=StringAlignmentCenter
-        
-        Page.Writes "请联系QQ 1361778219 或者在Github上提交Issue", GW / 2, 400, 16, argb(150, 27, 27, 27), align:=StringAlignmentCenter
+    Page.PaintPolygon2 argb(255, 27, 27, 27), 0, Points(), True
+
+    Page.Paint 1, GW / 2, GH / 2 - 80, 96, 96, argb(255, 92, 228, 220), pos:=posOnCenter
+    Page.DrawImageEx "app.png", GW / 2, GH / 2 - 80, 96, 96, posOnCenter
+    
+    Page.Writes "Here's " & SPackage.GameName, GW / 2, GH / 2 + 10, 24, argb(255, 64, 64, 64), align:=StringAlignmentCenter
+    Page.Writes "Made by " & SPackage.Maker, GW / 2, GH / 2 + 50, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter
+    Page.Writes "(" & SPackage.GameDescribe & ")", GW / 2, GH / 2 + 80, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter
+    
+    If Page.ShowColorButton(2, GW / 2 - 70, GH - 150, 140, 40, "Install", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18) = 3 Then
+        Step = 1
+        ECore.NewTransform transDarkTo, 1000
     End If
 End Sub
 Public Sub Update()
-    '绘制事件
-    If DoneMark Then Call UpdateDone: Exit Sub
+    '游戏每一帧的过程（绘制过程请放在此处）
     
-    If Progress <> DisplayProgress Then
-        If GetTickCount - ChangeTime >= 10 Then
-            ChangeTime = GetTickCount
-            DisplayProgress = DisplayProgress + (Progress - DisplayProgress) / 30
-        End If
-        If DisplayProgress > Progress Or (Progress - DisplayProgress) < 0.001 Then DisplayProgress = Progress
-    End If
-        
-    
-    Page.Clear argb(255 * 0.85, 242, 242, 249) '清空画布
-    
-    Page.PaintArc GW / 2, GH / 2 - 20, 200, 200, 360, -90, argb(255, 230, 230, 230), 2, 1, posOnCenter
-    Page.PaintArc GW / 2, GH / 2 - 20, 200, 200, DisplayProgress * 360, -90, argb(255, 95, 229, 221), 3, 1, posOnCenter
-    Page.Writes Int(DisplayProgress * 100), GW / 2, GH / 2 - 52, 50, argb(255, 27, 27, 27), align:=StringAlignmentCenter, style:=FontStyleBold
+    Page.Clear '清空画布
 
-    Page.Writes SetupInfo, GW / 2, GH - 110, 18, argb(255, 64, 64, 64), align:=StringAlignmentCenter
+    CallByName Me, "DrawStep" & Step, VbMethod
     
-    If DisplayProgress >= 0.9999 Then Page.StartAnimation 1, 500: Page.StartAnimation 2, 700: ECore.NewTransform , 400: DoneMark = True
+    If Step <> 2 And Step <> 4 Then Call DrawTitle
+End Sub
+Public Sub DrawTitle()
+    Dim m As Integer
+    m = CheckMouse(GW - 60 - 19, 48, 36, 36)
+    If Page.ShowColorButton(1, GW - 60 - 19, 35, 36, 36, "×", IIf(m = 0, argb(255, 128, 128, 128), argb(255, 255, 255, 255)), argb(0, 254, 84, 57), argb(255, 254, 84, 57), size:=18) = 2 Then
+        Unload MainWindow
+        End
+    End If
+
+    m = CheckMouse(GW - 120 - 19, 48, 36, 36)
+    If Page.ShowColorButton(1, GW - 120 - 19, 35, 36, 36, "-", IIf(m = 0, argb(255, 128, 128, 128), argb(255, 255, 255, 255)), argb(0, 128, 128, 128), argb(100, 128, 128, 128), size:=18) = 2 Then
+        MainWindow.WindowState = 1
+        Mouse.State = 0
+    End If
 End Sub
 Public Sub Wheel(Direction As Integer, Depth As Single)
     '鼠标滚轮事件
     'Direction:方向，Depth：深度
 End Sub
+Public Sub AnimationMsg(id As String, msg As String)
+    '动画消息接收
+End Sub
 Public Sub Enter()
     '页面进入事件
-    DisplayProgress = 0: Progress = 0: SetupInfo = "准备中": DoneMark = False
 End Sub
 Public Sub Leave()
     '页面离开事件
@@ -137,15 +185,12 @@ Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
     '导入游戏资源
-    If PackPos = -1 Then
-        Page.Res.NewImages App.path & "\assets", 0.7
-    End If
+
     '创建页面
     ECore.Add Page, "SetupPage"
     
     '===============================================
     '   如果需要添加动画，请放置在此处
-        Page.NewAnimation False, "FadeIn", 2, 400
-        Page.NewAnimation False, "FadeIn", 2, 400
+    
     '===============================================
 End Sub

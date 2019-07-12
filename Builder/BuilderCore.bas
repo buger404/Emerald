@@ -1,7 +1,10 @@
 Attribute VB_Name = "BuilderCore"
 Dim WSHShell As Object
 Public VBIDEPath As String, NewVersion As Long
-Public OPath As String
+Public OPath As String, PackPos As Long
+Public WelcomePage As WelcomePage, TitleBar As TitleBar, SetupPage As SetupPage
+Public ToNewPage As ToNewPage
+Public LnkSwitch As Boolean
 Public Type EmrPConfig
     AFileHeader As String
     Name As String
@@ -39,7 +42,69 @@ skip:
 End Sub
 Public Sub Main()
     OPath = Replace(Trim(Command$), """", "")
-    'OPath = "E:\Error 404\testEmr\"
+    'OPath = "E:\Error 404\Muing III"
+    'OPath = "E:\Error 404\Emerald 动画包含资源提取工具\"
+    Dim targetEXE As String
+    targetEXE = App.Path & "\" & App.EXEName & ".exe"
+    'targetEXE = "D:\MyDoc\Emerald\Export\MuingIII - Installer.exe"
+    'targetEXE = "C:\Program Files\MuingIII\Uninstall.exe"
+    
+    PackPos = -1
+    If OPath = "" Then PackPos = FindPackage(targetEXE, 598000)
+    
+    If PackPos <> -1 Then
+        '从指定位置把安装包分离出来
+        Dim tempPath As String, Data() As Byte, data2() As Byte
+        tempPath = VBA.Environ("temp")
+        If Dir(tempPath & "\setuppack.emrpack") <> "" Then Kill tempPath & "\setuppack.emrpack"
+        ReDim Data(FileLen(targetEXE) - 1)
+        ReDim data2(UBound(Data) - PackPos)
+        Open targetEXE For Binary As #1
+        Get #1, , Data
+        Close #1
+        CopyMemory data2(0), Data(PackPos), UBound(Data) - PackPos + 1
+        ReDim Preserve Data(PackPos - 1)
+        Open tempPath & "\setuppack.emrpack" For Binary As #1
+        Put #1, , data2
+        Close #1
+        If Dir(tempPath & "\emrtempUninstall.exe") <> "" Then Kill tempPath & "\emrtempUninstall.exe"
+        Open tempPath & "\emrtempUninstall.exe" For Binary As #1
+        Put #1, , Data
+        Close #1
+        Open tempPath & "\setuppack.emrpack" For Binary As #1
+        Get #1, , SPackage
+        Close #1
+        If UBound(SPackage.Files) = 1 Then
+            If SPackage.Files(1).Path = "setup.config" Then
+                '执行卸载程序
+                Open App.Path & "\setup.config" For Binary As #1
+                Put #1, , SPackage.Files(1).Data
+                Close #1
+                GoTo UninstallGame
+            End If
+        End If
+        
+        MainWindow.Show
+        MainWindow.Caption = SPackage.GameName & "  Installer"
+        SetWindowLongA MainWindow.Hwnd, GWL_STYLE, _
+        GetWindowLongA(MainWindow.Hwnd, GWL_STYLE) Or WS_CAPTION Or WS_MINIMIZEBOX Or WS_BORDER
+        MainWindow.WindowState = 1
+        MainWindow.WindowState = 0
+        MainWindow.SetFocus
+        
+        If SPackage.Files(0).Path <> "" Then
+            Open tempPath & "\setupappicon.png" For Binary As #1
+            Put #1, , SPackage.Files(0).Data
+            Close #1
+            SetupPage.Page.Res.newImage tempPath & "\setupappicon.png", 128, 128, "app.png"
+        End If
+        SetupMode = True
+        SSetupPath = "C:\Program Files\" & SPackage.GameName
+        Kill tempPath & "\setuppack.emrpack"
+        ECore.ActivePage = "SetupPage"
+        Exit Sub
+    End If
+    
     EmrPC.AFileHeader = "Emerald Project Config File"
     Call GetVBIDEPath
     If VBIDEPath = "" Then
@@ -49,6 +114,38 @@ Public Sub Main()
     MainWindow.Show
     EmrPC.Maker = ESave.GetData("Maker")
     If OPath <> "" Then WelcomePage.InitProject
+    
+    Exit Sub
+    
+UninstallGame:
+    MainWindow.Show
+    Open App.Path & "\setup.config" For Binary As #1
+    Put #1, , SPackage.Files(1).Data
+    Close #1
+    Dim te As String
+    Open App.Path & "\setup.config" For Input As #1
+    Line Input #1, te
+    SPackage.GameName = te
+    Close #1
+    MainWindow.Caption = SPackage.GameName & "  Uninstaller"
+    SetWindowLongA MainWindow.Hwnd, GWL_STYLE, _
+    GetWindowLongA(MainWindow.Hwnd, GWL_STYLE) Or WS_CAPTION Or WS_MINIMIZEBOX Or WS_BORDER
+    MainWindow.WindowState = 1
+    MainWindow.WindowState = 0
+    MainWindow.SetFocus
+    Kill tempPath & "\setuppack.emrpack"
+    SetupPage.Step = 4
+    ECore.ActivePage = "SetupPage"
+    ECore.Display
+    DoEvents
+    If MsgBox("Uninstall " & SPackage.GameName & " right now , really ?", 48 + vbYesNo, MainWindow.Caption) = vbNo Then Unload MainWindow: End
+    Dim ret As String
+    ret = UninPack
+    If ret <> "" Then
+        MsgBox "Fail to uninstall ." & vbCrLf & ret, 16, MainWindow.Caption
+    End If
+    SetupPage.Step = 5
+    ECore.NewTransform transDarkTo, 1000
 End Sub
 Public Sub GetVBIDEPath()
     On Error Resume Next
@@ -152,7 +249,7 @@ Public Sub CheckOnLineUpdate()
     If Now - CDate(Data.GetData("UpdateTime")) >= UpdateCheckInterval Or Data.GetData("UpdateAble") = 1 Then
         Data.PutData "UpdateTime", Now
         
-        Dim xmlHttp As Object, Ret As String, Start As Long
+        Dim xmlHttp As Object, ret As String, Start As Long
         Set xmlHttp = PoolCreateObject("Microsoft.XMLHTTP")
         xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
         xmlHttp.send
@@ -166,10 +263,10 @@ Public Sub CheckOnLineUpdate()
             ECore.Display
             Sleep 10: DoEvents
         Loop
-        Ret = xmlHttp.responseText
+        ret = xmlHttp.responseText
         Set xmlHttp = Nothing
 
-        NewVersion = Val(Ret)
+        NewVersion = Val(ret)
         Data.PutData "UpdateAble", 1
     Else
         NewVersion = Version

@@ -24,7 +24,7 @@ Public Sub DrawPage0()
     Page.Writes "Welcome to Emerald 2.0", GW / 2, GH / 2 + 30, 24, argb(255, 64, 64, 64), align:=StringAlignmentCenter, animation:=1
     Page.Writes "Better UI and better user experience .", GW / 2, GH / 2 + 70, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter, animation:=2
     
-    If Page.ShowColorButton(2, GW / 2 - 70, GH - 150, 140, 40, "Get started", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, Size:=18) = 3 Then
+    If Page.ShowColorButton(2, GW / 2 - 70, GH - 150, 140, 40, "Get started", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18) = 3 Then
         If IsRegCreated("HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\DisplayIcon") Then
             PageIndex = 1
         Else
@@ -37,7 +37,7 @@ Public Sub DrawPage1()
     Page.DrawImageEx "old.png", GW / 2, GH / 2 - 80, 128, 128, posOnCenter
     Page.Writes "Before you enter", GW / 2, GH / 2 + 30, 24, argb(255, 64, 64, 64), align:=StringAlignmentCenter, animation:=1
     Page.Writes "You must uninstall the old version of Emerald .", GW / 2, GH / 2 + 70, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter, animation:=2
-    If Page.ShowColorButton(2, GW / 2 - 70, GH - 150, 140, 40, "Uninstall", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, Size:=18) = 3 Then
+    If Page.ShowColorButton(2, GW / 2 - 70, GH - 150, 140, 40, "Uninstall", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18) = 3 Then
         Dim Error As String
         Error = UninstallOld
         If Error <> "" Then
@@ -52,8 +52,8 @@ Public Sub DrawPage2()
     Page.DrawImageEx "user.png", GW / 2, GH / 2 - 120, 128, 128, posOnCenter
     Page.Writes "Leave your footprint", GW / 2, GH / 2 - 10, 24, argb(255, 64, 64, 64), align:=StringAlignmentCenter, animation:=1
     Page.Writes "Tell me your name , it will be displaied in your game installer and binary information .", GW / 2, GH / 2 + 30, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter, animation:=2
-    Page.ShowEdit Maker, 2, GW / 2 - 250, GH / 2 + 80, 500, 40, argb(255, 96, 96, 96), argb(255, 242, 242, 242), argb(255, 232, 232, 232), argb(255, 100, 62, 255), 50, Size:=18
-    If Page.ShowColorButton(2, GW / 2 - 70, GH - 150, 140, 40, "OK", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, Size:=18, style:=FontStyleBold) = 3 Then
+    Page.ShowEdit Maker, 2, GW / 2 - 250, GH / 2 + 80, 500, 40, argb(255, 96, 96, 96), argb(255, 242, 242, 242), argb(255, 232, 232, 232), argb(255, 100, 62, 255), 50, size:=18
+    If Page.ShowColorButton(2, GW / 2 - 70, GH - 150, 140, 40, "OK", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18, style:=FontStyleBold) = 3 Then
         If Maker = "" Then MsgBox "Please tell me your name .", 64: Exit Sub
         ESave.PutData "Maker", Maker
         PageIndex = 3
@@ -74,10 +74,11 @@ Public Sub DrawPage3()
     End If
     
     If AcceptMIT Then
-        If Page.ShowColorButton(2, GW / 2 - 70, GH - 170, 140, 40, "OK", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, Size:=18, style:=FontStyleBold) = 3 Then
+        If Page.ShowColorButton(2, GW / 2 - 70, GH - 170, 140, 40, "OK", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18, style:=FontStyleBold) = 3 Then
             If CopyModel Then
+                If Dir(VBIDEPath & "Template", vbDirectory) = "" Then MkDir VBIDEPath & "Template"
                 FileCopy App.Path & "\Example\Emerald Window.frm", VBIDEPath & "Template\Forms\Emerald Window.frm"
-                FileCopy App.Path & "\Example\Emerald Page.cls", VBIDEPath & "Template\Forms\Emerald Page.cls"
+                FileCopy App.Path & "\Example\Emerald Page.cls", VBIDEPath & "Template\Classes\Emerald Page.cls"
             End If
             If CreateContentMenu Then OperContentMenu False
             ESave.PutData "Emerald 2.0", "√"
@@ -90,7 +91,7 @@ Public Sub DrawPage4()
     Page.Writes "Welcome to Emerald 2.0", GW / 2, GH / 2 + 30, 24, argb(255, 64, 64, 64), align:=StringAlignmentCenter, animation:=1
     Page.Writes "You must update your config now .", GW / 2, GH / 2 + 70, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter, animation:=2
     
-    If Page.ShowColorButton(2, GW / 2 - 70, GH - 150, 140, 40, "Update", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, Size:=18) = 3 Then
+    If Page.ShowColorButton(2, GW / 2 - 70, GH - 150, 140, 40, "Update", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18) = 3 Then
         Dim temp As String
         'On Error Resume Next
         Open OPath & "\.emerald" For Input As #1
@@ -115,14 +116,14 @@ Public Sub DrawPage5()
     Page.Writes "Let's create our project .", 170, 108, 18, argb(255, 96, 96, 96)
     
     Page.Writes "Project name", 70, 200, 24, argb(255, 100, 62, 255)
-    Page.ShowEdit ProjectName, 2, 63, 240, 500, 30, argb(255, 96, 96, 96), argb(0, 255, 255, 255), argb(255, 242, 242, 242), argb(255, 100, 62, 255), 50, Size:=18
+    Page.ShowEdit ProjectName, 2, 63, 240, 500, 30, argb(255, 96, 96, 96), argb(0, 255, 255, 255), argb(255, 242, 242, 242), argb(255, 100, 62, 255), 50, size:=18
 
     Page.Writes "Options", 70, 320, 24, argb(255, 100, 62, 255)
     Page.ShowColorCheckBox InitWindow, 73, 360, 500, 20, "Create a project with a Emerald Window created", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
     Page.ShowColorCheckBox InitPage, 73, 390, 500, 20, "Create a project with a Emerald Page created", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
     Page.ShowColorCheckBox OpenPro, 73, 420, 500, 20, "Open my project after finish creating", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
 
-    If Page.ShowColorButton(2, GW / 2 - 70, GH - 120, 140, 40, "OK", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, Size:=18, style:=FontStyleBold) = 3 Then
+    If Page.ShowColorButton(2, GW / 2 - 70, GH - 120, 140, 40, "OK", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18, style:=FontStyleBold) = 3 Then
         If CheckFileName(ProjectName) = False Or ProjectName = "" Then MsgBox "Terrible project name , please change other one .", 64: Exit Sub
         
         If Dir(OPath & "\core", vbDirectory) = "" Then MkDir OPath & "\core"
@@ -215,7 +216,7 @@ Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
     '导入游戏资源
-    Page.Res.NewImages App.Path & "\assets"
+    If PackPos = -1 Then Page.Res.NewImages App.Path & "\assets"
     '创建页面
     ECore.Add Page, "ToNewPage"
     

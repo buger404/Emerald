@@ -2,16 +2,12 @@ Attribute VB_Name = "Process"
 'Emerald Ïà¹Ø´úÂë
 
 Public InstalledPath As String, IsUpdate As Boolean
-Public WelcomePage As WelcomePage, TitleBar As TitleBar, SetupPage As SetupPage, WaitPage As WaitPage, DialogPage As DialogPage, UpdatePage As UpdatePage
-Public ToNewPage As ToNewPage
 
 Public Tasks() As String
 Public CmdMark As String, SetupErr As Long, Repaired As Boolean
 Public AppInfo() As String
 Public Cmd As String
 Public Abouting As Boolean
-Public SetMode As Boolean, PackPos As Long
-Public LnkSwitch As Boolean
 Public Function TestFile(Path As String, IncludeText As String) As Boolean
     Dim temp As String
     If Dir(Path) = "" Then Exit Function

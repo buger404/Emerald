@@ -48,6 +48,8 @@ Attribute VB_Name = "GCore"
         transToDownFade = 9
         transHighLight = 10
         transFallDark = 11
+        transDarkTo = 12
+        transDarkReturn = 13
     End Enum
     Public Type GGIF
         time As Long
@@ -104,7 +106,7 @@ Attribute VB_Name = "GCore"
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
-    Public Const Version As Long = 19071102      'hhhhhdfgdfhhhxxxhhhhhhhhffff
+    Public Const Version As Long = 19071205      'hhhhhdfgdfhhhxxxhhhhhhhhffff
     Public TextHandle As Long, WaitChr As String
     
     Public AssetsTrees() As AssetsTree
@@ -402,7 +404,7 @@ sth:
         If Now - CDate(Data.GetData("UpdateTime")) >= UpdateCheckInterval Or Data.GetData("UpdateAble") = 1 Then
             Data.PutData "UpdateTime", Now
             
-            Dim xmlHttp As Object, Ret As String, Start As Long
+            Dim xmlHttp As Object, ret As String, Start As Long
             Set xmlHttp = PoolCreateObject("Microsoft.XMLHTTP")
             xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
             xmlHttp.send
@@ -415,11 +417,11 @@ sth:
                 End If
                 Sleep 10: DoEvents
             Loop
-            Ret = xmlHttp.responseText
+            ret = xmlHttp.responseText
             Set xmlHttp = Nothing
-            Debug.Print Now, "Emerald：检查版本完毕，最新版本号 " & Val(Ret)
+            Debug.Print Now, "Emerald：检查版本完毕，最新版本号 " & Val(ret)
             
-            If Val(Ret) > Version And App.LogMode = 0 Then
+            If Val(ret) > Version And App.LogMode = 0 Then
                 Data.PutData "UpdateAble", 1
                 If MsgBox("发现Emerald存在新版本，您希望现在前往下载吗？", vbYesNo + 48, "Emerald") = vbNo Then Exit Sub
                 

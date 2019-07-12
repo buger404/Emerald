@@ -30,11 +30,13 @@ Attribute VB_Exposed = False
         UseTime As Long
         Date As String
         FileCount As Long
-        Size As Long
+        size As Long
     End Type
     Dim BackupList() As BackupItem, BackupIndex As Integer
     Dim UFiles() As UpdateFiles, FileIndex As Integer
     Dim BackupSwitch As Boolean, ReplaceAccept As Long
+    Dim PackState As Long
+    Public PackText As String
 '======================================
 Public Sub ScanBackup()
     Dim File As String, Backup As EmrBackup
@@ -51,7 +53,7 @@ Public Sub ScanBackup()
                 .FileCount = UBound(Backup.Files)
                 .Name = Split(File, ".emrbackup")(0)
                 If .Name = "" Then .Name = "null"
-                .Size = FileLen(OPath & "\.emr\" & File)
+                .size = FileLen(OPath & "\.emr\" & File)
             End With
         End If
         File = Dir()
@@ -63,7 +65,7 @@ Public Sub ScanBackup()
             .Date = "Unknown"
             .FileCount = -1
             .Name = "Old version of Emerald created"
-            .Size = -1
+            .size = -1
         End With
     End If
 End Sub
@@ -169,18 +171,54 @@ Public Sub ReplaceProject()
     
     Set MD5 = Nothing
 End Sub
+Public Sub BuildInstaller()
+    Dim Name As String, Describe As String, GVersion As String
+    Dim tempr As String, targetEXE As String
+    
+    targetEXE = App.Path & "\Builder.exe"
+    
+    WelcomePage.PackText = "Scaning project information ..."
+    Open OPath & "\" & Dir(OPath & "\*.vbp") For Input As #1
+    Do While Not EOF(1)
+        Line Input #1, tempr
+        If InStr(tempr, "VersionProductName") = 1 Then Name = Split(tempr, """")(1)
+        If InStr(tempr, "VersionFileDescription") = 1 Then Describe = Split(tempr, """")(1)
+        If InStr(tempr, "VersionCompanyName") = 1 Then Maker = Split(tempr, """")(1)
+        If InStr(tempr, "MajorVer") = 1 Then GVersion = GVersion & Split(tempr, "=")(1) & "."
+        If InStr(tempr, "MinorVer") = 1 Then GVersion = GVersion & Split(tempr, "=")(1) & "."
+        If InStr(tempr, "RevisionVer") = 1 Then GVersion = GVersion & Split(tempr, "=")(1)
+    Loop
+    Close #1
+    MakePackage OPath, EmrPC.Maker, EmrPC.Name, GVersion, Describe, 0
+    CreateFolder GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\"
+    WelcomePage.PackText = "Building installer binary ..."
+    If Dir(GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & EmrPC.Name & " - Installer.exe") <> "" Then Kill GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & EmrPC.Name & " - Installer.exe"
+    Open VBA.Environ("temp") & "\copyemr.cmd" For Output As #1
+    Print #1, "@echo off"
+    Print #1, "echo Emerald Package Toolkit , Version: " & Version
+    Print #1, "echo Building Installer..."
+    Print #1, "ping localhost -n 3 > nul"
+    Print #1, "copy """ & targetEXE & """ /b + """ & VBA.Environ("temp") & "\emrpack"" /b """ & GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & EmrPC.Name & " - Installer.exe"""
+    Close #1
+    ShellExecuteA 0, "open", VBA.Environ("temp") & "\copyemr.cmd", "", "", SW_SHOW
+    Do While Dir(GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & EmrPC.Name & " - Installer.exe") = ""
+        Sleep 10: DoEvents
+        ECore.Display
+    Loop
+    ShellExecuteA 0, "open", "explorer.exe", "/select,""" & GetSpecialDir(MYDOCUMENTS) & "\Emerald\Export\" & EmrPC.Name & " - Installer.exe" & """", "", SW_SHOW
+End Sub
 Public Sub UpdateProject()
     If EmrPC.Version >= Version And Not EmrPC.FUpdate Then Exit Sub
     
     Dim File As String, Kind As Integer
     Dim Cache As EmrBackup
-    Dim Check As String, Check2 As String, MD5 As New MD5, Size As Long
+    Dim Check As String, Check2 As String, MD5 As New MD5, size As Long
     If Dir(OPath & "\.emr\.cache") <> "" Then
         Open OPath & "\.emr\.cache" For Binary As #1
         Get #1, , Cache
         Close #1
     End If
-    File = Dir(App.Path & "\Core\" & File)
+    File = Dir(App.Path & "\Core\")
     Do While File <> ""
         '1=新增，2=更新，3=被修改
         Kind = IIf(IsExitAFile(OPath & "\Core\" & File), 2, 1)
@@ -191,20 +229,20 @@ Public Sub UpdateProject()
                 For I = 1 To UBound(Cache.Files)
                     If Cache.Files(I).Path = "Core\" & File Then
                         Kind = IIf(Cache.Files(I).MD5Check = Check, 2, 3)
-                        Size = IIf(Kind = 3, -1, FileLen(App.Path & "\Core\" & File) - FileLen(OPath & "\Core\" & File))
+                        size = IIf(Kind = 3, -1, FileLen(App.Path & "\Core\" & File) - FileLen(OPath & "\Core\" & File))
                         Exit For
                     End If
                 Next
             Else
-                Size = FileLen(App.Path & "\Core\" & File) - FileLen(OPath & "\Core\" & File)
+                size = FileLen(App.Path & "\Core\" & File) - FileLen(OPath & "\Core\" & File)
             End If
             If Check = Check2 Then Kind = 0
         End If
-        If Kind = 1 Then Size = FileLen(App.Path & "\Core\" & File)
+        If Kind = 1 Then size = FileLen(App.Path & "\Core\" & File)
         If Kind <> 0 Then
             ReDim Preserve UFiles(UBound(UFiles) + 1)
             With UFiles(UBound(UFiles))
-                .IncraseByte = Size
+                .IncraseByte = size
                 .Kind = Kind
                 .ReplaceMark = IIf(Kind = 3, False, True)
                 .Name = File
@@ -234,7 +272,6 @@ Public Sub UpdateProject()
                 If .Name = "ResPool.bas" Then .Image = "cpu.png"
             End With
         End If
-        ECore.Display: DoEvents
         File = Dir()
     Loop
     
@@ -280,7 +317,7 @@ Public Sub DrawProject()
     Page.Writes EmrPC.Name, 381, 170, 18, argb(255, 96, 96, 96)
     Page.Writes "Maker", 380, 235, 24, argb(255, 100, 62, 255)
     'Page.Writes EmrPC.Maker, 381, 270, 18, argb(255, 96, 96, 96)
-    If Page.ShowEdit(EmrPC.Maker, 2, 373, 270 - 5 + 2, 280, 30, argb(255, 96, 96, 96), argb(0, 255, 255, 255), argb(255, 242, 242, 242), argb(255, 100, 62, 255), 50, Size:=18) = 4 Then
+    If Page.ShowEdit(EmrPC.Maker, 2, 373, 270 - 5 + 2, 280, 30, argb(255, 96, 96, 96), argb(0, 255, 255, 255), argb(255, 242, 242, 242), argb(255, 100, 62, 255), 50, size:=18) = 4 Then
         Open OPath & "\.emerald" For Binary As #1
         Put #1, , EmrPC
         Close #1
@@ -298,7 +335,7 @@ Public Sub DrawProject()
     End If
     
     m = CheckMouse(381, 400, 570, 20)
-    Page.Writes "Fix animation bugs , learn more ...", 381, 400, 18, IIf(m > 0, argb(255, 100, 62, 255), argb(255, 96, 96, 96)), 570, 20, style:=FontStyleUnderline
+    Page.Writes "Improve Builder and add package function , learn more ...", 381, 400, 18, IIf(m > 0, argb(255, 100, 62, 255), argb(255, 96, 96, 96)), 570, 20, style:=FontStyleUnderline
     If m = 3 Then ShellExecuteA 0, "open", "https://github.com/buger404/Emerald/releases", "", "", SW_SHOW
     m = IIf(m = 0, MousePointerConstants.vbDefault, MousePointerConstants.vbArrowQuestion)
     If Screen.MousePointer <> m Then Screen.MousePointer = m
@@ -320,29 +357,30 @@ Public Sub DrawProject()
         Page.Writes IIf(UFiles(I).IncraseByte > 0, "+", "") & UFiles(I).IncraseByte & " bytes", GW - 50, 430 + 30 * (I - FileIndex * 6) - 8, 18, argb(255, 96, 96, 96), align:=StringAlignmentFar
     Next
     
-    Dim Max As Long
-    Max = Int(UBound(UFiles) / 6) + 1
-    Page.Writes FileIndex + 1 & "/" & Max, 600, 430 + 30 * 7 + 5, 18, argb(255, 96, 96, 96), 120, 20, align:=StringAlignmentCenter
+    Dim max As Long
+    max = Int(UBound(UFiles) / 6) + 1
+    Page.Writes FileIndex + 1 & "/" & max, 600, 430 + 30 * 7 + 5, 18, argb(255, 96, 96, 96), 120, 20, align:=StringAlignmentCenter
     If FileIndex + 1 > 1 Then
-        If Page.ShowColorButton(1, 600, 430 + 30 * 7 + 5, 20, 20, "<", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, Size:=16) = 3 Then
+        If Page.ShowColorButton(1, 600, 430 + 30 * 7 + 5, 20, 20, "<", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=16) = 3 Then
             FileIndex = FileIndex - 1
             ECore.NewTransform
         End If
     End If
-    If FileIndex + 1 < Max Then
-        If Page.ShowColorButton(1, 700, 430 + 30 * 7 + 5, 20, 20, ">", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, Size:=16) = 3 Then
+    If FileIndex + 1 < max Then
+        If Page.ShowColorButton(1, 700, 430 + 30 * 7 + 5, 20, 20, ">", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=16) = 3 Then
             FileIndex = FileIndex + 1
             ECore.NewTransform
         End If
     End If
-    If FileIndex + 1 > Max Then FileIndex = Max - 1
+    If FileIndex + 1 > max Then FileIndex = max - 1
     
     Page.ShowColorCheckBox BackupSwitch, 384, GH - 80, 200, 20, "Create backup", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
 
-    If Page.ShowColorButton(2, GW - 160, GH - 82, 120, 30, IIf(ReplaceAccept = 0, "Replace", "Confirm (" & Round(5 - (GetTickCount - ReplaceAccept) / 1000) & "s)"), argb(255, 255, 255, 255), IIf(ReplaceAccept = 0, argb(255, 100, 62, 255), argb(255, 254, 84, 57)), IIf(ReplaceAccept = 0, argb(255, 140, 102, 255), argb(255, 258, 124, 97)), 40, Size:=18) = 3 Then
+    If Page.ShowColorButton(2, GW - 160, GH - 82, 120, 30, IIf(ReplaceAccept = 0, "Replace", "Confirm (" & Round(5 - (GetTickCount - ReplaceAccept) / 1000) & "s)"), argb(255, 255, 255, 255), IIf(ReplaceAccept = 0, argb(255, 100, 62, 255), argb(255, 254, 84, 57)), IIf(ReplaceAccept = 0, argb(255, 140, 102, 255), argb(255, 255, 124, 97)), 40, size:=18) = 3 Then
         If ReplaceAccept > 0 Then
             ReplaceAccept = -1
             Call ReplaceProject
+            Call ScanBackup
             ReplaceAccept = 0
             MsgBox "Success." & IIf(BackupSwitch, vbCrLf & "Backup has been created : " & OPath & "\.emr\" & EmrPC.LastBranch & ".emrbackup", ""), 64
         Else
@@ -369,10 +407,10 @@ Public Sub DrawBackup()
             Page.Paint 0, 380, 120 + 70 * (I - BackupIndex * 6) - 5 - 8, 560, 71, argb(255, 206, 246, 243)
         End If
         Page.Writes Left(BackupList(I).Name, 22) & IIf(Len(BackupList(I).Name) > 22, "...", "") & "  (" & BackupList(I).FileCount & " items)", 392, 120 + 70 * (I - BackupIndex * 6) - 2, 22, argb(255, 64, 64, 64)
-        Page.Writes "Date : " & BackupList(I).Date & " , size : " & BackupList(I).Size & " bytes", 392, 120 + 70 * (I - BackupIndex * 6) - 2 + 25, 18, argb(255, 96, 96, 96)
-        If Page.ShowColorButton(2, GW - 170, 120 + 70 * (I - BackupIndex * 6) + 8, 100, 30, IIf(BackupList(I).UseTime = 0, "Restore", "Confirm (" & Round(5 - (GetTickCount - BackupList(I).UseTime) / 1000) & "s)"), argb(255, 255, 255, 255), IIf(BackupList(I).UseTime = 0, argb(255, 100, 62, 255), argb(255, 254, 84, 57)), IIf(BackupList(I).UseTime = 0, argb(255, 140, 102, 255), argb(255, 258, 124, 97)), 40, Size:=18) = 3 Then
+        Page.Writes "Date : " & BackupList(I).Date & " , size : " & BackupList(I).size & " bytes", 392, 120 + 70 * (I - BackupIndex * 6) - 2 + 25, 18, argb(255, 96, 96, 96)
+        If Page.ShowColorButton(2, GW - 170, 120 + 70 * (I - BackupIndex * 6) + 8, 100, 30, IIf(BackupList(I).UseTime = 0, "Restore", "Confirm (" & Round(5 - (GetTickCount - BackupList(I).UseTime) / 1000) & "s)"), argb(255, 255, 255, 255), IIf(BackupList(I).UseTime = 0, argb(255, 100, 62, 255), argb(255, 254, 84, 57)), IIf(BackupList(I).UseTime = 0, argb(255, 140, 102, 255), argb(255, 255, 124, 97)), 40, size:=18) = 3 Then
             If BackupList(I).UseTime > 0 Then
-                If BackupList(I).Size = -1 Then
+                If BackupList(I).size = -1 Then
                     ShellExecuteA 0, "open", OPath & "\.emr\backup\", "", "", SW_SHOW
                     BackupList(I).UseTime = 0
                 Else
@@ -413,22 +451,59 @@ Public Sub DrawBackup()
         If GetTickCount - BackupList(I).UseTime >= 5000 And BackupList(I).UseTime > 0 Then BackupList(I).UseTime = 0: ECore.NewTransform
     Next
     
-    Dim Max As Long
-    Max = Int(UBound(BackupList) / 6) + 1
-    Page.Writes BackupIndex + 1 & "/" & Max, 600, 430 + 30 * 7 + 5, 18, argb(255, 96, 96, 96), 120, 20, align:=StringAlignmentCenter
+    Dim max As Long
+    max = Int(UBound(BackupList) / 6) + 1
+    Page.Writes BackupIndex + 1 & "/" & max, 600, 430 + 30 * 7 + 5, 18, argb(255, 96, 96, 96), 120, 20, align:=StringAlignmentCenter
     If BackupIndex + 1 > 1 Then
-        If Page.ShowColorButton(1, 600, 430 + 30 * 7 + 5, 20, 20, "<", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, Size:=16) = 3 Then
+        If Page.ShowColorButton(1, 600, 430 + 30 * 7 + 5, 20, 20, "<", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=16) = 3 Then
             BackupIndex = BackupIndex - 1
             ECore.NewTransform
         End If
     End If
-    If BackupIndex + 1 < Max Then
-        If Page.ShowColorButton(1, 700, 430 + 30 * 7 + 5, 20, 20, ">", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, Size:=16) = 3 Then
+    If BackupIndex + 1 < max Then
+        If Page.ShowColorButton(1, 700, 430 + 30 * 7 + 5, 20, 20, ">", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=16) = 3 Then
             BackupIndex = BackupIndex + 1
             ECore.NewTransform
         End If
     End If
-    If BackupIndex + 1 > Max Then BackupIndex = Max - 1
+    If BackupIndex + 1 > max Then BackupIndex = max - 1
+End Sub
+Public Sub DrawPackage()
+    Page.Writes "Package", 380, 135, 24, argb(255, 100, 62, 255)
+    Page.Writes "Pack your game as a installer .", 381, 175, 18, argb(255, 96, 96, 96)
+    
+    If PackState = 1 Then
+        Page.Writes "Making your installer ...", 381, 205, 18, argb(255, 96, 96, 96)
+        Page.Writes PackText, 381, 235, 18, argb(255, 96, 96, 96)
+        Page.ShowLoading 600, 410, 128, 128, 3, argb(255, 100, 62, 255), argb(255, 0, 176, 240), argb(255, 64, 218, 208)
+        Exit Sub
+    End If
+        
+    Dim CanDo As Boolean
+    CanDo = True
+    If Dir(OPath & "\app.exe") = "" Then
+        CanDo = False
+        Page.Writes "NO     Requires app.exe as your main binary .", 381, 255, 18, argb(255, 254, 84, 57)
+    Else
+        Page.Writes "OK     Requires app.exe as your main binary .", 381, 255, 18, argb(255, 100, 62, 255)
+    End If
+    If Dir(OPath & "\app.png") = "" Then
+        CanDo = False
+        Page.Writes "NO     Requires app.png as your app icon .", 381, 285, 18, argb(255, 254, 84, 57)
+    Else
+        Page.Writes "OK     Requires app.png as your app icon .", 381, 285, 18, argb(255, 100, 62, 255)
+    End If
+    If CanDo = False Then
+        Page.Writes "We can't continue .", 381, 205, 18, argb(255, 96, 96, 96)
+    Else
+        Page.Writes "Well done !", 381, 205, 18, argb(255, 96, 96, 96)
+        If Page.ShowColorButton(2, GW - 220, GH - 112, 150, 40, "Make", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18) = 3 Then
+            PackState = 1: PackText = "Begining ..."
+            Call BuildInstaller
+            PackState = 0
+            MsgBox "Success !", 64
+        End If
+    End If
 End Sub
 Public Sub DrawSettings()
     Dim Data As String
@@ -449,12 +524,13 @@ Public Sub DrawSettings()
     Page.ShowColorCheckBox Data, 384, 265, 200, 20, "Visual Basic template", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
     If Data <> (Dir(VBIDEPath & "Template\Forms\Emerald Window.frm") <> "") Then
         On Error GoTo sth
+        If Dir(VBIDEPath & "Template", vbDirectory) = "" Then MkDir VBIDEPath & "Template"
         If Data = False Then
             Kill VBIDEPath & "Template\Forms\Emerald Window.frm"
-            Kill VBIDEPath & "Template\Forms\Emerald Page.cls"
+            Kill VBIDEPath & "Template\Classes\Emerald Page.cls"
         Else
             FileCopy App.Path & "\Example\Emerald Window.frm", VBIDEPath & "Template\Forms\Emerald Window.frm"
-            FileCopy App.Path & "\Example\Emerald Page.cls", VBIDEPath & "Template\Forms\Emerald Page.cls"
+            FileCopy App.Path & "\Example\Emerald Page.cls", VBIDEPath & "Template\Classes\Emerald Page.cls"
         End If
 sth:
         If Err.Number <> 0 Then
@@ -466,12 +542,12 @@ sth:
     Page.Writes "Update", 380, 335, 24, argb(255, 100, 62, 255)
     Page.Writes "Check interval (day) : ", 381, 380, 18, argb(255, 96, 96, 96)
     Data = ESave.GetData("UpdateCheckInterval")
-    Page.ShowEdit Data, 2, 581, 380 - 5 + 1, 280, 30, argb(255, 100, 62, 255), argb(0, 255, 255, 255), argb(255, 242, 242, 242), argb(255, 100, 62, 255), 50, Size:=18
+    Page.ShowEdit Data, 2, 581, 380 - 5 + 1, 280, 30, argb(255, 100, 62, 255), argb(0, 255, 255, 255), argb(255, 242, 242, 242), argb(255, 100, 62, 255), 50, size:=18
     If Data <> ESave.GetData("UpdateCheckInterval") Then ESave.PutData "UpdateCheckInterval", Val(Data)
     Page.Writes "Connection timeout (ms) : ", 381, 410, 18, argb(255, 96, 96, 96)
     Dim data2 As String
     data2 = ESave.GetData("UpdateTimeOut")
-    Page.ShowEdit data2, 2, 581, 410 - 5 + 1, 280, 30, argb(255, 100, 62, 255), argb(0, 255, 255, 255), argb(255, 242, 242, 242), argb(255, 100, 62, 255), 50, Size:=18
+    Page.ShowEdit data2, 2, 581, 410 - 5 + 1, 280, 30, argb(255, 100, 62, 255), argb(0, 255, 255, 255), argb(255, 242, 242, 242), argb(255, 100, 62, 255), 50, size:=18
     If data2 <> ESave.GetData("UpdateTimeOut") Then ESave.PutData "UpdateTimeOut", Val(data2)
 
     Dim unAble As Boolean
@@ -523,6 +599,7 @@ Public Sub Update()
         GdipSetClipRect Page.GG, 38, 38, GW - 38 * 2, GH - 38 * 2, CombineModeReplace
         Dim Rgn As Long
         Rgn = CreateRectRgn(38, 38, GW - 38, GH - 38)
+        SelectClipRgn GCore.GDC, Rgn
         SelectClipRgn ECore.CDC, Rgn
         Cliped = 2
     End If
@@ -542,7 +619,7 @@ Public Sub Update()
         If CheckMouse2 = mMouseUp Then
             If OPath = "" And I <= 3 Then
                 MsgBox "Launch Emerald from your project folder please .", 64
-            ElseIf I = 2 Or I = 3 Then
+            ElseIf I = 2 Then
                 MsgBox "It doesn't work right now .", 64
             Else
                 PageIndex = I
@@ -566,7 +643,7 @@ Public Sub Update()
     If OPath = "" Then
         Page.Paint 0, 60, 135, 180, 50 * 4, argb(150, 255, 255, 255)
     Else
-        Page.Paint 0, 60, 135 + 50 * 2, 180, 50 * 2, argb(150, 255, 255, 255)
+        Page.Paint 0, 60, 135 + 50 * 2, 180, 50 * 1, argb(150, 255, 255, 255)
     End If
     
     Page.DrawImage "settings.png", 60, 135 + 50 * 4, alpha:=1
@@ -579,7 +656,7 @@ Public Sub Update()
         Case 0: DrawProject
         Case 1: DrawBackup
         Case 2
-        Case 3
+        Case 3: DrawPackage
         Case 4: DrawSettings
         Case 5: DrawAbout
     End Select
@@ -614,8 +691,8 @@ Public Sub InitProject()
     BackupSwitch = True
     
     If OPath = App.Path Then
+        OPath = "": PageIndex = 4
         MsgBox "Please launch Emerald in another folder .", 48
-        OPath = ""
         Exit Sub
     End If
     
@@ -645,7 +722,7 @@ Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
     '导入游戏资源
-    Page.Res.NewImages App.Path & "\assets", 0.75
+    If PackPos = -1 Then Page.Res.NewImages App.Path & "\assets", 0.75
     StartTime = GetTickCount
     
     '创建页面

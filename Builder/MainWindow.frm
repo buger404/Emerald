@@ -34,6 +34,7 @@ Attribute VB_Exposed = False
 '==================================================
 Private Sub DrawTimer_Timer()
     '绘制
+    If EC.ActivePage = "" Then Exit Sub
     EC.Display
 End Sub
 
@@ -47,14 +48,19 @@ Private Sub Form_Load()
     StartEmerald Me.Hwnd, 991, 754
     DebugSwitch.HideLOGO = 1
     DebugSwitch.DisableLOGO = 1
-     
+    
     '创建字体
     Set EF = New GFont
-    EF.AddFont App.Path & "\Builder.UI.otf"
-    EF.MakeFont "Abadi MT Extra Light"
+    If PackPos = -1 Then
+        EF.AddFont App.Path & "\Builder.UI.otf"
+        EF.MakeFont "Abadi MT Extra Light"
+    Else
+        EF.MakeFont "微软雅黑"
+    End If
+    
     '创建页面管理器
     Set EC = New GMan
-    EC.Layered False
+    If PackPos = -1 Then EC.Layered False
     
     '创建存档（可选）
     Set ESave = New GSaving
@@ -66,17 +72,16 @@ Private Sub Form_Load()
     MusicList.Create App.Path & "\music"
 
     '在此处初始化你的页面
-    Set WelcomePage = New WelcomePage
-    Set SetupPage = New SetupPage
-    Set WaitPage = New WaitPage
-    Set DialogPage = New DialogPage
-    Set UpdatePage = New UpdatePage
-    Set ToNewPage = New ToNewPage
-    
-    Set TitleBar = New TitleBar
+    If PackPos = -1 Then
+        Set WelcomePage = New WelcomePage
+        Set ToNewPage = New ToNewPage
+        Set TitleBar = New TitleBar
+    Else
+        Set SetupPage = New SetupPage
+    End If
 
     '设置活动页面
-    EC.ActivePage = "WelcomePage"
+    If PackPos = -1 Then EC.ActivePage = "WelcomePage"
     
     DrawTimer.Enabled = True
 End Sub
