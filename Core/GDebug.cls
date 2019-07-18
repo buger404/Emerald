@@ -143,6 +143,7 @@ Private Sub CheckUpdate(force As Boolean)
     If InternetGetConnectedState(0&, 0&) = 0 And force = False Then
         SetConsoleColor colors.ErrText
         WriteLine "Emerald-Error: connect to the Internet first ."
+        Err.Clear
         Exit Sub
     End If
     
@@ -152,7 +153,7 @@ Private Sub CheckUpdate(force As Boolean)
     If Now - CDate(Data.GetData("UpdateTime")) >= UpdateCheckInterval Or force Or Data.GetData("UpdateAble") = 1 Then
         Data.PutData "UpdateTime", Now
         
-        Dim xmlHttp As Object, Ret As String, Start As Long
+        Dim xmlHttp As Object, ret As String, Start As Long
         
         SetConsoleColor colors.DefaultText
         WriteLine "Emerald: connecting to the server"
@@ -173,7 +174,8 @@ Private Sub CheckUpdate(force As Boolean)
         Do While xmlHttp.ReadyState <> 4
             If GetTickCount - Start >= UpdateTimeOut Then
                 SetConsoleColor colors.ErrText
-                WriteLine "Emerald-Error: failed to connect , time out ."
+                WriteLine "Emerald-Error: failed to connect , time out "
+                Err.Clear
                 Exit Sub
             End If
             Call BackLine: Call ClearLine
@@ -181,14 +183,14 @@ Private Sub CheckUpdate(force As Boolean)
             Debuginfo.UpdateTimer_Timer
             Sleep 10: DoEvents
         Loop
-        Ret = xmlHttp.responseText
+        ret = xmlHttp.responseText
         Set xmlHttp = Nothing
         SetConsoleColor colors.SuccessText
-        WriteLine "Emerald-Success: the lastest version from the server " & Val(Ret)
+        WriteLine "Emerald-Success: the lastest version from the server " & Val(ret)
         SetConsoleColor colors.ContentText
         WriteLine "Emerald: current version " & Version
         
-        If Val(Ret) > Version And App.LogMode = 0 Then
+        If Val(ret) > Version And App.LogMode = 0 Then
             SetConsoleColor colors.SuccessText
             WriteLine "Emerald: update available , plz visit 'https://github.com/Red-Error404/Emerald/release' to download ."
             Exit Sub
@@ -198,6 +200,7 @@ Private Sub CheckUpdate(force As Boolean)
         WriteLine "Emerald-Skip: update has been checked at " & CDate(Data.GetData("UpdateTime")) & "."
     End If
     
+    Err.Clear
     Set Data = Nothing
 End Sub
 Public Function GetVBIDEPath() As String
@@ -270,7 +273,7 @@ Public Sub RunExec()
                     If UBound(Params) = 3 Then targetFile = Params(3): WriteLine "Finding"
                     
 ReCopy:
-                    On Error Resume Next
+                    'On Error Resume Next
                     Do While bFile <> ""
                         If targetFile <> "" Then
                             BackLine
@@ -864,10 +867,10 @@ End Sub
 Public Sub Update()
     If PageMark = 1 Then Call Update2: Exit Sub
 
-    On Error Resume Next
+    'On Error Resume Next
     
     Page.PaintLine -1, GH - 1, GW, GH - 1, argb(255, 0, 183, 195), 2
-    Page.Writes FPS & "/" & Int(1000 / Int(FPSct / FPS)), 15, 14, 34, argb(205, 182, 174, 173)
+    If FPS <> 0 Then Page.Writes FPS & "/" & Int(1000 / Int(FPSct / FPS)), 15, 14, 34, argb(205, 182, 174, 173)
     
     Page.DrawImage "mouse" & Mouse.button & ".png", GW - 138, 78 / 2 - 64 / 2, alpha:=1
     Page.DrawImage "menu.png", GW - 74, 78 / 2 - 64 / 2, alpha:=1

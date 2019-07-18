@@ -50,7 +50,7 @@ Private Sub Form_KeyPress(KeyAscii As Integer)
     ElseIf KeyAscii = vbKeyBack Then
         If Len(Console.InputingText) > 0 Then Console.InputingText = Left(Console.InputingText, Len(Console.InputingText) - 1)
     ElseIf KeyAscii >= 0 And KeyAscii <= 26 Then
-        On Error Resume Next
+        'On Error Resume Next
         If KeyAscii = 3 Then
             Clipboard.Clear
             Clipboard.SetText Console.InputingText
@@ -103,21 +103,21 @@ Private Sub Form_Load()
 
 End Sub
 
-Private Sub Form_MouseDown(button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseDown(button As Integer, Shift As Integer, X As Single, y As Single)
     If y <= 40 And button = 1 Then
         ReleaseCapture
         SendMessageA Me.Hwnd, WM_SYSCOMMAND, SC_MOVE Or HTCAPTION, 0
     End If
-    Call Form_MouseMove(button, Shift, x, y)
+    Call Form_MouseMove(button, Shift, X, y)
     If button = 1 Then
-        If Console.NeedScroll And x >= Console.GW - 20 And x <= Console.GW - 10 And y >= 40 Then
+        If Console.NeedScroll And X >= Console.GW - 20 And X <= Console.GW - 10 And y >= 40 Then
             SetCapture Me.Hwnd
             ScrollMode = True
         End If
     End If
 End Sub
 
-Private Sub Form_MouseMove(button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseMove(button As Integer, Shift As Integer, X As Single, y As Single)
     If button = 1 Then
         If Console.NeedScroll And ScrollMode Then
             Dim MaxY As Single
@@ -129,8 +129,8 @@ Private Sub Form_MouseMove(button As Integer, Shift As Integer, x As Single, y A
     End If
 End Sub
 
-Private Sub Form_MouseUp(button As Integer, Shift As Integer, x As Single, y As Single)
-    Call Form_MouseMove(button, Shift, x, y)
+Private Sub Form_MouseUp(button As Integer, Shift As Integer, X As Single, y As Single)
+    Call Form_MouseMove(button, Shift, X, y)
     If ScrollMode Then ReleaseCapture: ScrollMode = False
 End Sub
 

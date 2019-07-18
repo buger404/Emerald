@@ -28,7 +28,9 @@ Dim OutOfWindow As Boolean
 Dim FirstPlay As Boolean
 Public CDC As Long, ODC As Long, GG As Long, pB As Long
 Public LastPage As String
+Dim CurrentPage As Integer
 Dim IsLayered As Boolean
+Dim ErrorMark As Boolean, ErrorMark2 As Boolean
 '========================================================
 '   Init
     Private Sub Class_Initialize()
@@ -87,6 +89,8 @@ Dim IsLayered As Boolean
 '========================================================
 '   Draw
     Public Sub Display()
+        If ErrorMark2 Then Exit Sub
+        
         Dim o As Boolean, t As Long, played As Boolean
         
         t = Timer * 1000
@@ -105,8 +109,11 @@ Dim IsLayered As Boolean
         End If
 
         For I = 1 To UBound(Pages)
-            If ActivePage = Pages(I).Name Or Pages(I).p.TopPage Then
-                Pages(I).p.Update: Pages(I).p.Display (CDC)
+            CurrentPage = I
+            If ActivePage = Pages(I).Name Or (Pages(I).p.TopPage And (Not ErrorMark)) Then
+                Pages(I).p.Update
+                Pages(I).p.Display (CDC)
+                If Pages(I).Name = "ErrorScreen" Then ErrorMark2 = True
                 played = True
                 o = (GetActiveWindow = 0)
                 If o <> OutOfWindow Then
@@ -157,6 +164,7 @@ skipPage:
         End If
         
         If Mouse.State = 2 Then Mouse.State = 0
+        
     End Sub
 '========================================================
 '   Transform

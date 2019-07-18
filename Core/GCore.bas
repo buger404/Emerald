@@ -395,6 +395,7 @@ sth:
         On Error Resume Next
         If InternetGetConnectedState(0&, 0&) = 0 Then
             Debug.Print Now, "Emerald：未连接网络，检查更新取消。"
+            Err.Clear
             Exit Sub
         End If
         
@@ -433,6 +434,7 @@ sth:
         End If
         
         Set Data = Nothing
+        Err.Clear
     End Sub
 '========================================================
 '   AssetsTree

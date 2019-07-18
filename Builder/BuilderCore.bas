@@ -157,6 +157,7 @@ Public Sub GetVBIDEPath()
     temp2 = Split(temp, "vb6.exe")
     VBIDEPath = Replace(temp2(0), """", "")
     
+    Err.Clear
 End Sub
 Public Function UninstallOld() As String
     On Error Resume Next

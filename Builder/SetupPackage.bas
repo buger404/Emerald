@@ -309,5 +309,10 @@ Public Function SetupPack() As String
 last:
     Close #2
     
+    Kill VBA.Environ("temp") & "\emrtempUninstall.exe"
+    Print #2, Now & "    " & "Delete: " & VBA.Environ("temp") & "\emrtempUninstall.exe"
+    Kill VBA.Environ("temp") & "\emrpack"
+    Print #2, Now & "    " & "Delete: " & VBA.Environ("temp") & "\emrpack"
+    
     SetupPack = Err.Description
 End Function

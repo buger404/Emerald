@@ -169,6 +169,8 @@ Public Sub ReplaceProject()
     ReDim UFiles(0)
     Call UpdateProject
     
+    CopyInto App.Path & "\assets\debug\", OPath & "\assets\debug"
+    
     Set MD5 = Nothing
 End Sub
 Public Sub BuildInstaller()
@@ -552,6 +554,7 @@ sth:
 
     Dim unAble As Boolean
     If ESave.GetData("UpdateTime") <> "" Then
+        On Error Resume Next
         If Not (Now - CDate(ESave.GetData("UpdateTime")) >= UpdateCheckInterval) Then
             m = CheckMouse(381, 445, 170, 20)
             Page.Writes "Reset update ...", 381, 445, 18, IIf(m = 0, argb(255, 96, 96, 96), argb(255, 100, 62, 255)), 200, 20, style:=FontStyleUnderline
@@ -564,6 +567,7 @@ sth:
         Else
             unAble = True
         End If
+        Err.Clear
     Else
         unAble = True
     End If
@@ -592,6 +596,8 @@ sth:
 End Sub
 Public Sub Update()
     '绘制事件
+    
+    'MsgBox 1 / 0
     
     Page.Clear argb(255, 255, 255, 255)
     
@@ -680,6 +686,7 @@ Public Sub Update()
             ToNewPage.PageIndex = 4
         End If
     End If
+    
 End Sub
 Public Sub Wheel(Direction As Integer, Depth As Single)
     '鼠标滚轮事件

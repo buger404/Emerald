@@ -16,7 +16,7 @@ Attribute VB_Exposed = False
 Private Declare Function AddFontResource Lib "gdi32" Alias "AddFontResourceA" (ByVal lpFileName As String) As Long
 Private Declare Function RemoveFontResource Lib "gdi32" Alias "RemoveFontResourceA" (ByVal lpFileName As String) As Long
 Dim brush As Long, fFile As String, fFam As Long, StrF(2) As Long, Font(8, 1 To 100) As Long
-Public EMHeight As Long
+Public EmHeight As Long
 '========================================================
 '   Init
     Public Sub MakeFont(Name As String)
@@ -59,26 +59,26 @@ Public EMHeight As Long
     End Sub
 '========================================================
 '   Writer
-    Public Function GetWidth(g As Long, Text As String, Size As Long, ByVal align As StringAlignment, ByVal style As FontStyle) As Long
+    Public Function GetWidth(g As Long, Text As String, size As Long, ByVal align As StringAlignment, ByVal style As FontStyle) As Long
         Dim r As RECTF, r2 As RECTF
-        GdipMeasureString g, StrPtr(Text), Len(Text), Font(style, Size), r2, StrF(align), r, 0, 0
+        GdipMeasureString g, StrPtr(Text), Len(Text), Font(style, size), r2, StrF(align), r, 0, 0
         
         GetWidth = r.Right
     End Function
-    Public Function GetHeight(g As Long, Text As String, Size As Long, ByVal align As StringAlignment, ByVal style As FontStyle) As Long
+    Public Function GetHeight(g As Long, Text As String, size As Long, ByVal align As StringAlignment, ByVal style As FontStyle) As Long
         Dim r As RECTF, r2 As RECTF
-        GdipMeasureString g, StrPtr(Text), Len(Text), Font(style, Size), r2, StrF(align), r, 0, 0
+        GdipMeasureString g, StrPtr(Text), Len(Text), Font(style, size), r2, StrF(align), r, 0, 0
         
         GetHeight = r.Bottom
     End Function
-    Public Sub Writes(Text As String, X As Long, y As Long, g As Long, Color As Long, Size As Long, w As Long, h As Long, ByVal align As StringAlignment, ByVal style As FontStyle)
-        On Error Resume Next
-        If Font(style, Size) = 0 Then
-            PoolCreateFont fFam, Size, style, UnitPixel, Font(style, Size)
+    Public Sub Writes(Text As String, X As Long, y As Long, g As Long, Color As Long, size As Long, w As Long, h As Long, ByVal align As StringAlignment, ByVal style As FontStyle)
+        'On Error Resume Next
+        If Font(style, size) = 0 Then
+            PoolCreateFont fFam, size, style, UnitPixel, Font(style, size)
         End If
-        If EMHeight = 0 Then EMHeight = GetHeight(g, "ABCDEFG", 18, StringAlignmentNear, FontStyleRegular)
+        If EmHeight = 0 Then EmHeight = GetHeight(g, "ABCDEFG", 18, StringAlignmentNear, FontStyleRegular)
         
         If Color <> 0 Then GdipSetSolidFillColor brush, Color
-        GdipDrawString g, StrPtr(Text), -1, Font(style, Size), NewRectF(X, y, w, h), StrF(align), brush
+        GdipDrawString g, StrPtr(Text), -1, Font(style, size), NewRectF(X, y, w, h), StrF(align), brush
     End Sub
 '========================================================
