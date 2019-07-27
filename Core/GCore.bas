@@ -106,7 +106,7 @@ Attribute VB_Name = "GCore"
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
-    Public Const Version As Long = 19071205      'hhhhhdfgdfhhhxxxhhhhhhhhffff
+    Public Const Version As Long = 19071805      'hhhhhdfgdfhhhxxxhhhhhhhhffff
     Public TextHandle As Long, WaitChr As String
     
     Public AssetsTrees() As AssetsTree
@@ -353,6 +353,9 @@ sth:
     End Sub
     Public Function CheckMouse(X As Long, y As Long, w As Long, h As Long) As MButtonState
         'Return Value:0=none,1=in,2=down,3=up
+        If ECore.LockPage <> "" Then
+            If ECore.LockPage <> ECore.UpdatingPage Then Exit Function
+        End If
         If Mouse.X >= X And Mouse.y >= y And Mouse.X <= X + w And Mouse.y <= y + h Then
             CheckMouse = Mouse.State + 1
             If Mouse.State = 2 Then Mouse.State = 0
@@ -360,6 +363,9 @@ sth:
     End Function
     Public Function CheckMouse2() As MButtonState
         'Return Value:0=none,1=in,2=down,3=up
+        If ECore.LockPage <> "" Then
+            If ECore.LockPage <> ECore.UpdatingPage Then Exit Function
+        End If
         If Mouse.X >= DrawF.X And Mouse.y >= DrawF.y And Mouse.X <= DrawF.X + DrawF.Width And Mouse.y <= DrawF.y + DrawF.Height Then
             CheckMouse2 = Mouse.State + 1
             If DrawF.CrashIndex <> 0 Then
