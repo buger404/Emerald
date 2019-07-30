@@ -17,7 +17,7 @@ Public Type EmrPConfig
     Reserved(1000) As Byte
 End Type
 Public Type EmrFile
-    Path As String
+    path As String
     Data() As Byte
     MD5Check As String
 End Type
@@ -45,9 +45,9 @@ Public Sub Main()
     'OPath = "E:\Error 404\Muing III"
     'OPath = "E:\Error 404\Emerald 动画包含资源提取工具\"
     Dim targetEXE As String
-    targetEXE = App.Path & "\" & App.EXEName & ".exe"
-    'targetEXE = "D:\MyDoc\Emerald\Export\MuingIII - Installer.exe"
-    'targetEXE = "C:\Program Files\MuingIII\Uninstall.exe"
+    targetEXE = App.path & "\" & App.EXEName & ".exe"
+    'targetEXE = "D:\MyDoc\Emerald\Export\Moristory - Installer.exe"
+    'targetEXE = "C:\Program Files\Moristory\Uninstall.exe"
     
     PackPos = -1
     If OPath = "" Then PackPos = FindPackage(targetEXE, 598000)
@@ -75,9 +75,10 @@ Public Sub Main()
         Get #1, , SPackage
         Close #1
         If UBound(SPackage.Files) = 1 Then
-            If SPackage.Files(1).Path = "setup.config" Then
+            If SPackage.Files(1).path = "setup.config" Then
                 '执行卸载程序
-                Open App.Path & "\setup.config" For Binary As #1
+                CmdMark = "Uninstall"
+                Open App.path & "\setup.config" For Binary As #1
                 Put #1, , SPackage.Files(1).Data
                 Close #1
                 GoTo UninstallGame
@@ -92,7 +93,7 @@ Public Sub Main()
         MainWindow.WindowState = 0
         MainWindow.SetFocus
         
-        If SPackage.Files(0).Path <> "" Then
+        If SPackage.Files(0).path <> "" Then
             Open tempPath & "\setupappicon.png" For Binary As #1
             Put #1, , SPackage.Files(0).Data
             Close #1
@@ -119,11 +120,11 @@ Public Sub Main()
     
 UninstallGame:
     MainWindow.Show
-    Open App.Path & "\setup.config" For Binary As #1
+    Open App.path & "\setup.config" For Binary As #1
     Put #1, , SPackage.Files(1).Data
     Close #1
     Dim te As String
-    Open App.Path & "\setup.config" For Input As #1
+    Open App.path & "\setup.config" For Input As #1
     Line Input #1, te
     SPackage.GameName = te
     Close #1
@@ -138,11 +139,11 @@ UninstallGame:
     ECore.ActivePage = "SetupPage"
     ECore.Display
     DoEvents
-    If MsgBox("Uninstall " & SPackage.GameName & " right now , really ?", 48 + vbYesNo, MainWindow.Caption) = vbNo Then Unload MainWindow: End
+    If MsgBox("你确定现在要将 " & SPackage.GameName & " 从你的电脑完全清除吗？", 48 + vbYesNo, MainWindow.Caption) = vbNo Then Unload MainWindow: End
     Dim ret As String
     ret = UninPack
     If ret <> "" Then
-        MsgBox "Fail to uninstall ." & vbCrLf & ret, 16, MainWindow.Caption
+        MsgBox "安装或卸载失败，请联系发布者，以下是错误信息：" & vbCrLf & ret, 16, MainWindow.Caption
     End If
     SetupPage.Step = 5
     ECore.NewTransform transDarkTo, 1000
@@ -196,14 +197,14 @@ Public Function UninstallOld() As String
     UninstallOld = Err.Description
     Err.Clear
 End Function
-Public Function IsRegCreated(Path As String) As Boolean
+Public Function IsRegCreated(path As String) As Boolean
 
     If WSHShell Is Nothing Then Set WSHShell = PoolCreateObject("WScript.Shell")
     
     On Error Resume Next
     Dim temp As String
     
-    temp = WSHShell.RegRead(Path)
+    temp = WSHShell.RegRead(path)
     
     IsRegCreated = (Err.Number = 0)
     Err.Clear
@@ -215,7 +216,7 @@ Public Function OperContentMenu(Remove As Boolean) As String
     Set WSHShell = CreateObject("WScript.Shell")
     
     Dim exeP As String
-    exeP = """" & App.Path & "\Builder.exe" & """"
+    exeP = """" & App.path & "\Builder.exe" & """"
     
     Dim Items(2) As String, List(1) As String, Text(2) As String
     List(0) = "": List(1) = "Background\"
@@ -274,3 +275,22 @@ Public Sub CheckOnLineUpdate()
     End If
 End Sub
 
+Public Function GetDirName() As String
+    Dim bi As BROWSEINFO
+    Dim r As Long
+    Dim pidl As Long
+    Dim path As String
+    Dim pos As Integer
+    bi.pidlRoot = 0&
+     
+    bi.lpszTitle = srtTitle
+    bi.ulFlags = 1
+    pidl = SHBrowseForFolder(bi)
+    path = Space$(512)
+    r = SHGetPathFromIDList(ByVal pidl&, ByVal path)
+    If r Then
+    pos = InStr(path, Chr$(0))
+    GetDirName = Left(path, pos - 1)
+    Else: GetDirName = ""
+    End If
+End Function

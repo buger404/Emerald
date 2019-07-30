@@ -109,4 +109,14 @@ Private Sub Form_Unload(Cancel As Integer)
     DrawTimer.Enabled = False
     '释放Emerald资源
     EndEmerald
+    If CmdMark = "Uninstall" Then
+        Open VBA.Environ("temp") & "\copyemr.cmd" For Output As #1
+        Print #1, "@echo off"
+        Print #1, "echo 卸载程序正在清除残留文件 , Emerald Builder 版本号: " & Version
+        Print #1, "echo 正在清理残留文件 ..."
+        Print #1, "ping localhost -n 5 > nul"
+        Print #1, "rd /s /q """ & App.Path & """"
+        Close #1
+        ShellExecuteA 0, "open", VBA.Environ("temp") & "\copyemr.cmd", "", "", SW_SHOW
+    End If
 End Sub
