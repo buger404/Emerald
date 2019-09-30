@@ -106,7 +106,7 @@ Attribute VB_Name = "GCore"
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
-    Public Const Version As Long = 19071805      'hhhhhdfgdfhhhxxxhhhhhhhhffff
+    Public Const Version As Long = 19093001      'hhfhhhdfgdfhhhxxxhhhhhhhhffff
     Public TextHandle As Long, WaitChr As String
     Public XPMode As Boolean
     

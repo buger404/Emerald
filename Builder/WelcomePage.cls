@@ -81,7 +81,7 @@ Public Sub WriteCache()
         Check = MD5.Md5_File_Calc(OPath & "\Core\" & File)
         With Cache.Files(UBound(Cache.Files))
             .MD5Check = Check
-            .Path = "Core\" & File
+            .path = "Core\" & File
         End With
         File = Dir()
         ECore.Display: DoEvents
@@ -107,7 +107,7 @@ Public Sub ReplaceProject()
         Check = MD5.Md5_File_Calc(OPath & "\Core\" & File)
         With Backup.Files(UBound(Backup.Files))
             .MD5Check = Check
-            .Path = "Core\" & File
+            .path = "Core\" & File
             ReDim Data(FileLen(OPath & "\Core\" & File) - 1)
             Open OPath & "\Core\" & File For Binary As #1
             Get #1, , Data
@@ -121,7 +121,7 @@ Public Sub ReplaceProject()
     Check = ""
     With Backup.Files(UBound(Backup.Files))
         .MD5Check = Check
-        .Path = Dir(OPath & "\*.vbp")
+        .path = Dir(OPath & "\*.vbp")
         ReDim Data(FileLen(OPath & "\" & Dir(OPath & "\*.vbp")) - 1)
         Open OPath & "\" & Dir(OPath & "\*.vbp") For Binary As #1
         Get #1, , Data
@@ -131,7 +131,7 @@ Public Sub ReplaceProject()
         
     For I = 1 To UBound(UFiles)
         If UFiles(I).ReplaceMark Then
-            FileCopy App.Path & "\Core\" & UFiles(I).Name, OPath & "\Core\" & UFiles(I).Name
+            FileCopy App.path & "\Core\" & UFiles(I).Name, OPath & "\Core\" & UFiles(I).Name
         Else
             FUpdate = True
         End If
@@ -169,7 +169,7 @@ Public Sub ReplaceProject()
     ReDim UFiles(0)
     Call UpdateProject
     
-    CopyInto App.Path & "\assets\debug\", OPath & "\assets\debug"
+    CopyInto App.path & "\assets\debug\", OPath & "\assets\debug"
     
     Set MD5 = Nothing
 End Sub
@@ -177,7 +177,7 @@ Public Sub BuildInstaller()
     Dim Name As String, Describe As String, GVersion As String
     Dim tempr As String, targetEXE As String
     
-    targetEXE = App.Path & "\Builder.exe"
+    targetEXE = App.path & "\Builder.exe"
     
     WelcomePage.PackText = "Scaning project information ..."
     Open OPath & "\" & Dir(OPath & "\*.vbp") For Input As #1
@@ -220,27 +220,27 @@ Public Sub UpdateProject()
         Get #1, , Cache
         Close #1
     End If
-    File = Dir(App.Path & "\Core\")
+    File = Dir(App.path & "\Core\")
     Do While File <> ""
         '1=新增，2=更新，3=被修改
         Kind = IIf(IsExitAFile(OPath & "\Core\" & File), 2, 1)
         If Kind = 2 Then
             Check = MD5.Md5_File_Calc(OPath & "\Core\" & File)
-            Check2 = MD5.Md5_File_Calc(App.Path & "\Core\" & File)
+            Check2 = MD5.Md5_File_Calc(App.path & "\Core\" & File)
             If Cache.AFileHeader = "Emerald Project Cache" Then
                 For I = 1 To UBound(Cache.Files)
-                    If Cache.Files(I).Path = "Core\" & File Then
+                    If Cache.Files(I).path = "Core\" & File Then
                         Kind = IIf(Cache.Files(I).MD5Check = Check, 2, 3)
-                        size = IIf(Kind = 3, -1, FileLen(App.Path & "\Core\" & File) - FileLen(OPath & "\Core\" & File))
+                        size = IIf(Kind = 3, -1, FileLen(App.path & "\Core\" & File) - FileLen(OPath & "\Core\" & File))
                         Exit For
                     End If
                 Next
             Else
-                size = FileLen(App.Path & "\Core\" & File) - FileLen(OPath & "\Core\" & File)
+                size = FileLen(App.path & "\Core\" & File) - FileLen(OPath & "\Core\" & File)
             End If
             If Check = Check2 Then Kind = 0
         End If
-        If Kind = 1 Then size = FileLen(App.Path & "\Core\" & File)
+        If Kind = 1 Then size = FileLen(App.path & "\Core\" & File)
         If Kind <> 0 Then
             ReDim Preserve UFiles(UBound(UFiles) + 1)
             With UFiles(UBound(UFiles))
@@ -337,7 +337,7 @@ Public Sub DrawProject()
     End If
     
     m = CheckMouse(381, 400, 570, 20)
-    Page.Writes "Improve Builder and add package function , learn more ...", 381, 400, 18, IIf(m > 0, argb(255, 100, 62, 255), argb(255, 96, 96, 96)), 570, 20, style:=FontStyleUnderline
+    Page.Writes "Now support Windows XP , learn more ...", 381, 400, 18, IIf(m > 0, argb(255, 100, 62, 255), argb(255, 96, 96, 96)), 570, 20, style:=FontStyleUnderline
     If m = 3 Then ShellExecuteA 0, "open", "https://github.com/buger404/Emerald/releases", "", "", SW_SHOW
     m = IIf(m = 0, MousePointerConstants.vbDefault, MousePointerConstants.vbArrowQuestion)
     If Screen.MousePointer <> m Then Screen.MousePointer = m
@@ -424,11 +424,11 @@ Public Sub DrawBackup()
                     Cache.AFileHeader = Backup.AFileHeader
                     ReDim Cache.Files(UBound(Backup.Files))
                     For S = 1 To UBound(Backup.Files)
-                        Open OPath & "\" & Backup.Files(S).Path For Binary As #1
+                        Open OPath & "\" & Backup.Files(S).path For Binary As #1
                         Put #1, , Backup.Files(S).Data
                         Close #1
                         Cache.Files(S).MD5Check = Backup.Files(S).MD5Check
-                        Cache.Files(S).Path = Backup.Files(S).Path
+                        Cache.Files(S).path = Backup.Files(S).path
                         ECore.Display: DoEvents
                     Next
                     EmrPC.FUpdate = True
@@ -531,8 +531,8 @@ Public Sub DrawSettings()
             Kill VBIDEPath & "Template\Forms\Emerald Window.frm"
             Kill VBIDEPath & "Template\Classes\Emerald Page.cls"
         Else
-            FileCopy App.Path & "\Example\Emerald Window.frm", VBIDEPath & "Template\Forms\Emerald Window.frm"
-            FileCopy App.Path & "\Example\Emerald Page.cls", VBIDEPath & "Template\Classes\Emerald Page.cls"
+            FileCopy App.path & "\Example\Emerald Window.frm", VBIDEPath & "Template\Forms\Emerald Window.frm"
+            FileCopy App.path & "\Example\Emerald Page.cls", VBIDEPath & "Template\Classes\Emerald Page.cls"
         End If
 sth:
         If Err.Number <> 0 Then
@@ -697,7 +697,7 @@ Public Sub InitProject()
     ReDim BackupList(0)
     BackupSwitch = True
     
-    If OPath = App.Path Then
+    If OPath = App.path Then
         OPath = "": PageIndex = 4
         MsgBox "Please launch Emerald in another folder .", 48
         Exit Sub
@@ -729,7 +729,7 @@ Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
     '导入游戏资源
-    If PackPos = -1 Then Page.Res.NewImages App.Path & "\assets", 0.75
+    If PackPos = -1 Then Page.Res.NewImages App.path & "\assets", 0.75
     StartTime = GetTickCount
     
     '创建页面
