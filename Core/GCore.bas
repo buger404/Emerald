@@ -72,7 +72,7 @@ Attribute VB_Name = "GCore"
     End Type
     Public Type AssetsTree
         Files() As GMem
-        Path As String
+        path As String
         arg1 As Variant
         arg2 As Variant
     End Type
@@ -108,6 +108,7 @@ Attribute VB_Name = "GCore"
     Public BassInstalled As Boolean
     Public Const Version As Long = 19071805      'hhhhhdfgdfhhhxxxhhhhhhhhffff
     Public TextHandle As Long, WaitChr As String
+    Public XPMode As Boolean
     
     Public AssetsTrees() As AssetsTree
     Dim LastKeyUpRet As Boolean
@@ -133,7 +134,7 @@ Attribute VB_Name = "GCore"
         ReadINI = strBuf
     End Function
     Public Sub OutPutDebug(Str As String)
-        Open App.Path & "\debug.txt" For Append As #1
+        Open App.path & "\debug.txt" For Append As #1
         Print #1, Now & "    " & Str
         Close #1
     End Sub
@@ -183,8 +184,7 @@ Attribute VB_Name = "GCore"
     
         Select Case Val(Split(strOSversion, ".")(0))
         Case Is <= "5"
-            MsgBox "非常抱歉，Emerald不再支持运行在Windows 7以下版本的操作系统。" & vbCrLf & vbCrLf & "如果您有方法提供支持，请联系QQ 1361778219。", 48, "Emerald：不兼容的操作系统"
-            End
+            XPMode = True
         End Select
     
         Call GetSettings
@@ -450,10 +450,10 @@ sth:
         AssetsTrees(UBound(AssetsTrees)).arg1 = arg1
         AssetsTrees(UBound(AssetsTrees)).arg2 = arg2
     End Function
-    Public Function FindAssetsTree(Path As String, arg1 As Variant, arg2 As Variant) As Integer
+    Public Function FindAssetsTree(path As String, arg1 As Variant, arg2 As Variant) As Integer
         On Error Resume Next
         For I = 1 To UBound(AssetsTrees)
-            If AssetsTrees(I).Path = Path And AssetsTrees(I).arg1 = arg1 And AssetsTrees(I).arg2 = arg2 Then
+            If AssetsTrees(I).path = path And AssetsTrees(I).arg1 = arg1 And AssetsTrees(I).arg2 = arg2 Then
                 If Err.Number <> 0 Then
                     Err.Clear
                 Else
@@ -462,9 +462,9 @@ sth:
             End If
         Next
     End Function
-    Public Function GetAssetsTree(Path As String) As AssetsTree
+    Public Function GetAssetsTree(path As String) As AssetsTree
         For I = 1 To UBound(AssetsTrees)
-            If AssetsTrees(I).Path = Path Then GetAssetsTree = AssetsTrees(I): Exit For
+            If AssetsTrees(I).path = path Then GetAssetsTree = AssetsTrees(I): Exit For
         Next
     End Function
 '========================================================

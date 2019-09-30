@@ -23,18 +23,24 @@ Private Type SaveFile
 End Type
 Dim MySave As SaveFile
 Public AutoSave As Boolean
-Public sToken As Boolean, Path As String
+Public sToken As Boolean, path As String
 Public Key As String
 '========================================================
 '   Init
     Public Function Create(Name As String, Optional BMKey) As Boolean
-        Path = "C:\Users\" & PoolCreateObject("Wscript.Network").Username & "\AppData\Local\" & Name
+        If XPMode Then
+            If Dir("C:\Emerad\", vbDirectory) = "" Then MkDir "C:\Emerad\"
+            path = "C:\Emerad\" & Name
+        Else
+            path = "C:\Users\" & PoolCreateObject("Wscript.Network").Username & "\AppData\Local\" & Name
+        End If
+        
         AutoSave = True
         
         If Not IsMissing(BMKey) Then Key = BMKey
         
         ReDim MySave.Data(0)
-        If Dir(Path & "\", vbDirectory) = "" Then
+        If Dir(path & "\", vbDirectory) = "" Then
             If Name <> "Emerald.Core" Then
                 SysPage.index = 0: SysPage.Key = 0
                 Dim Win As Object
@@ -45,14 +51,14 @@ Public Key As String
                 Loop
                 Unload Win
                 
-                If SysPage.Key = 1 Then MkDir Path & "\": Create = True
+                If SysPage.Key = 1 Then MkDir path & "\": Create = True
             Else
-                MkDir Path & "\"
+                MkDir path & "\"
             End If
         Else
-            If Dir(Path & "\save") <> "" Then
+            If Dir(path & "\save") <> "" Then
                 On Error GoTo ErrHandle
-                Open Path & "\save" For Binary As #1
+                Open path & "\save" For Binary As #1
                 Get #1, , MySave
                 Close #1
                 Call CheckSave
@@ -94,7 +100,7 @@ ErrHandle:
     End Function
     Public Sub Save()
         If sToken = False Then Exit Sub
-        Open Path & "\save" For Binary As #1
+        Open path & "\save" For Binary As #1
         Put #1, , MySave
         Close #1
     End Sub
