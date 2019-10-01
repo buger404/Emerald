@@ -19,7 +19,7 @@ Private Type Page
 End Type
 Private Type Transform
     Kind As TranslationKind
-    time As Long
+    Time As Long
     during As Long
 End Type
 Dim Pages() As Page, Transform As Transform
@@ -131,11 +131,37 @@ Dim ErrorMark As Boolean, ErrorMark2 As Boolean
         
 skipPage:
         If Not played Then
-            GdipGraphicsClear GG, argb(255, 255, 255, 255)
-            EF.Writes "页面""" & ActivePage & """不存在", GW / 2, GH / 2, GG, argb(255, 27, 27, 27), 20, 0, 0, StringAlignmentCenter, FontStyleBold
+            GdipGraphicsClear GG, argb(255, 0, 0, 0)
+            Suggest "页面""" & ActivePage & """不存在。", ClearOnUpdate, 2
         End If
         
-        If GetTickCount - Transform.time <= Transform.during Then Call Translation
+        If GetTickCount - Transform.Time <= Transform.during Then Call Translation
+        
+        If App.LogMode = 0 Then
+            Dim SOrIndex As Integer
+            SOrIndex = SysPage.index
+            SysPage.index = 4
+            SysPage.Page.Update
+            SysPage.Page.Display (CDC)
+            SysPage.index = SOrIndex
+            For I = 1 To UBound(SGS)
+                If I > UBound(SGS) Then Exit For
+                If SGS(I).ClearTime = ClearOnUpdate Then GoTo ClearSGS
+                If SGS(I).ClearTime = ClearOnOnce And GetTickCount - SGS(I).Time >= 1000 Then GoTo ClearSGS
+                GoTo NoClear
+ClearSGS:
+                SGS(I) = SGS(UBound(SGS)): ReDim Preserve SGS(UBound(SGS) - 1): I = I - 1
+NoClear:
+            Next
+            
+            If GetTickCount - FPSt >= 1000 Then
+                FPSt = GetTickCount: FPS = tFPS: tFPS = 0
+                If FPS < 20 Then
+                    Suggest "FPS过低。", ClearOnOnce, 2
+                End If
+                FPSct = FPSctt: FPSctt = 0
+            End If
+        End If
         
         If IsLayered Then
             Dim bs As BLENDFUNCTION, sz As size
@@ -154,17 +180,6 @@ skipPage:
         End If
         tFPS = tFPS + 1: FPSctt = FPSctt + (Timer * 1000 - t)
         
-        If GetTickCount - FPSt >= 1000 Then
-            FPSt = GetTickCount: FPS = tFPS: tFPS = 0
-            If FPS < 20 Then
-                If FPSWarn < 10 Then FPSWarn = FPSWarn + 1
-                If FPSWarn = 10 Then Suggest "FPS过低了噢！你是想要让玩家玩PPT嘛！": FPSWarn = FPSWarn + 1
-            ElseIf FPSWarn <> 0 Then
-                FPSWarn = 0
-            End If
-            FPSct = FPSctt: FPSctt = 0
-        End If
-        
         If Mouse.State = 2 Then Mouse.State = 0
         
     End Sub
@@ -175,7 +190,7 @@ skipPage:
         With Transform
             .during = during
             .Kind = Kind
-            .time = GetTickCount
+            .Time = GetTickCount
         End With
         
         If Not IsMissing(newPage) Then
@@ -186,37 +201,37 @@ skipPage:
         Dim pro As Single
         Select Case Transform.Kind
             Case 0 'FadeIn
-                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
                 PaintDC ODC, CDC, alpha:=1 - pro
             Case 1 'FadeOut
-                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 0, 0, 1)
+                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 0, 0, 1)
                 PaintDC ODC, CDC, alpha:=1 - pro
             Case 2 'ToRight
-                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
                 PaintDC ODC, CDC, (pro * GW), alpha:=1
             Case 3 'ToLeft
-                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
                 PaintDC ODC, CDC, -(pro * GW), alpha:=1
             Case 4 'ToUp
-                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
                 PaintDC ODC, CDC, 0, -(pro * GW), alpha:=1
             Case 5 'ToDown
-                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
                 PaintDC ODC, CDC, 0, (pro * GW), alpha:=1
             Case 6 'ToRight(Fade)
-                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
                 PaintDC ODC, CDC, (pro * GW), alpha:=1 - pro
             Case 7 'ToLeft(Fade)
-                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
                 PaintDC ODC, CDC, -(pro * GW), alpha:=1 - pro
             Case 8 'ToUp(Fade)
-                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
                 PaintDC ODC, CDC, 0, -(pro * GW), alpha:=1 - pro
             Case 9 'ToDown(Fade)
-                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
                 PaintDC ODC, CDC, 0, (pro * GW), alpha:=1 - pro
             Case 10 'HighLight
-                pro = (GetTickCount - Transform.time) / Transform.during
+                pro = (GetTickCount - Transform.Time) / Transform.during
                 Select Case pro
                     Case Is < 0.2
                         pro = Cubic(pro / 0.2, 0, 1, 1, 1)
@@ -231,7 +246,7 @@ skipPage:
                         GdipFillRectangle GG, pB, 0, 0, GW, GH
                 End Select
             Case 11 'Dark
-                pro = (GetTickCount - Transform.time) / Transform.during
+                pro = (GetTickCount - Transform.Time) / Transform.during
                 Select Case pro
                     Case Is < 0.2
                         pro = Cubic(pro / 0.2, 0, 1, 1, 1)
@@ -246,7 +261,7 @@ skipPage:
                         GdipFillRectangle GG, pB, 0, 0, GW, GH
                 End Select
             Case 12
-                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
                 BitBlt CDC, GW - (pro * GW), 0, GW, GH, CDC, 0, 0, vbSrcCopy
                 GdipSetSolidFillColor pB, argb((1 - pro) * 255, 0, 0, 0)
                 GdipFillRectangle GG, pB, GW - (pro * GW), 0, GW, GH
@@ -254,7 +269,7 @@ skipPage:
                 GdipSetSolidFillColor pB, argb(pro * 255, 0, 0, 0)
                 GdipFillRectangle GG, pB, -(pro * GW), 0, GW, GH
             Case 13
-                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
                 BitBlt CDC, -GW + (pro * GW), 0, GW, GH, CDC, 0, 0, vbSrcCopy
                 GdipSetSolidFillColor pB, argb((1 - pro) * 255, 0, 0, 0)
                 GdipFillRectangle GG, pB, -GW + (pro * GW), 0, GW, GH

@@ -262,14 +262,14 @@ Public Sub RunExec()
                     
                     Dim bFile As String, Size1 As Long, Size2 As Long
                     
-                    If Dir(App.Path & "\.emr\backup\" & Params(2), vbDirectory) = "" Then
+                    If Dir(App.path & "\.emr\backup\" & Params(2), vbDirectory) = "" Then
                         SetConsoleColor colors.ErrText
-                        WriteWord "backup-Error: the backup not found '" & App.Path & "\.emr\backup\" & Params(2) & "'"
+                        WriteWord "backup-Error: the backup not found '" & App.path & "\.emr\backup\" & Params(2) & "'"
                         Call ExitExec
                         Exit Sub
                     End If
                     Dim bStep As Long, bfo As String, bsfo As String, targetFile As String, targetGet As Boolean
-                    bFile = Dir(App.Path & "\.emr\backup\" & Params(2) & "\"): bfo = "core": bsfo = ""
+                    bFile = Dir(App.path & "\.emr\backup\" & Params(2) & "\"): bfo = "core": bsfo = ""
                     If UBound(Params) = 3 Then targetFile = Params(3): WriteLine "Finding"
                     
 ReCopy:
@@ -282,9 +282,9 @@ ReCopy:
                             NextLine
                         End If
                         If (targetFile <> "" And targetFile = bFile) Or (targetFile = "") Then
-                            Size1 = FileLen(App.Path & "\.emr\backup\" & Params(2) & "\" & bsfo & "\" & bFile): Size2 = 0
-                            Size2 = FileLen(App.Path & "\" & bfo & "\" & bFile)
-                            FileCopy App.Path & "\.emr\backup\" & Params(2) & "\" & bsfo & "\" & bFile, App.Path & "\" & bfo & "\" & bFile
+                            Size1 = FileLen(App.path & "\.emr\backup\" & Params(2) & "\" & bsfo & "\" & bFile): Size2 = 0
+                            Size2 = FileLen(App.path & "\" & bfo & "\" & bFile)
+                            FileCopy App.path & "\.emr\backup\" & Params(2) & "\" & bsfo & "\" & bFile, App.path & "\" & bfo & "\" & bFile
                             SetConsoleColor colors.DefaultText
                             WriteWord "Success : " & bFile & "      "
                             SetConsoleColor IIf(Size1 = Size2, colors.DefaultText, IIf(Size1 > Size2, colors.SuccessText, colors.ErrText))
@@ -298,8 +298,8 @@ ReCopy:
                         Sleep 10: DoEvents
                     Loop
                     bStep = bStep + 1
-                    If bStep = 1 And (Not targetGet) Then bFile = Dir(App.Path & "\.emr\backup\" & Params(2) & "\cache\"): bfo = ".emr\cache": bsfo = "cache"
-                    If bStep = 2 And (Not targetGet) Then bFile = Dir(App.Path & "\.emr\backup\" & Params(2) & "\project\"): bfo = "": bsfo = "project"
+                    If bStep = 1 And (Not targetGet) Then bFile = Dir(App.path & "\.emr\backup\" & Params(2) & "\cache\"): bfo = ".emr\cache": bsfo = "cache"
+                    If bStep = 2 And (Not targetGet) Then bFile = Dir(App.path & "\.emr\backup\" & Params(2) & "\project\"): bfo = "": bsfo = "project"
                     If bStep <= 2 And (Not targetGet) Then GoTo ReCopy
                     
                     If targetFile = "" Then
@@ -323,7 +323,7 @@ ReCopy:
                     WriteLine "The consequences are at one's own expense !!!"
                     WriteLine "All your backups will be erased from your drive forever ."
                     SetConsoleColor colors.DefaultText
-                    WriteLine "Target folder : " & App.Path & "\.emr\backup\"
+                    WriteLine "Target folder : " & App.path & "\.emr\backup\"
                     WriteLine "Erase them any way ? [Y/N]"
                     AllowInput
                     Params(1) = "-clear2"
@@ -331,17 +331,17 @@ ReCopy:
                 Case "-clear3"
                     Dim FSO3 As Object
                     Set FSO3 = PoolCreateObject("Scripting.FileSystemObject")
-                    FSO3.DeleteFolder App.Path & "\.emr\backup"
+                    FSO3.DeleteFolder App.path & "\.emr\backup"
                     SetConsoleColor colors.DefaultText
                     WriteLine "Erasing"
-                    Do While Dir(App.Path & "\.emr\backup", vbDirectory) <> ""
+                    Do While Dir(App.path & "\.emr\backup", vbDirectory) <> ""
                         Call BackLine: Call ClearLine
                         WriteWord "Erasing " & IIf(GetTickCount Mod 4000 < 1000, ".", "") & IIf(GetTickCount Mod 4000 < 2000, ".", "") & IIf(GetTickCount Mod 4000 < 3000, ".", "")
                         Debuginfo.UpdateTimer_Timer
                         Sleep 10: DoEvents
                     Loop
                     SetConsoleColor colors.SuccessText
-                    MkDir App.Path & "\.emr\backup"
+                    MkDir App.path & "\.emr\backup"
                     WriteWord "backup-Success: succeed in erasing all your backup ."
                     Set FSO3 = Nothing
                     Call ExitExec
@@ -349,11 +349,11 @@ ReCopy:
                 Case "-list"
                     Dim backupF As String, backupI As Integer, FSO As Object
                     Set FSO = PoolCreateObject("Scripting.FileSystemObject")
-                    backupF = Dir(App.Path & "\.emr\backup\", vbDirectory)
+                    backupF = Dir(App.path & "\.emr\backup\", vbDirectory)
                     Do While backupF <> ""
                         If backupF <> "." And backupF <> ".." Then
                             backupI = backupI + 1
-                            WriteLine backupI & ". " & backupF & "  (" & FSO.GetFolder(App.Path & "\.emr\backup\" & backupF).size & " bytes)"
+                            WriteLine backupI & ". " & backupF & "  (" & FSO.GetFolder(App.path & "\.emr\backup\" & backupF).size & " bytes)"
                         End If
                         backupF = Dir(, vbDirectory)
                         'reserve : folder size
@@ -373,7 +373,7 @@ ReCopy:
                     Call ExitExec
                     Exit Sub
                 Case "-reset"
-                    Open App.Path & "\.emerald" For Output As #1
+                    Open App.path & "\.emerald" For Output As #1
                     Print #1, 0 'version
                     Print #1, Now 'Update Time
                     Print #1, False
@@ -447,7 +447,7 @@ ReCopy:
                     WriteLine "Music List : " & IIf(EAni Is Nothing, "[Missing]", ObjPtr(EMusic))
                     WriteLine "Assets Tree : " & UBound(AssetsTrees) & " trees in total ."
                     For I = 1 To UBound(AssetsTrees)
-                        WriteLine I & ". " & AssetsTrees(I).Path & " (" & IIf(IsMissing(AssetsTrees(I).arg1), "[Missing]", AssetsTrees(I).arg1) & "," & IIf(IsMissing(AssetsTrees(I).arg2), "[Missing]", AssetsTrees(I).arg2) & ") , " & UBound(AssetsTrees(I).Files) & " files in total ."
+                        WriteLine I & ". " & AssetsTrees(I).path & " (" & IIf(IsMissing(AssetsTrees(I).arg1), "[Missing]", AssetsTrees(I).arg1) & "," & IIf(IsMissing(AssetsTrees(I).arg2), "[Missing]", AssetsTrees(I).arg2) & ") , " & UBound(AssetsTrees(I).Files) & " files in total ."
                     Next
                     WriteLine "Current EditBox : " & TextHandle
                     WriteLine "Bass : " & BassInstalled
@@ -867,7 +867,7 @@ End Sub
 Public Sub Update()
     If PageMark = 1 Then Call Update2: Exit Sub
 
-    'On Error Resume Next
+    On Error Resume Next
     
     Page.PaintLine -1, GH - 1, GW, GH - 1, argb(255, 0, 183, 195), 2
     If FPS <> 0 Then Page.Writes FPS & "/" & Int(1000 / Int(FPSct / FPS)), 15, 14, 34, argb(205, 182, 174, 173)

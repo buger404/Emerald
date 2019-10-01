@@ -30,7 +30,42 @@ Public Sub Update()
         Call LOGODialog
         Case 3
         Call SaveManDialog
+        Case 4
+        Call SuggestionDialog
     End Select
+End Sub
+Public Sub SuggestionDialog()
+    Page.Clear argb(0, 0, 0, 0)
+    If IsKeyPress(VK_F12) Then
+        If UBound(SGS) = 0 Then
+            MsgBox "没有任何建议。", 48, "Emerald 建议中心"
+        Else
+            Dim ret As String, sRet As String
+            ret = "共 " & UBound(SGS) & " 项建议。" & vbCrLf & vbCrLf
+            For I = 1 To UBound(SGS)
+                Select Case SGS(I).Deepth
+                    Case 0: sRet = "(无关紧要)"
+                    Case 1: sRet = "(需要留意)"
+                    Case 2: sRet = "(*紧急)"
+                    Case 3: sRet = "(*非常紧急*)"
+                End Select
+                ret = ret & sRet & "    " & SGS(I).Content & vbCrLf
+            Next
+            MsgBox ret, 48, "Emerald 建议中心"
+        End If
+    End If
+    If GetTickCount - SGTime <= 3000 And UBound(SGS) <> 0 Then
+        Dim pro As Single
+        
+        If GetTickCount Mod 600 < 300 Then
+            pro = 0.6 + (GetTickCount Mod 300) / 300 * 0.4
+        Else
+            pro = 1 - (GetTickCount Mod 300) / 300 * 0.4
+        End If
+        
+        Page.Paint 2, GW / 2, GH / 2, 300, 40, argb(255 * pro, 255, 84, 57), 100, pos:=posOnCenter
+        Page.Writes "共 " & UBound(SGS) & " 项建议 (F12)", GW / 2, GH / 2 - 8 / 0.75, 16, argb(255, 255, 255, 255), align:=StringAlignmentCenter
+    End If
 End Sub
 Public Sub SaveManDialog()
     Page.Clear argb(220, 242, 242, 249)
@@ -102,13 +137,13 @@ Public Sub LOGODialog()
         GdipCreateTexture bitmap, WrapModeTile, LOGO
     End If
     
-    Dim Points() As POINTF, Path As Long, brush As Long, y As Long
+    Dim Points() As POINTF, path As Long, brush As Long, y As Long
     Dim pro As Single
     ReDim Points(1)
     
     pro = (LoadedCount / PreLoadCount)
     
-    GdipCreatePath FillModeWinding, Path
+    GdipCreatePath FillModeWinding, path
     GdipCreateSolidFill argb(255, 27, 27, 27), brush
     
     y = GH / 2
@@ -131,19 +166,19 @@ Public Sub LOGODialog()
     Points(UBound(Points) - 1).X = GW: Points(UBound(Points) - 1).y = y
     Points(UBound(Points)).X = GW: Points(UBound(Points)).y = 0
     
-    GdipAddPathCurve Path, Points(0), UBound(Points) + 1
-    GdipFillPath Page.GG, brush, Path
+    GdipAddPathCurve path, Points(0), UBound(Points) + 1
+    GdipFillPath Page.GG, brush, path
     GdipFillRectangle Page.GG, LOGO, GW / 2 - GH * 0.2 / 2, GH * 0.4, GH * 0.2, GH * 0.2
     Page.Writes Int(pro * 100) & "%", GW / 2, GH / 2 + GH * 0.2 / 2 + 20, 20, argb(255, 27, 27, 27), align:=StringAlignmentCenter
     
     GdipDeleteBrush brush
-    GdipDeletePath Path
+    GdipDeletePath path
     
 End Sub
 Public Sub SaveDialog()
     Page.Paint 0, 0, 0, 600, 76, argb(255, 242, 242, 242)
     Page.DrawImage "save.png", 40, 40, alpha:=1
-    Page.Writes "你希望该应用在以下位置保存数据吗？" & vbCrLf & ESave.Path, 40, 130, 18, argb(255, 64, 64, 64)
+    Page.Writes "你希望该应用在以下位置保存数据吗？" & vbCrLf & ESave.path, 40, 130, 18, argb(255, 64, 64, 64)
     
     Page.Writes "*如果不允许，该应用可能永远保持初始状态。", 40, 400 - 110, 16, argb(255, 96, 96, 96)
     
@@ -181,7 +216,8 @@ End Sub
 Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
-    Page.Res.NewImages App.Path & "\assets\debug"
+    Page.Res.NewImages App.path & "\assets\debug"
+    Page.TopPage = True
     
     BDC = CreateCDC(GW, GH)
 End Sub

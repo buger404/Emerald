@@ -52,8 +52,9 @@ Private Sub Form_Load()
     '创建字体
     Set EF = New GFont
     If PackPos = -1 Then
-        EF.AddFont App.Path & "\Builder.UI.otf"
+        EF.AddFont App.path & "\Builder.UI.otf"
         EF.MakeFont "Abadi MT Extra Light"
+        'EF.MakeFont "微软雅黑"
     Else
         EF.MakeFont "微软雅黑"
     End If
@@ -69,7 +70,7 @@ Private Sub Form_Load()
     
     '创建音乐列表
     Set MusicList = New GMusicList
-    MusicList.Create App.Path & "\music"
+    MusicList.Create App.path & "\music"
 
     '在此处初始化你的页面
     If PackPos = -1 Then
@@ -115,7 +116,7 @@ Private Sub Form_Unload(Cancel As Integer)
         Print #1, "echo 卸载程序正在清除残留文件 , Emerald Builder 版本号: " & Version
         Print #1, "echo 正在清理残留文件 ..."
         Print #1, "ping localhost -n 5 > nul"
-        Print #1, "rd /s /q """ & App.Path & """"
+        Print #1, "rd /s /q """ & App.path & """"
         Close #1
         ShellExecuteA 0, "open", VBA.Environ("temp") & "\copyemr.cmd", "", "", SW_SHOW
     End If

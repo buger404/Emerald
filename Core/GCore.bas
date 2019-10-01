@@ -52,7 +52,7 @@ Attribute VB_Name = "GCore"
         transDarkReturn = 13
     End Enum
     Public Type GGIF
-        time As Long
+        Time As Long
         frames() As Long
         tick As Long
         Count As Long
@@ -96,6 +96,18 @@ Attribute VB_Name = "GCore"
     Public Type ColorCollection
         IsAlpha() As Boolean
     End Type
+    Public Enum SuggestClearTime
+        NeverClear = 0
+        ClearOnUpdate = 1
+        ClearOnOnce = 2
+    End Enum
+    Public Type Suggestion
+        Content As String
+        Deepth As Long
+        Time As Long
+        ClearTime As SuggestClearTime
+    End Type
+    Public SGS() As Suggestion, SGTime As Long
     Public ColorLists() As ColorCollection
     Public ECore As GMan, EF As GFont, EAni As Object, ESave As GSaving, EMusic As GMusicList
     Public GHwnd As Long, GDC As Long, GW As Long, GH As Long
@@ -106,7 +118,7 @@ Attribute VB_Name = "GCore"
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
-    Public Const Version As Long = 19093001      'hhfhhhdfgdfhhhxxxhhhhhhhhffff
+    Public Const Version As Long = 19100102      'hhfhyhasdgdfhhhxxxhhhhhhhhffff
     Public TextHandle As Long, WaitChr As String
     Public XPMode As Boolean
     
@@ -170,6 +182,7 @@ Attribute VB_Name = "GCore"
     End Sub
     Public Sub StartEmerald(Hwnd As Long, w As Long, h As Long)
         ReDim ColorLists(0)
+        ReDim SGS(0)
             
         Call InitPool
         
@@ -224,11 +237,18 @@ Attribute VB_Name = "GCore"
         
         If App.LogMode = 0 Then Call CheckUpdate
         
-        If ReLoadCount > LoadedCount Then Suggest "重复加载的资源数量太多啦！不考虑每个页面的资源单独一个文件夹放置吗？"
+        If ReLoadCount > LoadedCount Then Suggest "重复加载的资源数量过多。", NeverClear, 1
         
     End Sub
-    Public Sub Suggest(Text As String)
-        Debug.Print Now, "Emeraldの建议：" & Text
+    Public Sub Suggest(Text As String, Clears As SuggestClearTime, Deepth As Long)
+        ReDim Preserve SGS(UBound(SGS) + 1)
+        With SGS(UBound(SGS))
+            .Content = Text
+            .ClearTime = Clears
+            .Time = GetTickCount
+            .Deepth = Deepth
+        End With
+        SGTime = GetTickCount
     End Sub
     Public Sub EndEmerald()
         If DebugMode Then
@@ -250,8 +270,8 @@ Attribute VB_Name = "GCore"
     End Sub
 '========================================================
 '   RunTime
-    Public Function ToTime(time) As String
-        ToTime = Int(time / 60) & ":" & format(time Mod 60, "00")
+    Public Function ToTime(Time) As String
+        ToTime = Int(Time / 60) & ":" & format(Time Mod 60, "00")
     End Function
     Public Function Process(ByVal Hwnd As Long, ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam As Long) As Long
         On Error GoTo sth
@@ -281,6 +301,8 @@ sth:
         GetWinNTVersion = Left(strOSversion, 3)
     End Function
     Public Sub BlurTo(DC As Long, srcDC As Long, buffWin As Form, Optional Radius As Long = 60)
+        If XPMode Then BitBlt DC, 0, 0, GW, GH, srcDC, 0, 0, vbSrcCopy: Exit Sub
+        
         Dim I As Long, g As Long, e As Long, B As BlurParams, w As Long, h As Long
         '粘贴到缓冲窗口
         buffWin.AutoRedraw = True
@@ -301,10 +323,12 @@ sth:
         buffWin.AutoRedraw = False
     End Sub
     Public Sub BlurImg(img As Long, Radius As Long)
+        If XPMode Then Exit Sub
+    
         Dim B As BlurParams, e As Long, w As Long, h As Long
         
         '模糊操作
-
+        
         PoolCreateEffect2 GdipEffectType.Blur, e: B.Radius = Radius: GdipSetEffectParameters e, B, LenB(B)
         GdipGetImageWidth img, w: GdipGetImageHeight img, h
         GdipBitmapApplyEffect img, e, NewRectL(0, 0, w, h), 0, 0, 0
@@ -400,7 +424,7 @@ sth:
     Public Sub CheckUpdate()
         On Error Resume Next
         If InternetGetConnectedState(0&, 0&) = 0 Then
-            Debug.Print Now, "Emerald：未连接网络，检查更新取消。"
+            Suggest "未连接网络，Emerald 检查更新取消。", NeverClear, 0
             Err.Clear
             Exit Sub
         End If
@@ -419,7 +443,7 @@ sth:
             Start = GetTickCount
             Do While xmlHttp.ReadyState <> 4
                 If GetTickCount - Start >= UpdateTimeOut Then
-                    Debug.Print Now, "Emerald：检查更新超时。"
+                    Suggest "Emerald 检查更新超时。", NeverClear, 0
                     Exit Sub
                 End If
                 Sleep 10: DoEvents

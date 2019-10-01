@@ -28,6 +28,8 @@ Public Key As String
 '========================================================
 '   Init
     Public Function Create(Name As String, Optional BMKey) As Boolean
+        If ESave Is Nothing Then Set ESave = Me
+    
         If XPMode Then
             If Dir("C:\Emerad\", vbDirectory) = "" Then MkDir "C:\Emerad\"
             path = "C:\Emerad\" & Name
@@ -43,13 +45,17 @@ Public Key As String
         If Dir(path & "\", vbDirectory) = "" Then
             If Name <> "Emerald.Core" Then
                 SysPage.index = 0: SysPage.Key = 0
-                Dim Win As Object
-                Set Win = StartScreenDialog(600, 400, SysPage)
-                Set SysPage.Win = Win
-                Do While Not Win.AcceptMark
-                    DoEvents
-                Loop
-                Unload Win
+                If XPMode Then
+                    SysPage.Key = MsgBox("你希望该应用在以下位置保存数据吗？" & vbCrLf & ESave.path & vbCrLf & "*如果不允许，该应用可能永远保持初始状态。", 64 + vbYesNo) = vbYes
+                Else
+                    Dim Win As Object
+                    Set Win = StartScreenDialog(600, 400, SysPage)
+                    Set SysPage.Win = Win
+                    Do While Not Win.AcceptMark
+                        DoEvents
+                    Loop
+                    Unload Win
+                End If
                 
                 If SysPage.Key = 1 Then MkDir path & "\": Create = True
             Else
@@ -63,14 +69,17 @@ Public Key As String
                 Close #1
                 Call CheckSave
 ErrHandle:
-                If Err.Number <> 0 Then MsgBox "存档已经损坏！", 16, DisplayName: ReDim MySave.Data(0)
+                If Err.Number <> 0 Then
+                    MsgBox "存档已经损坏！", 16, DisplayName: ReDim MySave.Data(0)
+                    Suggest "游戏存档损坏。", NeverClear, 2
+                End If
             End If
             Create = True
         End If
         
+        If Create = False Then Suggest "游戏存档授权失败。", NeverClear, 1
         sToken = Create
         
-        If ESave Is Nothing Then Set ESave = Me
     End Function
 '========================================================
 '   RunTime
@@ -88,6 +97,7 @@ ErrHandle:
         If msg <> "" Then
             Call Save
             MsgBox "已经发现并删除存档中以下非法数据：" & vbCrLf & msg, 64
+            Suggest "游戏存档中含有非法数据。", NeverClear, 1
         End If
     End Sub
 '========================================================
