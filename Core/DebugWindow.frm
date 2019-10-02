@@ -47,7 +47,7 @@ Private Sub Form_Load()
     Set Charge = New GDebug
     
     Page.Create Charge
-    Page.Res.NewImages App.Path & "\assets\debug", 64, 64
+    Page.Res.NewImages App.path & "\assets\debug", 64, 64
     
     Set Charge.Page = Page
     
@@ -68,17 +68,17 @@ Private Sub Form_Load()
     
     SetWindowPos Me.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE Or SWP_NOSIZE
     
-    For i = 1 To 5
-        Load touchArea(i)
-        With touchArea(i)
+    For I = 1 To 5
+        Load touchArea(I)
+        With touchArea(I)
             .Visible = True
             .ZOrder
-            .Move Me.ScaleWidth - 10 - 64 * i, 78 / 2 - 64 / 2, 64, 64
-            Select Case i
+            .Move Me.ScaleWidth - 10 - 64 * I, 78 / 2 - 64 / 2, 64, 64
+            Select Case I
                 Case 1
                     .ToolTipText = "详细信息窗口"
                 Case 2
-                    .ToolTipText = "鼠标状态指示"
+                    .ToolTipText = "鼠标状态指示&点击检测矩形"
                 Case 3
                     .ToolTipText = "显示/不显示绘制矩形"
                 Case 4
@@ -98,6 +98,8 @@ Public Sub touchArea_Click(index As Integer)
     Select Case index
         Case 1
             Debuginfo.Visible = Not Debuginfo.Visible
+        Case 2
+            Debug_mouse = Not Debug_mouse
         Case 3
             Debug_focus = Not Debug_focus
         Case 4

@@ -83,10 +83,10 @@ Attribute VB_Name = "GCore"
         DirHorizontalVertical = 3
     End Enum
     Public Type GraphicsBound
-        X As Long
-        y As Long
-        Width As Long
-        Height As Long
+        X As Single
+        y As Single
+        Width As Single
+        Height As Single
         WSc As Single
         HSc As Single
         CrashIndex As Long
@@ -110,7 +110,7 @@ Attribute VB_Name = "GCore"
     Public SGS() As Suggestion, SGTime As Long
     Public ColorLists() As ColorCollection
     Public ECore As GMan, EF As GFont, EAni As Object, ESave As GSaving, EMusic As GMusicList
-    Public GHwnd As Long, GDC As Long, GW As Long, GH As Long
+    Public GHwnd As Long, GDC As Long, GW As Single, GH As Single
     Public Mouse As MState, DrawF As GraphicsBound
     Public FPS As Long, FPSt As Long, tFPS As Long, FPSct As Long, FPSctt As Long
     Public SysPage As GSysPage
@@ -118,7 +118,7 @@ Attribute VB_Name = "GCore"
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
-    Public Const Version As Long = 19100102      'hhfhyhasdgdfhhhxxxhhhhhhhhffff
+    Public Const Version As Long = 19100202      'hhfhhhhhh
     Public TextHandle As Long, WaitChr As String
     Public XPMode As Boolean
     
@@ -375,22 +375,44 @@ sth:
             .button = button
         End With
     End Sub
-    Public Function CheckMouse(X As Long, y As Long, w As Long, h As Long) As MButtonState
+    Public Function CheckMouse(ByVal X As Long, ByVal y As Long, ByVal w As Long, ByVal h As Long) As MButtonState
         'Return Value:0=none,1=in,2=down,3=up
+        If Debug_mouse Then
+            GdipSetSolidFillColor ECore.pB, argb(20, 255, 0, 0)
+            GdipFillRectangle ECore.UPage.GG, ECore.pB, X, y, w, h
+        End If
         If ECore.LockPage <> "" Then
             If ECore.LockPage <> ECore.UpdatingPage Then Exit Function
         End If
         If Mouse.X >= X And Mouse.y >= y And Mouse.X <= X + w And Mouse.y <= y + h Then
+            If Debug_mouse Then
+                GdipSetSolidFillColor ECore.pB, argb(255, 27, 27, 27)
+                GdipFillEllipse ECore.UPage.GG, ECore.pB, X - 10, y - 10, 20, 20
+                GdipSetSolidFillColor ECore.pB, argb(80, 255, 0, 0)
+                GdipFillRectangle ECore.UPage.GG, ECore.pB, X, y, w, h
+                EF.Writes Mouse.State + 1, X - 10, y - 7, ECore.UPage.GG, argb(255, 255, 255, 255), 14, 20, 0, StringAlignmentCenter, FontStyleBold
+            End If
             CheckMouse = Mouse.State + 1
             If Mouse.State = 2 Then Mouse.State = 0
         End If
     End Function
     Public Function CheckMouse2() As MButtonState
         'Return Value:0=none,1=in,2=down,3=up
+        If Debug_mouse Then
+            GdipSetSolidFillColor ECore.pB, argb(20, 0, 0, 255)
+            GdipFillRectangle ECore.UPage.GG, ECore.pB, DrawF.X, DrawF.y, DrawF.Width, DrawF.Height
+        End If
         If ECore.LockPage <> "" Then
             If ECore.LockPage <> ECore.UpdatingPage Then Exit Function
         End If
         If Mouse.X >= DrawF.X And Mouse.y >= DrawF.y And Mouse.X <= DrawF.X + DrawF.Width And Mouse.y <= DrawF.y + DrawF.Height Then
+            If Debug_mouse Then
+                GdipSetSolidFillColor ECore.pB, argb(255, 27, 27, 27)
+                GdipFillEllipse ECore.UPage.GG, ECore.pB, DrawF.X - 10, DrawF.y - 10, 20, 20
+                GdipSetSolidFillColor ECore.pB, argb(80, 0, 0, 255)
+                GdipFillRectangle ECore.UPage.GG, ECore.pB, DrawF.X, DrawF.y, DrawF.Width, DrawF.Height
+                EF.Writes Mouse.State + 1, DrawF.X - 10, DrawF.y - 7, ECore.UPage.GG, argb(255, 255, 255, 255), 14, 20, 0, StringAlignmentCenter, FontStyleBold
+            End If
             CheckMouse2 = Mouse.State + 1
             If DrawF.CrashIndex <> 0 Then
                 If ColorLists(DrawF.CrashIndex).IsAlpha((Mouse.X - DrawF.X) * DrawF.WSc, (Mouse.y - DrawF.y) * DrawF.HSc) = False Then CheckMouse2 = mMouseOut: Exit Function

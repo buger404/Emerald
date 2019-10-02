@@ -1,12 +1,12 @@
 Attribute VB_Name = "ResPool"
 Dim DC() As Long, brush() As Long, Font() As Long, StrF() As Long, Pen() As Long
-Dim Graphics() As Long, Image() As Long, Effect() As Long, Path() As Long
+Dim Graphics() As Long, Image() As Long, Effect() As Long, path() As Long
 Dim Obj() As Object
 Public Function GetCountStr() As String
     GetCountStr = "DC " & UBound(DC) & " , Brush " & UBound(brush) & " , Pen " & UBound(Pen) & vbCrLf & _
                   "Font " & UBound(Font) & " , StringFormat " & UBound(StrF) & vbCrLf & _
                   "Bitmap " & UBound(Image) & " , Object " & UBound(Obj) & vbCrLf & _
-                  "Effect " & UBound(Effect) & " , Graphics " & UBound(Graphics) & " , Path " & UBound(Path)
+                  "Effect " & UBound(Effect) & " , Graphics " & UBound(Graphics) & " , Path " & UBound(path)
 End Function
 Public Sub InitPool()
     ReDim DC(0)
@@ -18,7 +18,7 @@ Public Sub InitPool()
     ReDim Image(0)
     ReDim Obj(0)
     ReDim Effect(0)
-    ReDim Path(0)
+    ReDim path(0)
     If App.LogMode = 0 Then Open VBA.Environ("temp") & "\Emerald " & year(Now) & "_" & Month(Now) & "_" & Day(Now) & "_" & Hour(Now) & "_" & Minute(Now) & "_" & Second(Now) & "_" & App.ThreadID & ".txt" For Output As #446
 End Sub
 Public Sub EmrLog(Str As String)
@@ -28,95 +28,95 @@ Public Sub DestroyPool()
     On Error Resume Next
     EmrLog "Emerald ResPool Version " & Version
     EmrLog "Work starting ..."
-    For i = 1 To UBound(DC)
-        If DC(i) <> 0 Then DeleteObject DC(i): EmrLog "Delete DC " & DC(i)
+    For I = 1 To UBound(DC)
+        If DC(I) <> 0 Then DeleteObject DC(I): EmrLog "Delete DC " & DC(I)
     Next
-    For i = 1 To UBound(brush)
-        If brush(i) <> 0 Then gdiplus.GdipDeleteBrush brush(i): EmrLog "Delete Brush " & brush(i)
+    For I = 1 To UBound(brush)
+        If brush(I) <> 0 Then gdiplus.GdipDeleteBrush brush(I): EmrLog "Delete Brush " & brush(I)
     Next
-    For i = 1 To UBound(Pen)
-        If Pen(i) <> 0 Then gdiplus.GdipDeletePen Pen(i): EmrLog "Delete Pen " & Pen(i)
+    For I = 1 To UBound(Pen)
+        If Pen(I) <> 0 Then gdiplus.GdipDeletePen Pen(I): EmrLog "Delete Pen " & Pen(I)
     Next
-    For i = 1 To UBound(Graphics)
-        If Graphics(i) <> 0 Then gdiplus.GdipDeleteGraphics Graphics(i): EmrLog "Delete Graphics " & Graphics(i)
+    For I = 1 To UBound(Graphics)
+        If Graphics(I) <> 0 Then gdiplus.GdipDeleteGraphics Graphics(I): EmrLog "Delete Graphics " & Graphics(I)
     Next
-    For i = 1 To UBound(Image)
-        If Image(i) <> 0 Then gdiplus.GdipDisposeImage Image(i): EmrLog "Delete Image " & Image(i)
+    For I = 1 To UBound(Image)
+        If Image(I) <> 0 Then gdiplus.GdipDisposeImage Image(I): EmrLog "Delete Image " & Image(I)
     Next
-    For i = 1 To UBound(Font)
-        If Font(i) <> 0 Then gdiplus.GdipDeleteFont Font(i): EmrLog "Delete Font " & Font(i)
+    For I = 1 To UBound(Font)
+        If Font(I) <> 0 Then gdiplus.GdipDeleteFont Font(I): EmrLog "Delete Font " & Font(I)
     Next
-    For i = 1 To UBound(StrF)
-        If StrF(i) <> 0 Then gdiplus.GdipDeleteStringFormat StrF(i): EmrLog "Delete StrF " & StrF(i)
+    For I = 1 To UBound(StrF)
+        If StrF(I) <> 0 Then gdiplus.GdipDeleteStringFormat StrF(I): EmrLog "Delete StrF " & StrF(I)
     Next
-    For i = 1 To UBound(Effect)
-        If Effect(i) <> 0 Then gdiplus.GdipDeleteEffect Effect(i): EmrLog "Delete Effect " & Effect(i)
+    For I = 1 To UBound(Effect)
+        If Effect(I) <> 0 Then gdiplus.GdipDeleteEffect Effect(I): EmrLog "Delete Effect " & Effect(I)
     Next
-    For i = 1 To UBound(Path)
-        If Path(i) <> 0 Then gdiplus.GdipDeletePath Path(i): EmrLog "Delete Path " & Path(i)
+    For I = 1 To UBound(path)
+        If path(I) <> 0 Then gdiplus.GdipDeletePath path(I): EmrLog "Delete Path " & path(I)
     Next
-    For i = 1 To UBound(Obj)
-        If Not Obj(i) Is Nothing Then EmrLog "Delete Object " & ObjPtr(Obj(i)): Set Obj(i) = Nothing
+    For I = 1 To UBound(Obj)
+        If Not Obj(I) Is Nothing Then EmrLog "Delete Object " & ObjPtr(Obj(I)): Set Obj(I) = Nothing
     Next
     
     If App.LogMode = 0 Then Close #446
 End Sub
 Public Sub DeleteObj(Hwnd As Long)
-    For i = 1 To UBound(Obj)
-        If Obj(i) = Hwnd Then Set Obj(i) = Nothing: Exit For
+    For I = 1 To UBound(Obj)
+        If Obj(I) = Hwnd Then Set Obj(I) = Nothing: Exit For
     Next
 End Sub
 Public Sub PoolDisposeImage(Hwnd As Long)
-    For i = 1 To UBound(Image)
-        If Image(i) = Hwnd Then Image(i) = 0: Exit For
+    For I = 1 To UBound(Image)
+        If Image(I) = Hwnd Then Image(I) = 0: Exit For
     Next
     gdiplus.GdipDisposeImage Hwnd
 End Sub
 Public Sub PoolDeletePath(Hwnd As Long)
-    For i = 1 To UBound(Path)
-        If Path(i) = Hwnd Then Path(i) = 0: Exit For
+    For I = 1 To UBound(path)
+        If path(I) = Hwnd Then path(I) = 0: Exit For
     Next
     gdiplus.GdipDeletePath Hwnd
 End Sub
 Public Sub PoolDeleteEffect(Hwnd As Long)
-    For i = 1 To UBound(Effect)
-        If Effect(i) = Hwnd Then Effect(i) = 0: Exit For
+    For I = 1 To UBound(Effect)
+        If Effect(I) = Hwnd Then Effect(I) = 0: Exit For
     Next
     gdiplus.GdipDeleteEffect Hwnd
 End Sub
 Public Sub PoolDeleteGraphics(Hwnd As Long)
-    For i = 1 To UBound(Graphics)
-        If Graphics(i) = Hwnd Then Graphics(i) = 0: Exit For
+    For I = 1 To UBound(Graphics)
+        If Graphics(I) = Hwnd Then Graphics(I) = 0: Exit For
     Next
     gdiplus.GdipDeleteGraphics Hwnd
 End Sub
 Public Sub PoolDeletePen(Hwnd As Long)
-    For i = 1 To UBound(Pen)
-        If Pen(i) = Hwnd Then Pen(i) = 0: Exit For
+    For I = 1 To UBound(Pen)
+        If Pen(I) = Hwnd Then Pen(I) = 0: Exit For
     Next
     gdiplus.GdipDeletePen Hwnd
 End Sub
 Public Sub PoolDeleteStringFormat(Hwnd As Long)
-    For i = 1 To UBound(StrF)
-        If StrF(i) = Hwnd Then StrF(i) = 0: Exit For
+    For I = 1 To UBound(StrF)
+        If StrF(I) = Hwnd Then StrF(I) = 0: Exit For
     Next
     gdiplus.GdipDeleteStringFormat Hwnd
 End Sub
 Public Sub PoolDeleteFont(Hwnd As Long)
-    For i = 1 To UBound(Font)
-        If Font(i) = Hwnd Then Font(i) = 0: Exit For
+    For I = 1 To UBound(Font)
+        If Font(I) = Hwnd Then Font(I) = 0: Exit For
     Next
     gdiplus.GdipDeleteFont Hwnd
 End Sub
 Public Sub PoolDeleteBrush(Hwnd As Long)
-    For i = 1 To UBound(brush)
-        If brush(i) = Hwnd Then brush(i) = 0: Exit For
+    For I = 1 To UBound(brush)
+        If brush(I) = Hwnd Then brush(I) = 0: Exit For
     Next
     gdiplus.GdipDeleteBrush Hwnd
 End Sub
 Public Sub DeleteDC(Hwnd As Long)
-    For i = 1 To UBound(DC)
-        If DC(i) = Hwnd Then DC(i) = 0: Exit For
+    For I = 1 To UBound(DC)
+        If DC(I) = Hwnd Then DC(I) = 0: Exit For
     Next
     DeleteObject Hwnd
 End Sub
@@ -125,8 +125,8 @@ Public Sub PoolAddObject(nObj As Object)
     Set Obj(UBound(Obj)) = nObj
 End Sub
 Public Sub PoolAddPath(Hwnd As Long)
-    ReDim Preserve Path(UBound(Path) + 1)
-    Path(UBound(Path)) = Hwnd
+    ReDim Preserve path(UBound(path) + 1)
+    path(UBound(path)) = Hwnd
 End Sub
 Public Sub PoolAddEffect(Hwnd As Long)
     ReDim Preserve Effect(UBound(Effect) + 1)
@@ -188,15 +188,15 @@ Public Sub PoolCreateSolidFill(argb As Long, brush As Long)
     gdiplus.GdipCreateSolidFill argb, brush
     PoolAddBrush brush
 End Sub
-Public Sub PoolCreatePath(mode As FillMode, Path As Long)
-    gdiplus.GdipCreatePath mode, Path
-    PoolAddPath Path
+Public Sub PoolCreatePath(mode As FillMode, path As Long)
+    gdiplus.GdipCreatePath mode, path
+    PoolAddPath path
 End Sub
 Public Sub PoolCreateFromHdc(DC As Long, g As Long)
     gdiplus.GdipCreateFromHDC DC, g
     PoolAddGraphics g
 End Sub
-Public Function CreateCDC(w As Long, h As Long) As Long
+Public Function CreateCDC(ByVal w As Long, ByVal h As Long) As Long
     Dim bm As BITMAPINFOHEADER, DC As Long, DIB As Long
 
     With bm

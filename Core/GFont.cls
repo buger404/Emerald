@@ -71,7 +71,7 @@ Public EmHeight As Long
         
         GetHeight = r.Bottom
     End Function
-    Public Sub Writes(Text As String, X As Long, y As Long, g As Long, Color As Long, size As Long, w As Long, h As Long, ByVal align As StringAlignment, ByVal style As FontStyle)
+    Public Sub Writes(Text As String, X As Single, y As Single, g As Long, Color As Long, ByVal size As Long, w As Single, h As Single, ByVal align As StringAlignment, ByVal style As FontStyle)
         'On Error Resume Next
         If Font(style, size) = 0 Then
             PoolCreateFont fFam, size, style, UnitPixel, Font(style, size)

@@ -61,5 +61,5 @@ Attribute VB_Name = "DebugSwitch"
 '======================================================
 '   警告：不要修改下列代码
     Public DebugMode As Integer, DisableLOGO As Integer, HideLOGO As Integer, UpdateCheckInterval As Long, UpdateTimeOut As Long
-    Public Debug_focus As Boolean, Debug_pos As Boolean, Debug_data As Boolean
+    Public Debug_focus As Boolean, Debug_pos As Boolean, Debug_data As Boolean, Debug_mouse As Boolean
 '======================================================

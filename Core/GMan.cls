@@ -26,9 +26,9 @@ Dim Pages() As Page, Transform As Transform
 Dim mPage As String, aPage As Object
 Dim OutOfWindow As Boolean
 Dim FirstPlay As Boolean
-Public CDC As Long, ODC As Long, GG As Long, pB As Long
+Public CDC As Long, ODC As Long, GG As Long, pB As Long, pen As Long
 Public LastPage As String
-Public UpdatingPage As String, LockPage As String
+Public UpdatingPage As String, LockPage As String, UPage As GPage
 Dim CurrentPage As Integer
 Dim IsLayered As Boolean
 Dim ErrorMark As Boolean, ErrorMark2 As Boolean
@@ -43,6 +43,7 @@ Dim ErrorMark As Boolean, ErrorMark2 As Boolean
         GdipSetSmoothingMode GG, SmoothingModeAntiAlias
         GdipSetTextRenderingHint GG, TextRenderingHintAntiAlias
         PoolCreateSolidFill argb(255, 255, 255, 255), pB
+        PoolCreatePen1 argb(255, 255, 255, 255), 1, UnitPixel, pen
     End Sub
     Public Sub Layered(Optional WithAero As Boolean = False)
         SetWindowLongA GHwnd, GWL_EXSTYLE, GetWindowLongA(GHwnd, GWL_EXSTYLE) Or WS_EX_LAYERED
@@ -52,6 +53,7 @@ Dim ErrorMark As Boolean, ErrorMark2 As Boolean
     Public Sub Dispose()
         PoolDeleteGraphics GG
         PoolDeleteBrush pB
+        PoolDeletePen pen
         For I = 1 To UBound(Pages)
             Pages(I).p.Dispose
         Next
@@ -113,6 +115,7 @@ Dim ErrorMark As Boolean, ErrorMark2 As Boolean
             CurrentPage = I
             If ActivePage = Pages(I).Name Or (Pages(I).p.TopPage And (Not ErrorMark)) Then
                 UpdatingPage = Pages(I).Name
+                Set UPage = Pages(I).p
                 Pages(I).p.Update
                 Pages(I).p.Display (CDC)
                 If Pages(I).Name = "ErrorScreen" Then ErrorMark2 = True

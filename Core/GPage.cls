@@ -25,7 +25,7 @@ Private Type AniTask
 End Type
 Dim GTick As Long
 Dim Anis() As AniTask
-Dim DrawBox As Object, brush As Long, Path As Long, Pen As Long
+Dim DrawBox As Object, brush As Long, path As Long, Pen As Long
 Dim ScrollMode As Boolean, ScrollX As Long, ScrollY As Long, ScrollBX As Long, ScrollBY As Long, CRgn As Long
 Dim AniCollection() As EAnimation, PlayAni() As EAnimation
 Public CDC As Long, GG As Long, OutOfScroll As Boolean
@@ -49,13 +49,13 @@ Public TopPage As Boolean
         
         PoolCreateSolidFill 0, brush
         PoolCreatePen1 0, 1, UnitPixel, Pen
-        PoolCreatePath FillModeWinding, Path
+        PoolCreatePath FillModeWinding, path
     End Sub
     Public Sub Dispose()
         Exit Sub
         PoolDeleteBrush brush
         PoolDeletePen Pen
-        GdipDeletePath Path
+        GdipDeletePath path
         Res.Dispose
     End Sub
 '========================================================
@@ -96,9 +96,9 @@ Public TopPage As Boolean
     Public Property Let GIFTick(nGIFTick As Long)
         GTick = nGIFTick
     End Property
-    Public Sub LoadAnimation(Path As String)
+    Public Sub LoadAnimation(path As String)
         ReDim Preserve AniCollection(UBound(AniCollection) + 1)
-        AniCollection(UBound(AniCollection)) = Animations.LoadAnimation(Path)
+        AniCollection(UBound(AniCollection)) = Animations.LoadAnimation(path)
         With AniCollection(UBound(AniCollection))
             For I = 1 To UBound(.channel)
                 For S = 1 To UBound(.channel(I).frames)
@@ -109,13 +109,13 @@ Public TopPage As Boolean
             Next
         End With
     End Sub
-    Public Sub LoadAnimationsFromDir(Path As String)
+    Public Sub LoadAnimationsFromDir(path As String)
         Dim f As String
-        If Right(Path, 1) <> "\" Then Path = Path & "\"
+        If Right(path, 1) <> "\" Then path = path & "\"
         
-        f = Dir(Path & "*.emrani")
+        f = Dir(path & "*.emrani")
         Do While f <> ""
-            Call LoadAnimation(Path & f)
+            Call LoadAnimation(path & f)
             f = Dir()
         Loop
     End Sub
@@ -211,10 +211,10 @@ Public TopPage As Boolean
         
         If DisposeMark Then DisposePlayAnimation playname
     End Sub
-    Public Sub DrawImageEx(n, X As Long, y As Long, Optional w, Optional h, Optional pos As PosAlign = posNormal, Optional angle As Long = 0, Optional animation As Integer = 0)
+    Public Sub DrawImageEx(n, ByVal X As Single, ByVal y As Single, Optional w, Optional h, Optional pos As PosAlign = posNormal, Optional angle As Long = 0, Optional animation As Integer = 0)
         Dim index As Integer
         
-        Dim OX As Long, OY As Long, ow As Long, oh As Long
+        Dim OX As Single, OY As Single, ow As Long, oh As Long
         OX = X: OY = y: ow = w: oh = h
         
         If animation <> 0 Then
@@ -276,17 +276,19 @@ Public TopPage As Boolean
         End With
         
         If Debug_focus Then
+            GdipSetPenWidth Pen, 1
             GdipSetPenColor Pen, argb(255, 255, 0, 255)
             GdipDrawRectangle GG, Pen, OX, OY, ow - 1, oh - 1
         End If
         
         If Debug_pos Then
+            GdipSetPenWidth Pen, 1
             GdipSetPenColor Pen, argb(255, 0, 183, 195)
             GdipDrawLine GG, Pen, X - 5, y, X + 5, y
             GdipDrawLine GG, Pen, X, y - 5, X, y + 5
         End If
     End Sub
-    Public Sub DrawImage(n, X As Long, y As Long, Optional cx, Optional cy, Optional cw, Optional ch, Optional alpha, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0, Optional Direction As ImgDirection = DirNormal)
+    Public Sub DrawImage(n, ByVal X As Long, ByVal y As Long, Optional cx, Optional cy, Optional cw, Optional ch, Optional alpha, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0, Optional Direction As ImgDirection = DirNormal)
         'If OutOfScroll Then Exit Sub
         
         Dim B As BLENDFUNCTION, index As Integer, bl As Long
@@ -368,11 +370,13 @@ Public TopPage As Boolean
         End With
         
         If Debug_focus Then
+            GdipSetPenWidth Pen, 1
             GdipSetPenColor Pen, argb(255, 0, 0, 255)
             GdipDrawRectangle GG, Pen, OX, OY, ocw - 1, och - 1
         End If
         
         If Debug_pos Then
+            GdipSetPenWidth Pen, 1
             GdipSetPenColor Pen, argb(255, 0, 183, 195)
             GdipDrawLine GG, Pen, X - 5, y, X + 5, y
             GdipDrawLine GG, Pen, X, y - 5, X, y + 5
@@ -381,10 +385,10 @@ Public TopPage As Boolean
     End Sub
 '========================================================
 '   Writer
-    Public Sub Writes(ByVal Text As String, X As Long, y As Long, Optional size As Long = 14, Optional Color As Long, Optional w As Long = 0, Optional h As Long = 0, Optional align As StringAlignment = StringAlignmentNear, Optional style As FontStyle = FontStyleRegular, Optional animation As Integer = 0)
+    Public Sub Writes(ByVal Text As String, ByVal X As Single, ByVal y As Single, Optional size As Long = 14, Optional Color As Long, Optional ByVal w As Single = 0, Optional ByVal h As Single = 0, Optional align As StringAlignment = StringAlignmentNear, Optional style As FontStyle = FontStyleRegular, Optional animation As Integer = 0)
         'If OutOfScroll Then Exit Sub
         
-        Dim OX As Long, OY As Long
+        Dim OX As Single, OY As Single
         OX = X: OY = y
         
         If ScrollMode Then
@@ -421,11 +425,13 @@ Public TopPage As Boolean
         End With
         
         If Debug_focus Then
+            GdipSetPenWidth Pen, 1
             GdipSetPenColor Pen, argb(255, 0, 255, 0)
             GdipDrawRectangle GG, Pen, OX, OY, w - 1, h - 1
         End If
         
         If Debug_pos Then
+            GdipSetPenWidth Pen, 1
             GdipSetPenColor Pen, argb(255, 0, 183, 195)
             GdipDrawLine GG, Pen, X - 5, y, X + 5, y
             GdipDrawLine GG, Pen, X, y - 5, X, y + 5
@@ -433,7 +439,7 @@ Public TopPage As Boolean
     End Sub
 '========================================================
 '   Shape
-    Public Sub PaintLine(X1 As Long, Y1 As Long, X2 As Long, Y2 As Long, Optional Color As Long, Optional size As Long = 1, Optional animation As Integer = 0)
+    Public Sub PaintLine(ByVal X1 As Single, ByVal Y1 As Single, ByVal X2 As Single, ByVal Y2 As Single, Optional Color As Long, Optional size As Long = 1, Optional animation As Integer = 0)
         If ScrollMode Then
             X = X + ScrollX + ScrollBX: y = y + ScrollY + ScrollBY
             Dim ret As Long
@@ -474,16 +480,17 @@ Public TopPage As Boolean
         End With
         
         If Debug_focus Then
+            GdipSetPenWidth Pen, 1
             GdipSetPenColor Pen, argb(255, 240, 176, 0)
             GdipDrawRectangle GG, Pen, DrawF.X, DrawF.y, DrawF.Width + 1, DrawF.Height + 1
         End If
     End Sub
-    Public Sub Paint(ByVal Shape As Integer, X As Long, y As Long, w As Long, h As Long, Optional Color As Long, Optional Radius As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0)
+    Public Sub Paint(ByVal Shape As Integer, ByVal X As Single, ByVal y As Single, ByVal w As Single, ByVal h As Single, Optional Color As Long, Optional Radius As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0)
         'shape:0=rect,1=ellipse,2=rectr
         'style:0=fill,1=border
         'If OutOfScroll Then Exit Sub
 
-        Dim OX As Long, OY As Long, ow As Long, oh As Long
+        Dim OX As Single, OY As Single, ow As Single, oh As Single
         OX = X: OY = y: ow = w: oh = h
         
         If ScrollMode Then
@@ -509,7 +516,7 @@ Public TopPage As Boolean
             End If
         End If
         
-        GdipResetPath Path
+        GdipResetPath path
         
         If pos = 1 Then OX = Int(OX - ow / 2): OY = Int(OY - oh / 2)
         If pos = 2 Then OX = OX - ow
@@ -518,8 +525,8 @@ Public TopPage As Boolean
         If pos = 5 Then OY = OY + oh
         
 ReShape:
-        If Shape = 0 Then GdipAddPathRectangle Path, OX, OY, ow - 1, oh - 1
-        If Shape = 1 Then GdipAddPathEllipse Path, OX, OY, ow - 1, oh - 1
+        If Shape = 0 Then GdipAddPathRectangle path, OX, OY, ow - 1, oh - 1
+        If Shape = 1 Then GdipAddPathEllipse path, OX, OY, ow - 1, oh - 1
         If Shape = 2 Then
         
             If Radius = 0 Then
@@ -529,11 +536,11 @@ ReShape:
             If Radius > ow Then Radius = ow
             If Radius > oh Then Radius = oh
             
-            GdipAddPathArc Path, OX, OY, Radius, Radius, 180, 90
-            GdipAddPathArc Path, OX + ow - Radius, OY, Radius, Radius, 270, 90
-            GdipAddPathArc Path, OX + ow - Radius, OY + oh - Radius, Radius, Radius, 0, 90
-            GdipAddPathArc Path, OX, OY + oh - Radius, Radius, Radius, 90, 90
-            GdipClosePathFigure Path
+            GdipAddPathArc path, OX, OY, Radius, Radius, 180, 90
+            GdipAddPathArc path, OX + ow - Radius, OY, Radius, Radius, 270, 90
+            GdipAddPathArc path, OX + ow - Radius, OY + oh - Radius, Radius, Radius, 0, 90
+            GdipAddPathArc path, OX, OY + oh - Radius, Radius, Radius, 90, 90
+            GdipClosePathFigure path
             
         End If
         
@@ -546,8 +553,8 @@ ReShape:
         End If
         
         If Shape = 0 Then GdipSetSmoothingMode GG, SmoothingModeDefault
-        If style = 0 Then GdipFillPath GG, brush, Path
-        If style = 1 Then GdipDrawPath GG, Pen, Path
+        If style = 0 Then GdipFillPath GG, brush, path
+        If style = 1 Then GdipDrawPath GG, Pen, path
         If Shape = 0 Then GdipSetSmoothingMode GG, SmoothingModeAntiAlias
         
         With DrawF
@@ -560,20 +567,22 @@ ReShape:
         End With
         
         If Debug_focus Then
+            GdipSetPenWidth Pen, 1
             GdipSetPenColor Pen, argb(255, 255, 0, 0)
             GdipDrawRectangle GG, Pen, OX, OY, ow - 1, oh - 1
         End If
         
         If Debug_pos Then
+            GdipSetPenWidth Pen, 1
             GdipSetPenColor Pen, argb(255, 0, 183, 195)
             GdipDrawLine GG, Pen, X - 5, y, X + 5, y
             GdipDrawLine GG, Pen, X, y - 5, X, y + 5
         End If
     End Sub
-    Public Sub PaintArc(X As Long, y As Long, w As Long, h As Long, degree As Long, Optional Start As Long = 0, Optional Color As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0)
+    Public Sub PaintArc(ByVal X As Single, ByVal y As Single, ByVal w As Single, ByVal h As Single, degree As Single, Optional Start As Single = 0, Optional Color As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0)
         'style:0=fill,1=border,2=sector
 
-        Dim OX As Long, OY As Long, ow As Long, oh As Long
+        Dim OX As Single, OY As Single, ow As Single, oh As Single
         OX = X: OY = y: ow = w: oh = h
         
         If ScrollMode Then
@@ -599,7 +608,7 @@ ReShape:
             End If
         End If
         
-        GdipResetPath Path
+        GdipResetPath path
         
         If pos = 1 Then OX = Int(X - ow / 2): OY = Int(y - oh / 2)
         If pos = 2 Then OX = OX - ow
@@ -607,9 +616,9 @@ ReShape:
         If pos = 4 Then OX = OX + ow
         If pos = 5 Then OY = OY + oh
         
-        GdipAddPathArc Path, OX, OY, ow, oh, Start, degree
-        If style = 2 Then GdipAddPathLine Path, OX + ow / 2, OY + ow / 2, OX + ow / 2, OY + ow / 2
-        If style = 0 Then GdipClosePathFigure Path
+        GdipAddPathArc path, OX, OY, ow, oh, Start, degree
+        If style = 2 Then GdipAddPathLine path, OX + ow / 2, OY + ow / 2, OX + ow / 2, OY + ow / 2
+        If style = 0 Then GdipClosePathFigure path
         
         If Color <> 0 Then
             If style = 0 Or style = 2 Then GdipSetSolidFillColor brush, Color
@@ -619,8 +628,8 @@ ReShape:
             End If
         End If
         
-        If style = 0 Or style = 2 Then GdipFillPath GG, brush, Path
-        If style = 1 Then GdipDrawPath GG, Pen, Path
+        If style = 0 Or style = 2 Then GdipFillPath GG, brush, path
+        If style = 1 Then GdipDrawPath GG, Pen, path
         
         With DrawF
             .X = OX
@@ -632,11 +641,13 @@ ReShape:
         End With
         
         If Debug_focus Then
+            GdipSetPenWidth Pen, 1
             GdipSetPenColor Pen, argb(255, 0, 255, 255)
             GdipDrawRectangle GG, Pen, OX, OY, ow - 1, oh - 1
         End If
         
         If Debug_pos Then
+            GdipSetPenWidth Pen, 1
             GdipSetPenColor Pen, argb(255, 0, 183, 195)
             GdipDrawLine GG, Pen, X - 5, y, X + 5, y
             GdipDrawLine GG, Pen, X, y - 5, X, y + 5
@@ -644,7 +655,7 @@ ReShape:
     End Sub
     Public Sub PaintPolygon2(Color As Long, style As Integer, Points(), Optional SmoothMode As Boolean = False)
 
-        GdipResetPath Path
+        GdipResetPath path
         Dim p() As POINTF
         ReDim p((UBound(Points) - 1) / 2)
         For I = 0 To UBound(Points) Step 2
@@ -652,9 +663,9 @@ ReShape:
         Next
         
         If SmoothMode Then
-            GdipAddPathCurve Path, p(0), UBound(p) + 1
+            GdipAddPathCurve path, p(0), UBound(p) + 1
         Else
-            GdipAddPathPolygon Path, p(0), UBound(p) + 1
+            GdipAddPathPolygon path, p(0), UBound(p) + 1
         End If
         
         If style = 0 Then GdipSetSolidFillColor brush, Color
@@ -663,17 +674,18 @@ ReShape:
             GdipSetPenWidth Pen, size
         End If
         
-        If style = 0 Then GdipFillPath GG, brush, Path
-        If style = 1 Then GdipDrawPath GG, Pen, Path
+        If style = 0 Then GdipFillPath GG, brush, path
+        If style = 1 Then GdipDrawPath GG, Pen, path
         
         If Debug_focus Then
+            GdipSetPenWidth Pen, 1
             GdipSetPenColor Pen, argb(255, 0, 176, 240)
-            GdipDrawPath GG, Pen, Path
+            GdipDrawPath GG, Pen, path
         End If
     End Sub
     Public Sub PaintPolygon(Color As Long, style As Integer, SmoothMode As Boolean, ParamArray Points())
 
-        GdipResetPath Path
+        GdipResetPath path
         Dim p() As POINTF
         ReDim p((UBound(Points) - 1) / 2)
         For I = 0 To UBound(Points) Step 2
@@ -681,9 +693,9 @@ ReShape:
         Next
         
         If SmoothMode Then
-            GdipAddPathCurve Path, p(0), UBound(p) + 1
+            GdipAddPathCurve path, p(0), UBound(p) + 1
         Else
-            GdipAddPathPolygon Path, p(0), UBound(p) + 1
+            GdipAddPathPolygon path, p(0), UBound(p) + 1
         End If
         
         If style = 0 Then GdipSetSolidFillColor brush, Color
@@ -692,12 +704,13 @@ ReShape:
             GdipSetPenWidth Pen, size
         End If
         
-        If style = 0 Then GdipFillPath GG, brush, Path
-        If style = 1 Then GdipDrawPath GG, Pen, Path
+        If style = 0 Then GdipFillPath GG, brush, path
+        If style = 1 Then GdipDrawPath GG, Pen, path
         
         If Debug_focus Then
+            GdipSetPenWidth Pen, 1
             GdipSetPenColor Pen, argb(255, 0, 176, 240)
-            GdipDrawPath GG, Pen, Path
+            GdipDrawPath GG, Pen, path
         End If
     End Sub
 '========================================================
@@ -741,7 +754,7 @@ ReShape:
     End Function
 '========================================================
     'Control
-    Public Function ShowEdit(Text As String, Shape As Integer, X As Long, y As Long, w As Long, h As Long, TextColor As Long, Color As Long, HoverColor As Long, LineColor As Long, Optional Radius As Long = 0, Optional ShapeStyle As Integer = 0, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
+    Public Function ShowEdit(Text As String, Shape As Integer, X As Single, y As Single, w As Single, h As Single, TextColor As Long, Color As Long, HoverColor As Long, LineColor As Long, Optional Radius As Long = 0, Optional ShapeStyle As Integer = 0, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
         Dim m As Integer, r As RECT
         
         m = CheckMouse(X, y, w - IIf(TextHandle = VarPtr(Text), h, 0), h)
@@ -813,7 +826,7 @@ ReShape:
         ShowEdit = m
         
     End Function
-    Public Sub ShowLoading(X As Long, y As Long, w As Long, h As Long, size As Long, color1 As Long, color2 As Long, color3 As Long)
+    Public Sub ShowLoading(X As Single, y As Single, w As Single, h As Single, size As Long, color1 As Long, color2 As Long, color3 As Long)
         
         PaintArc X, y, w, h, 120, (GetTickCount Mod 3000) / 3000 * 360, color3, size * 0.86, 1
         PaintArc X, y, w, h, 120, (GetTickCount Mod 1800) / 1800 * 360 + 90, color2, size * 0.93, 1
@@ -821,7 +834,7 @@ ReShape:
         'argb(255, 242, 195, 17),argb(255, 240, 127, 34),argb(255, 232, 76, 61)
     End Sub
     Public Function ShowButton(pic As String, X As Long, y As Long, Text As String, Color As Long, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
-        Dim w As Long, h As Long, I As Integer, m As Integer
+        Dim w As Single, h As Single, I As Integer, m As Integer
         I = Res.GetImage(pic)
         w = Res.ImgSize(I, imgGetWidth): h = Res.ImgSize(I, imgGetHeight)
         
@@ -833,7 +846,7 @@ ReShape:
         ShowButton = m
     End Function
     Public Function ShowSimpleButton(pic As String, X As Long, y As Long, Text As String, Color As Long, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
-        Dim w As Long, h As Long, I As Integer, m As Integer
+        Dim w As Single, h As Single, I As Integer, m As Integer
         I = Res.GetImage(pic)
         w = Res.ImgSize(I, imgGetWidth): h = Res.ImgSize(I, imgGetHeight)
         
@@ -844,7 +857,7 @@ ReShape:
     
         ShowSimpleButton = m
     End Function
-    Public Function ShowColorButton(Shape As Integer, X As Long, y As Long, w As Long, h As Long, Text As String, TextColor As Long, Color As Long, HoverColor As Long, Optional Radius As Long = 0, Optional ShapeStyle As Integer = 0, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
+    Public Function ShowColorButton(Shape As Integer, X As Single, y As Single, w As Single, h As Single, Text As String, TextColor As Long, Color As Long, HoverColor As Long, Optional Radius As Long = 0, Optional ShapeStyle As Integer = 0, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
         Dim m As Integer
         
         m = CheckMouse(X, y, w, h)
@@ -855,7 +868,7 @@ ReShape:
         ShowColorButton = m
     End Function
     Public Function ShowCheckBox(value, pic As String, X As Long, y As Long, Text As String, Color As Long, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
-        Dim w As Long, h As Long, I As Integer, m As Integer
+        Dim w As Single, h As Single, I As Integer, m As Integer
         Dim X2 As Long, Y2 As Long
         X2 = X: Y2 = y
         
@@ -870,7 +883,7 @@ ReShape:
         
         ShowCheckBox = m
     End Function
-    Public Function ShowColorCheckBox(value, X As Long, y As Long, w As Long, h As Long, Text As String, DefaultColor As Long, ChooseColor As Long, ForeColor As Long, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
+    Public Function ShowColorCheckBox(value, X As Single, y As Single, w As Single, h As Single, Text As String, DefaultColor As Long, ChooseColor As Long, ForeColor As Long, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
         m = CheckMouse(X, y, w, h)
         
         Paint 1, X, y, h, h, IIf(value = True, ChooseColor, DefaultColor)
@@ -881,7 +894,7 @@ ReShape:
         ShowColorCheckBox = m
     End Function
     Public Function ShowSliderBar(value, pic As String, X As Long, y As Long) As Integer
-        Dim w As Long, h As Long, I As Integer, m As Integer
+        Dim w As Single, h As Single, I As Integer, m As Integer
         Dim X2 As Long, Y2 As Long
         
         X2 = X: Y2 = y
@@ -901,7 +914,7 @@ ReShape:
         
         ShowSliderBar = m
     End Function
-    Public Function ShowHScrollBar(value, X As Long, y As Long, w As Long, h As Long, LineColor As Long, BallColor As Long, Optional size As Long = 2) As Integer
+    Public Function ShowHScrollBar(value, X As Single, y As Single, w As Single, h As Single, LineColor As Long, BallColor As Long, Optional size As Long = 2) As Integer
         Dim m As Integer
         
         m = CheckMouse(X, y, w, h)
@@ -915,7 +928,7 @@ ReShape:
         
         ShowHScrollBar = m
     End Function
-    Public Function ShowVScrollBar(value, X As Long, y As Long, w As Long, h As Long, LineColor As Long, BallColor As Long, Optional size As Long = 2) As Integer
+    Public Function ShowVScrollBar(value, X As Single, y As Single, w As Single, h As Single, LineColor As Long, BallColor As Long, Optional size As Long = 2) As Integer
         Dim m As Integer
         
         m = CheckMouse(X, y, w, h)

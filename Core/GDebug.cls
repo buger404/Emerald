@@ -13,7 +13,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 'Emerald Ïà¹Ø´úÂë
 
-Public Page As GPage, GW As Long, GH As Long
+Public Page As GPage, GW As Single, GH As Single
 Public PageMark As Long
 
 Public InputingText As String, InputAllow As Boolean
@@ -869,10 +869,12 @@ Public Sub Update()
 
     On Error Resume Next
     
-    Page.PaintLine -1, GH - 1, GW, GH - 1, argb(255, 0, 183, 195), 2
+    Page.PaintLine -1, GH - 1, GW * 1, GH - 1, argb(255, 0, 183, 195), 2
     If FPS <> 0 Then Page.Writes FPS & "/" & Int(1000 / Int(FPSct / FPS)), 15, 14, 34, argb(205, 182, 174, 173)
     
     Page.DrawImage "mouse" & Mouse.button & ".png", GW - 138, 78 / 2 - 64 / 2, alpha:=1
+    If Debug_mouse Then Page.Paint 0, GW - 74 - 64, 0, 64, 79, argb(50, 128, 128, 128)
+    
     Page.DrawImage "menu.png", GW - 74, 78 / 2 - 64 / 2, alpha:=1
     If Debuginfo.Visible Then Page.Paint 0, GW - 74, 0, 64, 79, argb(50, 128, 128, 128)
     
