@@ -23,24 +23,24 @@ Public Sub Update()
 
     Dim m As Integer
     m = CheckMouse(GW - 60 - 19, 48, 36, 36)
-    If Page.ShowColorButton(1, GW - 60 - 19, 48, 36, 36, "×", IIf(m = 0, argb(255, 128, 128, 128), argb(255, 255, 255, 255)), argb(0, 254, 84, 57), argb(255, 254, 84, 57), Size:=18) = 2 Then
+    If Page.ShowColorButton(1, GW - 60 - 19, 48, 36, 36, "×", IIf(m = 0, argb(255, 128, 128, 128), argb(255, 255, 255, 255)), argb(0, 254, 84, 57), argb(255, 254, 84, 57), size:=18) = 2 Then
         Unload MainWindow
         End
     End If
 
     m = CheckMouse(GW - 120 - 19, 48, 36, 36)
-    If Page.ShowColorButton(1, GW - 120 - 19, 48, 36, 36, "-", IIf(m = 0, argb(255, 128, 128, 128), argb(255, 255, 255, 255)), argb(0, 128, 128, 128), argb(100, 128, 128, 128), Size:=18) = 2 Then
+    If Page.ShowColorButton(1, GW - 120 - 19, 48, 36, 36, "-", IIf(m = 0, argb(255, 128, 128, 128), argb(255, 255, 255, 255)), argb(0, 128, 128, 128), argb(100, 128, 128, 128), size:=18) = 2 Then
         MainWindow.WindowState = 1
-        Mouse.state = 0
+        Mouse.State = 0
     End If
     
     m = CheckMouse(0, 12, GW - 120, 30 + 16 / 0.75)
     If m >= 1 And Mouse.button = 1 Then
         ReleaseCapture
         SendMessageA MainWindow.Hwnd, WM_SYSCOMMAND, SC_MOVE Or HTCAPTION, 0
-        Mouse.state = 0
+        Mouse.State = 0
     End If
-    If m = 3 Then Mouse.state = 0
+    If m = 3 Then Mouse.State = 0
 End Sub
 Public Sub Wheel(Direction As Integer, Depth As Single)
     '鼠标滚轮事件
@@ -58,7 +58,7 @@ End Sub
 Public Sub Lostfocus()
     '窗口失去焦点事件
 End Sub
-Public Sub AnimationDone(ID As Integer)
+Public Sub AnimationDone(id As Integer)
     '动画播放结束事件
     'id：结束的动画ID
 End Sub

@@ -314,7 +314,7 @@ Public Property Get ResourceGIFCount(index As Integer) As Long
     ResourceGIFCount = Mems(index).GIF.Count
 End Property
 Public Property Get ResourceGIFTime(index As Integer) As Long
-    ResourceGIFTime = Mems(index).GIF.time
+    ResourceGIFTime = Mems(index).GIF.Time
 End Property
 Public Property Get ResourceName(index As Integer) As Long
     ResourceName = Mems(index).Name
@@ -364,6 +364,11 @@ Public Sub newImage(path As String, Optional arg1, Optional arg2, Optional Name 
     
     If si = 1 Then w = Round(w * arg1): h = Round(h * arg1)
     If si = 2 Then w = arg1: h = arg2
+    
+    If Scales <> 1 Then
+        w = w * Scales
+        h = h * Scales
+    End If
     
     Dim gC As clsid, gL As Long, index As Long, temp() As String, CrashPath As Long
     CLSIDFromString StrPtr("{6AEDBD6D-3FB5-418A-83A6-7F45229DC872}"), gC

@@ -602,9 +602,9 @@ Public Sub Update()
     Page.Clear argb(255, 255, 255, 255)
     
     If Cliped = 1 Then
-        GdipSetClipRect Page.GG, 38, 38, GW - 38 * 2, GH - 38 * 2, CombineModeReplace
+        GdipSetClipRect Page.GG, 38 * Scales, 38 * Scales, RGW - 38 * 2 * Scales, RGH - 38 * 2 * Scales, CombineModeReplace
         Dim Rgn As Long
-        Rgn = CreateRectRgn(38, 38, GW - 38, GH - 38)
+        Rgn = CreateRectRgn(38 * Scales, 38 * Scales, RGW - 38 * Scales, RGH - 38 * Scales)
         SelectClipRgn GCore.GDC, Rgn
         SelectClipRgn ECore.CDC, Rgn
         Cliped = 2

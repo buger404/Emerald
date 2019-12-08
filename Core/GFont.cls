@@ -15,7 +15,7 @@ Attribute VB_Exposed = False
 
 Private Declare Function AddFontResource Lib "gdi32" Alias "AddFontResourceA" (ByVal lpFileName As String) As Long
 Private Declare Function RemoveFontResource Lib "gdi32" Alias "RemoveFontResourceA" (ByVal lpFileName As String) As Long
-Dim brush As Long, fFile As String, fFam As Long, StrF(2) As Long, Font(8, 1 To 100) As Long
+Dim brush As Long, fFile As String, fFam As Long, StrF(2) As Long, Font(8, 1 To 1000) As Long
 Public EmHeight As Long
 '========================================================
 '   Init
@@ -46,7 +46,7 @@ Public EmHeight As Long
             PoolDeleteStringFormat StrF(I)
         Next
         For S = 0 To 8
-            For I = 1 To 100
+            For I = 1 To 1000
                 If Font(S, I) <> 0 Then PoolDeleteFont Font(S, I)
             Next
        Next

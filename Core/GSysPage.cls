@@ -13,7 +13,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 'Emerald 相关代码
 
-Public Page As GPage, index As Integer, Win As Object
+Public Page As GPage, Index As Integer, Win As Object
 Public BDC As Long
 Public Key As Integer
 Public OpenTime As Long, DoneMark As Boolean, DoneStep As Integer
@@ -21,9 +21,10 @@ Public DataPage As Integer
 Dim ChangeTime As Long, LastLoadPro As Single, LastLoadPro2 As Single
 Dim max2 As Long
 Dim LOGO As Long, bitmap As Long
+Dim PXPitch As Long
 Public Sub Update()
     Page.Clear
-    Select Case index
+    Select Case Index
         Case 0
         Call SaveDialog
         Case 1
@@ -32,7 +33,32 @@ Public Sub Update()
         Call SaveManDialog
         Case 4
         Call SuggestionDialog
+        Case 5
+        Call PageDialog
     End Select
+End Sub
+Public Sub PageDialog()
+    Page.Clear argb(0, 0, 0, 0)
+    Page.Paint 0, 0, GH - 100, RGW + 1, 101, argb(80, 0, 0, 0)
+    Dim i As Integer, Active As Boolean
+    Dim acI As Integer
+    For i = 1 To ECore.PageCount
+        If ECore.ActivePage = ECore.PageName(i) Then acI = i: Exit For
+    Next
+    
+    If IsKeyPress(VK_LEFT) Then PXPitch = PXPitch + 10
+    If IsKeyPress(VK_RIGHT) Then PXPitch = PXPitch - 10
+    
+    If PXPitch < 0 Then PXPitch = 0
+    If PXPitch > (ECore.PageCount - 1) * 170 Then PXPitch = (ECore.PageCount - 1) * 170
+    
+    For i = 1 To ECore.PageCount
+        Active = (acI = i)
+        Page.Paint 2, 30 + (i - 1) * 170 - PXPitch, GH - 73, 150, 40, IIf(Active, argb(255, 255, 84, 57), argb(180, 242, 242, 242)), 100
+        If CheckMouse2 = mMouseUp And (Not Active) Then ECore.NewTransform IIf(i >= acI, transDarkTo, transDarkReturn), , ECore.PageName(i)
+        If Not Active Then Page.Paint 2, 30 + (i - 1) * 170 - PXPitch, GH - 73, 150, 40, argb(255, 200, 200, 200), 100, style:=1
+        Page.Writes ECore.PageName(i), 30 + (i - 1) * 170 + 150 / 2 - PXPitch, GH - 66, 18, IIf(Active, argb(255, 255, 255, 255), argb(255, 32, 32, 32)), align:=StringAlignmentCenter
+    Next
 End Sub
 Public Sub SuggestionDialog()
     Page.Clear argb(0, 0, 0, 0)
@@ -40,18 +66,18 @@ Public Sub SuggestionDialog()
         If UBound(SGS) = 0 Then
             MsgBox "没有任何建议。", 48, "Emerald 建议中心"
         Else
-            Dim ret As String, sRet As String
-            ret = "共 " & UBound(SGS) & " 项建议。" & vbCrLf & vbCrLf
-            For I = 1 To UBound(SGS)
-                Select Case SGS(I).Deepth
+            Dim Ret As String, sRet As String
+            Ret = "共 " & UBound(SGS) & " 项建议。" & vbCrLf & vbCrLf
+            For i = 1 To UBound(SGS)
+                Select Case SGS(i).Deepth
                     Case 0: sRet = "(无关紧要)"
                     Case 1: sRet = "(需要留意)"
                     Case 2: sRet = "(*紧急)"
                     Case 3: sRet = "(*非常紧急*)"
                 End Select
-                ret = ret & sRet & "    " & SGS(I).Content & vbCrLf
+                Ret = Ret & sRet & "    " & SGS(i).Content & vbCrLf
             Next
-            MsgBox ret, 48, "Emerald 建议中心"
+            MsgBox Ret, 48, "Emerald 建议中心"
         End If
     End If
     If GetTickCount - SGTime <= 3000 And UBound(SGS) <> 0 Then
@@ -90,18 +116,18 @@ Public Sub SaveManDialog()
         ESave.PutData temp2, temp
     End If
 
-    Dim max As Long, I As Integer
+    Dim max As Long, i As Integer
     max = Int(GH * 0.5 / 30)
 
-    For I = DataPage + 1 To DataPage + max
-        If I > ESave.Count Then Exit For
-        Page.Paint 1, GW / 2 - GW * 0.3 + 20, 80 + 30 + (I - DataPage) * 30 + 2, 20, 20, argb(255, 0, 176, 240)
+    For i = DataPage + 1 To DataPage + max
+        If i > ESave.Count Then Exit For
+        Page.Paint 1, GW / 2 - GW * 0.3 + 20, 80 + 30 + (i - DataPage) * 30 + 2, 20, 20, argb(255, 0, 176, 240)
         If CheckMouse2 = mMouseUp Then
-            temp = InputBox("输入新的值：" & vbCrLf & ESave.GetName(I), "存档修改", ESave.GetData(ESave.GetName(I)))
-            ESave.PutData ESave.GetName(I), temp
+            temp = InputBox("输入新的值：" & vbCrLf & ESave.GetName(i), "存档修改", ESave.GetData(ESave.GetName(i)))
+            ESave.PutData ESave.GetName(i), temp
         End If
-        Page.Writes ESave.GetName(I), GW / 2 - GW * 0.3 + 50, 80 + 30 + (I - DataPage) * 30, 18, argb(150, 27, 27, 27), align:=StringAlignmentNear, style:=FontStyleBold
-        Page.Writes ESave.GetData(ESave.GetName(I)), GW / 2 + GW * 0.3 - 30, 80 + 30 + (I - DataPage) * 30, 18, argb(150, 27, 27, 27), align:=StringAlignmentFar
+        Page.Writes ESave.GetName(i), GW / 2 - GW * 0.3 + 50, 80 + 30 + (i - DataPage) * 30, 18, argb(150, 27, 27, 27), align:=StringAlignmentNear, style:=FontStyleBold
+        Page.Writes ESave.GetData(ESave.GetName(i)), GW / 2 + GW * 0.3 - 30, 80 + 30 + (i - DataPage) * 30, 18, argb(150, 27, 27, 27), align:=StringAlignmentFar
     Next
     
     Page.Writes (Int(DataPage / max) + 1) & " / " & (Int(ESave.Count / max) + 1), GW / 2, GH - 120, 16, argb(150, 27, 27, 27), align:=StringAlignmentCenter
@@ -137,7 +163,7 @@ Public Sub LOGODialog()
         GdipCreateTexture bitmap, WrapModeTile, LOGO
     End If
     
-    Dim Points() As POINTF, path As Long, brush As Long, y As Long
+    Dim Points() As POINTF, path As Long, brush As Long, Y As Long
     Dim pro As Single
     ReDim Points(1)
     
@@ -146,10 +172,10 @@ Public Sub LOGODialog()
     GdipCreatePath FillModeWinding, path
     GdipCreateSolidFill argb(255, 27, 27, 27), brush
     
-    y = GH / 2
+    Y = GH / 2
     
-    Points(0).X = 0: Points(0).y = 0
-    Points(1).X = 0: Points(1).y = y
+    Points(0).X = 0: Points(0).Y = 0
+    Points(1).X = 0: Points(1).Y = Y
     
     Dim Step As Long
     Step = Int(GW / 10)
@@ -158,13 +184,13 @@ Public Sub LOGODialog()
         ReDim Preserve Points(UBound(Points) + 1)
         With Points(UBound(Points))
             .X = X
-            .y = y + Sin(GetTickCount / 200 + X / 10) * (GH * 0.2 / 12)
+            .Y = Y + Sin(GetTickCount / 200 + X / 10) * (GH * 0.2 / 12)
         End With
     Next
     
     ReDim Preserve Points(UBound(Points) + 1)
-    Points(UBound(Points) - 1).X = GW: Points(UBound(Points) - 1).y = y
-    Points(UBound(Points)).X = GW: Points(UBound(Points)).y = 0
+    Points(UBound(Points) - 1).X = GW: Points(UBound(Points) - 1).Y = Y
+    Points(UBound(Points)).X = GW: Points(UBound(Points)).Y = 0
     
     GdipAddPathCurve path, Points(0), UBound(Points) + 1
     GdipFillPath Page.GG, brush, path

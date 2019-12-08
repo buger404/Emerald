@@ -39,7 +39,7 @@ Public TopPage As Boolean
         Set Res = New GResource
         
         GTick = 1000 / 30
-        CDC = CreateCDC(GW, GH)
+        CDC = CreateCDC(RGW, RGH)
         Res.Add CDC, 0, ""
         PoolCreateFromHdc CDC, GG
         GdipSetSmoothingMode GG, SmoothingModeAntiAlias
@@ -82,7 +82,7 @@ Public TopPage As Boolean
         If TopPage Then
             PaintDC CDC, DC, alpha:=1
         Else
-            BitBlt DC, 0, 0, GW, GH, CDC, 0, 0, vbSrcCopy
+            BitBlt DC, 0, 0, RGW, RGH, CDC, 0, 0, vbSrcCopy
         End If
     End Sub
 '========================================================
@@ -214,6 +214,12 @@ Public TopPage As Boolean
     Public Sub DrawImageEx(n, ByVal X As Single, ByVal y As Single, Optional w, Optional h, Optional pos As PosAlign = posNormal, Optional angle As Long = 0, Optional animation As Integer = 0)
         Dim index As Integer
         
+        If Scales <> 1 Then
+            X = X * Scales: y = y * Scales
+            If Not IsMissing(w) Then w = w * Scales
+            If Not IsMissing(h) Then h = h * Scales
+        End If
+        
         Dim OX As Single, OY As Single, ow As Long, oh As Long
         OX = X: OY = y: ow = w: oh = h
         
@@ -290,7 +296,13 @@ Public TopPage As Boolean
     End Sub
     Public Sub DrawImage(n, ByVal X As Long, ByVal y As Long, Optional cx, Optional cy, Optional cw, Optional ch, Optional alpha, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0, Optional Direction As ImgDirection = DirNormal)
         'If OutOfScroll Then Exit Sub
-        
+        If Scales <> 1 Then
+            X = X * Scales: y = y * Scales
+            If Not IsMissing(cx) Then cx = cx * Scales
+            If Not IsMissing(cy) Then cy = cy * Scales
+            If Not IsMissing(cw) Then cw = cw * Scales
+            If Not IsMissing(ch) Then ch = ch * Scales
+        End If
         Dim B As BLENDFUNCTION, index As Integer, bl As Long
         Dim OX As Long, OY As Long, ow As Long, oh As Long
         OX = X: OY = y: ow = w: oh = h
@@ -388,6 +400,13 @@ Public TopPage As Boolean
     Public Sub Writes(ByVal Text As String, ByVal X As Single, ByVal y As Single, Optional size As Long = 14, Optional Color As Long, Optional ByVal w As Single = 0, Optional ByVal h As Single = 0, Optional align As StringAlignment = StringAlignmentNear, Optional style As FontStyle = FontStyleRegular, Optional animation As Integer = 0)
         'If OutOfScroll Then Exit Sub
         
+        If Scales <> 1 Then
+            X = X * Scales: y = y * Scales
+            size = size * Scales
+            If Not IsMissing(w) Then w = w * Scales
+            If Not IsMissing(h) Then h = h * Scales
+        End If
+        
         Dim OX As Single, OY As Single
         OX = X: OY = y
         
@@ -440,6 +459,14 @@ Public TopPage As Boolean
 '========================================================
 '   Shape
     Public Sub PaintLine(ByVal X1 As Single, ByVal Y1 As Single, ByVal X2 As Single, ByVal Y2 As Single, Optional Color As Long, Optional size As Long = 1, Optional animation As Integer = 0)
+        
+        If Scales <> 1 Then
+            X1 = X1 * Scales: Y1 = Y1 * Scales
+            X2 = X2 * Scales
+            Y2 = Y2 * Scales
+            size = size * Scales
+        End If
+        
         If ScrollMode Then
             X = X + ScrollX + ScrollBX: y = y + ScrollY + ScrollBY
             Dim ret As Long
@@ -489,6 +516,13 @@ Public TopPage As Boolean
         'shape:0=rect,1=ellipse,2=rectr
         'style:0=fill,1=border
         'If OutOfScroll Then Exit Sub
+
+        If Scales <> 1 Then
+            X = X * Scales: y = y * Scales
+            w = w * Scales
+            h = h * Scales
+            size = size * Scales
+        End If
 
         Dim OX As Single, OY As Single, ow As Single, oh As Single
         OX = X: OY = y: ow = w: oh = h
@@ -582,6 +616,13 @@ ReShape:
     Public Sub PaintArc(ByVal X As Single, ByVal y As Single, ByVal w As Single, ByVal h As Single, degree As Single, Optional Start As Single = 0, Optional Color As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0)
         'style:0=fill,1=border,2=sector
 
+        If Scales <> 1 Then
+            X = X * Scales: y = y * Scales
+            w = w * Scales
+            h = h * Scales
+            size = size * Scales
+        End If
+
         Dim OX As Single, OY As Single, ow As Single, oh As Single
         OX = X: OY = y: ow = w: oh = h
         
@@ -654,6 +695,9 @@ ReShape:
         End If
     End Sub
     Public Sub PaintPolygon2(Color As Long, style As Integer, Points(), Optional SmoothMode As Boolean = False)
+        For I = 0 To UBound(Points)
+            Points(I) = Points(I) * Scales
+        Next
 
         GdipResetPath path
         Dim p() As POINTF
@@ -684,6 +728,9 @@ ReShape:
         End If
     End Sub
     Public Sub PaintPolygon(Color As Long, style As Integer, SmoothMode As Boolean, ParamArray Points())
+        For I = 0 To UBound(Points)
+            Points(I) = Points(I) * Scales
+        Next
 
         GdipResetPath path
         Dim p() As POINTF
@@ -756,7 +803,7 @@ ReShape:
     'Control
     Public Function ShowEdit(Text As String, Shape As Integer, X As Single, y As Single, w As Single, h As Single, TextColor As Long, Color As Long, HoverColor As Long, LineColor As Long, Optional Radius As Long = 0, Optional ShapeStyle As Integer = 0, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
         Dim m As Integer, r As RECT
-        
+
         m = CheckMouse(X, y, w - IIf(TextHandle = VarPtr(Text), h, 0), h)
         Paint Shape, X, y, w, h, IIf(m <> 0 Or TextHandle = VarPtr(Text), HoverColor, Color), Radius, style:=ShapeStyle
         If m = 3 Then TextHandle = VarPtr(Text)
@@ -834,6 +881,7 @@ ReShape:
         'argb(255, 242, 195, 17),argb(255, 240, 127, 34),argb(255, 232, 76, 61)
     End Sub
     Public Function ShowButton(pic As String, X As Long, y As Long, Text As String, Color As Long, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
+
         Dim w As Single, h As Single, I As Integer, m As Integer
         I = Res.GetImage(pic)
         w = Res.ImgSize(I, imgGetWidth): h = Res.ImgSize(I, imgGetHeight)
@@ -846,6 +894,7 @@ ReShape:
         ShowButton = m
     End Function
     Public Function ShowSimpleButton(pic As String, X As Long, y As Long, Text As String, Color As Long, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
+
         Dim w As Single, h As Single, I As Integer, m As Integer
         I = Res.GetImage(pic)
         w = Res.ImgSize(I, imgGetWidth): h = Res.ImgSize(I, imgGetHeight)
@@ -859,7 +908,7 @@ ReShape:
     End Function
     Public Function ShowColorButton(Shape As Integer, X As Single, y As Single, w As Single, h As Single, Text As String, TextColor As Long, Color As Long, HoverColor As Long, Optional Radius As Long = 0, Optional ShapeStyle As Integer = 0, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
         Dim m As Integer
-        
+
         m = CheckMouse(X, y, w, h)
         Paint Shape, X, y, w, h, IIf(m, HoverColor, Color), Radius, style:=ShapeStyle
         
@@ -868,6 +917,7 @@ ReShape:
         ShowColorButton = m
     End Function
     Public Function ShowCheckBox(value, pic As String, X As Long, y As Long, Text As String, Color As Long, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
+
         Dim w As Single, h As Single, I As Integer, m As Integer
         Dim X2 As Long, Y2 As Long
         X2 = X: Y2 = y
@@ -884,6 +934,7 @@ ReShape:
         ShowCheckBox = m
     End Function
     Public Function ShowColorCheckBox(value, X As Single, y As Single, w As Single, h As Single, Text As String, DefaultColor As Long, ChooseColor As Long, ForeColor As Long, Optional size As Long = 14, Optional style As FontStyle = FontStyleRegular) As Integer
+
         m = CheckMouse(X, y, w, h)
         
         Paint 1, X, y, h, h, IIf(value = True, ChooseColor, DefaultColor)
@@ -894,6 +945,7 @@ ReShape:
         ShowColorCheckBox = m
     End Function
     Public Function ShowSliderBar(value, pic As String, X As Long, y As Long) As Integer
+
         Dim w As Single, h As Single, I As Integer, m As Integer
         Dim X2 As Long, Y2 As Long
         
@@ -930,7 +982,7 @@ ReShape:
     End Function
     Public Function ShowVScrollBar(value, X As Single, y As Single, w As Single, h As Single, LineColor As Long, BallColor As Long, Optional size As Long = 2) As Integer
         Dim m As Integer
-        
+
         m = CheckMouse(X, y, w, h)
         PaintLine X + w / 2 - size / 2, y, X + w / 2 - size / 2, y + h, LineColor, size
         Paint 1, X, y + value * (h - w), w, w, BallColor
