@@ -46,7 +46,7 @@ End Sub
 Private Sub Form_Load()
     '≥ı ºªØEmerald
     StartEmerald Me.Hwnd, 991, 754
-    ScaleGame 0.7, ScaleDefault
+    'ScaleGame 0.7, ScaleDefault
     
     DebugSwitch.HideLOGO = 1
     DebugSwitch.DisableLOGO = 1
