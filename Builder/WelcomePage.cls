@@ -222,6 +222,7 @@ Public Sub UpdateProject()
     End If
     File = Dir(App.path & "\Core\")
     Do While File <> ""
+        If File = "Core.bas" Then GoTo NextFile
         '1=新增，2=更新，3=被修改
         Kind = IIf(IsExitAFile(OPath & "\Core\" & File), 2, 1)
         If Kind = 2 Then
@@ -274,6 +275,7 @@ Public Sub UpdateProject()
                 If .Name = "ResPool.bas" Then .Image = "cpu.png"
             End With
         End If
+NextFile:
         File = Dir()
     Loop
     

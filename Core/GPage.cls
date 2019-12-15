@@ -80,9 +80,9 @@ Public TopPage As Boolean
     End Sub
     Public Sub Display(DC As Long)
         If TopPage Then
-            PaintDC CDC, DC, alpha:=1
+            If Not ECore.FreezeAvailable Then PaintDC CDC, DC, alpha:=1
         Else
-            BitBlt DC, 0, 0, RGW, RGH, CDC, 0, 0, vbSrcCopy
+            If Not ECore.FreezeAvailable Then BitBlt DC, 0, 0, RGW, RGH, CDC, 0, 0, vbSrcCopy
         End If
     End Sub
 '========================================================
@@ -163,6 +163,8 @@ Public TopPage As Boolean
 '========================================================
 '   Images
     Public Sub DrawAnimation(playname As String, X As Long, y As Long, Optional Direction As ImgDirection = DirNormal)
+        If ECore.FreezeAvailable Then Exit Sub
+        
         Dim S As Integer, m As Integer, w As Long, h As Long, last As Boolean
         
         S = GetPlayAnimation(playname)
@@ -214,6 +216,8 @@ Public TopPage As Boolean
     Public Sub DrawImageEx(n, ByVal X As Single, ByVal y As Single, Optional w, Optional h, Optional pos As PosAlign = posNormal, Optional angle As Long = 0, Optional animation As Integer = 0)
         Dim index As Integer
         
+        If ECore.FreezeAvailable Then Exit Sub
+        
         If Scales <> 1 Then
             X = X * Scales: y = y * Scales
             If Not IsMissing(w) Then w = w * Scales
@@ -255,9 +259,9 @@ Public TopPage As Boolean
         
         If ScrollMode Then
             OX = OX + ScrollX + ScrollBX: OY = OY + ScrollY + ScrollBY
-            Dim ret As Long
-            GdipIsVisibleRect GG, OX - 1, OY - 1, ow, oh, ret
-            If Not ret Then OutOfScroll = True: Exit Sub
+            Dim Ret As Long
+            GdipIsVisibleRect GG, OX - 1, OY - 1, ow, oh, Ret
+            If Not Ret Then OutOfScroll = True: Exit Sub
         End If
         
         
@@ -295,6 +299,8 @@ Public TopPage As Boolean
         End If
     End Sub
     Public Sub DrawImage(n, ByVal X As Long, ByVal y As Long, Optional cx, Optional cy, Optional cw, Optional ch, Optional alpha, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0, Optional Direction As ImgDirection = DirNormal)
+        If ECore.FreezeAvailable Then Exit Sub
+        
         'If OutOfScroll Then Exit Sub
         If Scales <> 1 Then
             X = X * Scales: y = y * Scales
@@ -349,7 +355,7 @@ Public TopPage As Boolean
         
         If ScrollMode Then
             OX = OX + ScrollX + ScrollBX: OY = OY + ScrollY + ScrollBY
-            Dim ret As Long, Crect As RECT
+            Dim Ret As Long, Crect As RECT
             With Crect
                 .Left = OX: .top = OY: .Right = OX + ocw: .Bottom = OY + och
             End With
@@ -400,6 +406,8 @@ Public TopPage As Boolean
     Public Sub Writes(ByVal Text As String, ByVal X As Single, ByVal y As Single, Optional size As Long = 14, Optional Color As Long, Optional ByVal w As Single = 0, Optional ByVal h As Single = 0, Optional align As StringAlignment = StringAlignmentNear, Optional style As FontStyle = FontStyleRegular, Optional animation As Integer = 0)
         'If OutOfScroll Then Exit Sub
         
+        If ECore.FreezeAvailable Then Exit Sub
+        
         If Scales <> 1 Then
             X = X * Scales: y = y * Scales
             size = size * Scales
@@ -412,9 +420,9 @@ Public TopPage As Boolean
         
         If ScrollMode Then
             OX = OX + ScrollX + ScrollBX: OY = OY + ScrollY + ScrollBY
-            Dim ret As Long
-            GdipIsVisibleRect GG, OX, OY, w, h, ret
-            If ret = 0 Then OutOfScroll = True: Exit Sub
+            Dim Ret As Long
+            GdipIsVisibleRect GG, OX, OY, w, h, Ret
+            If Ret = 0 Then OutOfScroll = True: Exit Sub
         End If
         
         If animation <> 0 Then
@@ -460,6 +468,8 @@ Public TopPage As Boolean
 '   Shape
     Public Sub PaintLine(ByVal X1 As Single, ByVal Y1 As Single, ByVal X2 As Single, ByVal Y2 As Single, Optional Color As Long, Optional size As Long = 1, Optional animation As Integer = 0)
         
+        If ECore.FreezeAvailable Then Exit Sub
+        
         If Scales <> 1 Then
             X1 = X1 * Scales: Y1 = Y1 * Scales
             X2 = X2 * Scales
@@ -469,9 +479,9 @@ Public TopPage As Boolean
         
         If ScrollMode Then
             X = X + ScrollX + ScrollBX: y = y + ScrollY + ScrollBY
-            Dim ret As Long
-            GdipIsVisibleRect GG, IIf(X1 < X2, X1, X2), IIf(Y1 < Y2, Y1, Y2), IIf(X1 < X2, X2 - X1, X1 - X2), IIf(Y1 < Y2, Y2 - Y1, Y1 - Y2), ret
-            If Not ret Then OutOfScroll = True: Exit Sub
+            Dim Ret As Long
+            GdipIsVisibleRect GG, IIf(X1 < X2, X1, X2), IIf(Y1 < Y2, Y1, Y2), IIf(X1 < X2, X2 - X1, X1 - X2), IIf(Y1 < Y2, Y2 - Y1, Y1 - Y2), Ret
+            If Not Ret Then OutOfScroll = True: Exit Sub
         End If
         
         If animation <> 0 Then
@@ -517,6 +527,8 @@ Public TopPage As Boolean
         'style:0=fill,1=border
         'If OutOfScroll Then Exit Sub
 
+        If ECore.FreezeAvailable Then Exit Sub
+
         If Scales <> 1 Then
             X = X * Scales: y = y * Scales
             w = w * Scales
@@ -529,9 +541,9 @@ Public TopPage As Boolean
         
         If ScrollMode Then
             OX = OX + ScrollX + ScrollBX: OY = OY + ScrollY + ScrollBY
-            Dim ret As Long
-            GdipIsVisibleRect GG, OX - 1, OY - 1, ow, oh, ret
-            If Not ret Then OutOfScroll = True: Exit Sub
+            Dim Ret As Long
+            GdipIsVisibleRect GG, OX - 1, OY - 1, ow, oh, Ret
+            If Not Ret Then OutOfScroll = True: Exit Sub
         End If
         
         If animation <> 0 Then
@@ -616,6 +628,8 @@ ReShape:
     Public Sub PaintArc(ByVal X As Single, ByVal y As Single, ByVal w As Single, ByVal h As Single, degree As Single, Optional Start As Single = 0, Optional Color As Long, Optional size As Long = 1, Optional style As Integer = 0, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0)
         'style:0=fill,1=border,2=sector
 
+        If ECore.FreezeAvailable Then Exit Sub
+
         If Scales <> 1 Then
             X = X * Scales: y = y * Scales
             w = w * Scales
@@ -628,9 +642,9 @@ ReShape:
         
         If ScrollMode Then
             OX = OX + ScrollX + ScrollBX: OY = OY + ScrollY + ScrollBY
-            Dim ret As Long
-            GdipIsVisibleRect GG, OX - 1, OY - 1, ow, oh, ret
-            If Not ret Then OutOfScroll = True: Exit Sub
+            Dim Ret As Long
+            GdipIsVisibleRect GG, OX - 1, OY - 1, ow, oh, Ret
+            If Not Ret Then OutOfScroll = True: Exit Sub
         End If
         
         If animation <> 0 Then
@@ -695,6 +709,9 @@ ReShape:
         End If
     End Sub
     Public Sub PaintPolygon2(Color As Long, style As Integer, Points(), Optional SmoothMode As Boolean = False)
+    
+        If ECore.FreezeAvailable Then Exit Sub
+        
         For I = 0 To UBound(Points)
             Points(I) = Points(I) * Scales
         Next
@@ -728,6 +745,9 @@ ReShape:
         End If
     End Sub
     Public Sub PaintPolygon(Color As Long, style As Integer, SmoothMode As Boolean, ParamArray Points())
+        
+        If ECore.FreezeAvailable Then Exit Sub
+     
         For I = 0 To UBound(Points)
             Points(I) = Points(I) * Scales
         Next

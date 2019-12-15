@@ -77,8 +77,8 @@ Public Sub DrawPage3()
         If Page.ShowColorButton(2, GW / 2 - 70, GH - 170, 140, 40, "OK", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18, style:=FontStyleBold) = 3 Then
             If CopyModel Then
                 If Dir(VBIDEPath & "Template", vbDirectory) = "" Then MkDir VBIDEPath & "Template"
-                FileCopy App.Path & "\Example\Emerald Window.frm", VBIDEPath & "Template\Forms\Emerald Window.frm"
-                FileCopy App.Path & "\Example\Emerald Page.cls", VBIDEPath & "Template\Classes\Emerald Page.cls"
+                FileCopy App.path & "\Example\Emerald Window.frm", VBIDEPath & "Template\Forms\Emerald Window.frm"
+                FileCopy App.path & "\Example\Emerald Page.cls", VBIDEPath & "Template\Classes\Emerald Page.cls"
             End If
             If CreateContentMenu Then OperContentMenu False
             ESave.PutData "Emerald 2.0", "√"
@@ -135,7 +135,7 @@ Public Sub DrawPage5()
         If Dir(OPath & "\music", vbDirectory) = "" Then MkDir OPath & "\music"
         
         Dim t As String, f As String
-        Open App.Path & "\Example\example.vbp" For Input As #1
+        Open App.path & "\Example\example.vbp" For Input As #1
         Do While Not EOF(1)
         Line Input #1, t
         f = f & t & vbCrLf
@@ -151,8 +151,8 @@ Public Sub DrawPage5()
         f = Replace(f, "{maker}", EmrPC.Maker)
         f = Replace(f, "{include}", IIf(InitWindow, "Form=Code\GameWindow.frm" & vbCrLf, "") & IIf(InitPage, "Class=GamePage; Code\GamePage.cls" & vbCrLf, ""))
         
-        If InitWindow Then FileCopy App.Path & "\Example\Emerald Window.frm", OPath & "\code\GameWindow.frm"
-        If InitPage Then FileCopy App.Path & "\Example\Emerald Page.cls", OPath & "\code\GamePage.cls"
+        If InitWindow Then FileCopy App.path & "\Example\Emerald Window.frm", OPath & "\code\GameWindow.frm"
+        If InitPage Then FileCopy App.path & "\Example\Emerald Page.cls", OPath & "\code\GamePage.cls"
         
         Open OPath & "\" & ProjectName & ".vbp" For Output As #1
         Print #1, f
@@ -163,9 +163,9 @@ Public Sub DrawPage5()
         Print #1, ".emr/*"
         Close #1
         
-        CopyInto App.Path & "\core", OPath & "\core"
-        CopyInto App.Path & "\assets\debug", OPath & "\assets\debug"
-        CopyInto App.Path & "\framework", OPath
+        CopyInto App.path & "\core", OPath & "\core"
+        CopyInto App.path & "\assets\debug", OPath & "\assets\debug"
+        CopyInto App.path & "\framework", OPath
         
         Open OPath & "\.emerald" For Binary As #1
         Put #1, , EmrPC
@@ -216,7 +216,7 @@ Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
     '导入游戏资源
-    If PackPos = -1 Then Page.Res.NewImages App.Path & "\assets"
+    If PackPos = -1 Then Page.Res.NewImages App.path & "\assets"
     '创建页面
     ECore.Add Page, "ToNewPage"
     

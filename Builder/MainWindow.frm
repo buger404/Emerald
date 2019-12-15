@@ -46,8 +46,8 @@ End Sub
 Private Sub Form_Load()
     '初始化Emerald
     StartEmerald Me.Hwnd, 991, 754
-    ScaleGame 0.7, ScaleDefault
-    
+    'ScaleGame 0.7, ScaleDefault
+
     DebugSwitch.HideLOGO = 1
     DebugSwitch.DisableLOGO = 1
     
@@ -82,6 +82,8 @@ Private Sub Form_Load()
     Else
         Set SetupPage = New SetupPage
     End If
+
+    ECore.FreezeMode = True
 
     '设置活动页面
     If PackPos = -1 Then EC.ActivePage = "WelcomePage"

@@ -97,10 +97,10 @@ ErrHandler2:
         SetupInfo = "正在准备 ..."
         Step = 2
         ECore.NewTransform transDarkTo, 1000
-        Dim ret As String
-        ret = SetupPack
-        If ret <> "" Then
-            MsgBox "安装失败，请联系开发者，以下是错误信息：" & vbCrLf & ret, 16, MainWindow.Caption
+        Dim Ret As String
+        Ret = SetupPack
+        If Ret <> "" Then
+            MsgBox "安装失败，请联系开发者，以下是错误信息：" & vbCrLf & Ret, 16, MainWindow.Caption
         End If
         ECore.NewTransform transDarkTo, 1000
         Step = 3

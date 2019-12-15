@@ -5,7 +5,7 @@ Attribute VB_Name = "GCore"
 '=========================================================================
     Private Declare Sub AlphaBlend Lib "msimg32.dll" (ByVal hdcDest As Long, ByVal nXOriginDest As Long, ByVal nYOriginDest As Long, ByVal nWidthDest As Long, ByVal hHeightDest As Long, ByVal hdcSrc As Long, ByVal nXOriginSrc As Long, ByVal nYOriginSrc As Long, ByVal nWidthSrc As Long, ByVal nHeightSrc As Long, ByVal BLENDFUNCTION As Long) ' As Long
     Public Type MState
-        state As Integer
+        State As Integer
         button As Integer
         X As Single
         y As Single
@@ -52,7 +52,7 @@ Attribute VB_Name = "GCore"
         transDarkReturn = 13
     End Enum
     Public Type GGIF
-        time As Long
+        Time As Long
         frames() As Long
         tick As Long
         Count As Long
@@ -72,7 +72,7 @@ Attribute VB_Name = "GCore"
     End Type
     Public Type AssetsTree
         Files() As GMem
-        Path As String
+        path As String
         arg1 As Variant
         arg2 As Variant
     End Type
@@ -104,7 +104,7 @@ Attribute VB_Name = "GCore"
     Public Type Suggestion
         Content As String
         Deepth As Long
-        time As Long
+        Time As Long
         ClearTime As SuggestClearTime
     End Type
     Public Enum EScalePolicy
@@ -123,7 +123,7 @@ Attribute VB_Name = "GCore"
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
-    Public Const Version As Long = 19120802      'fine
+    Public Const Version As Long = 19121501      'okay
     Public TextHandle As Long, WaitChr As String
     Public XPMode As Boolean
     Public Scales As Single
@@ -153,39 +153,39 @@ Attribute VB_Name = "GCore"
         ReadINI = strBuf
     End Function
     Public Sub OutPutDebug(Str As String)
-        Open App.Path & "\debug.txt" For Append As #1
+        Open App.path & "\debug.txt" For Append As #1
         Print #1, Now & "    " & Str
         Close #1
     End Sub
 '================================================================================
 '   Init
-    Public Sub SaveSettings(data As GSaving)
-        data.PutData "DebugMode", DebugMode
-        data.PutData "DisableLOGO", DisableLOGO
-        data.PutData "HideLOGO", HideLOGO
-        data.PutData "UpdateCheckInterval", UpdateCheckInterval
-        data.PutData "UpdateTimeOut", UpdateTimeOut
+    Public Sub SaveSettings(Data As GSaving)
+        Data.PutData "DebugMode", DebugMode
+        Data.PutData "DisableLOGO", DisableLOGO
+        Data.PutData "HideLOGO", HideLOGO
+        Data.PutData "UpdateCheckInterval", UpdateCheckInterval
+        Data.PutData "UpdateTimeOut", UpdateTimeOut
     End Sub
     Public Sub GetSettings(Optional SkipDebug As Boolean = False)
         If App.LogMode <> 0 And SkipDebug = False Then Exit Sub
     
-        Dim data As New GSaving
-        data.Create "Emerald.Core"
-        data.AutoSave = True
+        Dim Data As New GSaving
+        Data.Create "Emerald.Core"
+        Data.AutoSave = True
         
-        If data.GetData("DebugMode") = "" Then
+        If Data.GetData("DebugMode") = "" Then
             UpdateCheckInterval = 1
             UpdateTimeOut = 2000
-            Call SaveSettings(data)
+            Call SaveSettings(Data)
         End If
         
-        DebugSwitch.DebugMode = Val(data.GetData("DebugMode"))
-        DebugSwitch.DisableLOGO = Val(data.GetData("DisableLOGO"))
-        DebugSwitch.HideLOGO = Val(data.GetData("HideLOGO"))
-        DebugSwitch.UpdateCheckInterval = Val(data.GetData("UpdateCheckInterval"))
-        DebugSwitch.UpdateTimeOut = Val(data.GetData("UpdateTimeOut"))
+        DebugSwitch.DebugMode = Val(Data.GetData("DebugMode"))
+        DebugSwitch.DisableLOGO = Val(Data.GetData("DisableLOGO"))
+        DebugSwitch.HideLOGO = Val(Data.GetData("HideLOGO"))
+        DebugSwitch.UpdateCheckInterval = Val(Data.GetData("UpdateCheckInterval"))
+        DebugSwitch.UpdateTimeOut = Val(Data.GetData("UpdateTimeOut"))
         
-        Set data = Nothing
+        Set Data = Nothing
     End Sub
     Public Sub ScaleGame(ByVal Percent As Single, ScaleMode As EScalePolicy)
         Select Case ScaleMode
@@ -209,7 +209,7 @@ Attribute VB_Name = "GCore"
         ReleaseDC GHwnd, GDC
         GDC = GetDC(GHwnd)
     End Sub
-    Public Sub StartEmerald(Hwnd As Long, w As Long, h As Long)
+    Public Sub StartEmerald(Hwnd As Long, w As Long, h As Long, Optional DPIPolicy As Boolean = True)
         Scales = 1
     
         ReDim ColorLists(0)
@@ -258,7 +258,9 @@ Attribute VB_Name = "GCore"
         Set SysPage = New GSysPage
         
         If Val(GetWinNTVersion) > 6.1 Then               '如果当前系统版本高于win7
-            SetProcessDpiAwareness 2&                    '调用API使本程序在高DPI情况下不模糊
+            If DPIPolicy Then
+                SetProcessDpiAwareness 2&                '调用API使本程序在高DPI情况下不模糊
+            End If
         End If
         
         If DebugMode Then
@@ -277,7 +279,7 @@ Attribute VB_Name = "GCore"
         With SGS(UBound(SGS))
             .Content = Text
             .ClearTime = Clears
-            .time = GetTickCount
+            .Time = GetTickCount
             .Deepth = Deepth
         End With
         SGTime = GetTickCount
@@ -302,8 +304,8 @@ Attribute VB_Name = "GCore"
     End Sub
 '========================================================
 '   RunTime
-    Public Function ToTime(time) As String
-        ToTime = Int(time / 60) & ":" & format(time Mod 60, "00")
+    Public Function ToTime(Time) As String
+        ToTime = Int(Time / 60) & ":" & format(Time Mod 60, "00")
     End Function
     Public Function Process(ByVal Hwnd As Long, ByVal uMsg As Long, ByVal wParam As Long, ByVal lParam As Long) As Long
         On Error GoTo sth
@@ -335,7 +337,7 @@ sth:
     Public Sub BlurTo(DC As Long, srcDC As Long, buffWin As Form, Optional Radius As Long = 60)
         If XPMode Then BitBlt DC, 0, 0, GW, GH, srcDC, 0, 0, vbSrcCopy: Exit Sub
         
-        Dim I As Long, G As Long, e As Long, b As BlurParams, w As Long, h As Long
+        Dim I As Long, g As Long, e As Long, B As BlurParams, w As Long, h As Long
         '粘贴到缓冲窗口
         buffWin.AutoRedraw = True
         BitBlt buffWin.hdc, 0, 0, GW, GH, srcDC, 0, 0, vbSrcCopy: buffWin.Refresh
@@ -344,24 +346,24 @@ sth:
         GdipCreateBitmapFromHBITMAP buffWin.Image.handle, buffWin.Image.hpal, I
         
         '模糊操作
-        PoolCreateEffect2 GdipEffectType.Blur, e: b.Radius = Radius: GdipSetEffectParameters e, b, LenB(b)
+        PoolCreateEffect2 GdipEffectType.Blur, e: B.Radius = Radius: GdipSetEffectParameters e, B, LenB(B)
         GdipGetImageWidth I, w: GdipGetImageHeight I, h
         GdipBitmapApplyEffect I, e, NewRectL(0, 0, w, h), 0, 0, 0
         
         '画~
-        PoolCreateFromHdc DC, G
-        GdipDrawImage G, I, 0, 0
-        PoolDisposeImage I: PoolDeleteGraphics G: PoolDeleteEffect e '垃圾处理
+        PoolCreateFromHdc DC, g
+        GdipDrawImage g, I, 0, 0
+        PoolDisposeImage I: PoolDeleteGraphics g: PoolDeleteEffect e '垃圾处理
         buffWin.AutoRedraw = False
     End Sub
     Public Sub BlurImg(img As Long, Radius As Long)
         If XPMode Then Exit Sub
     
-        Dim b As BlurParams, e As Long, w As Long, h As Long
+        Dim B As BlurParams, e As Long, w As Long, h As Long
         
         '模糊操作
         
-        PoolCreateEffect2 GdipEffectType.Blur, e: b.Radius = Radius: GdipSetEffectParameters e, b, LenB(b)
+        PoolCreateEffect2 GdipEffectType.Blur, e: B.Radius = Radius: GdipSetEffectParameters e, B, LenB(B)
         GdipGetImageWidth img, w: GdipGetImageHeight img, h
         GdipBitmapApplyEffect img, e, NewRectL(0, 0, w, h), 0, 0, 0
         
@@ -369,18 +371,18 @@ sth:
         PoolDeleteEffect e '垃圾处理
     End Sub
     Public Sub PaintDC(DC As Long, destDC As Long, Optional X As Long = 0, Optional y As Long = 0, Optional cx As Long = 0, Optional cy As Long = 0, Optional cw, Optional ch, Optional alpha)
-        Dim b As BLENDFUNCTION, index As Integer, bl As Long
+        Dim B As BLENDFUNCTION, index As Integer, bl As Long
         
         If Not IsMissing(alpha) Then
             If alpha < 0 Then alpha = 0
             If alpha > 1 Then alpha = 1
-            With b
+            With B
                 .AlphaFormat = &H1
                 .BlendFlags = &H0
                 .BlendOp = 0
                 .SourceConstantAlpha = Int(alpha * 255)
             End With
-            CopyMemory bl, b, 4
+            CopyMemory bl, B, 4
         End If
         
         If IsMissing(cw) Then cw = RGW - cx
@@ -399,11 +401,11 @@ sth:
     End Function
 '========================================================
 '   Mouse
-    Public Sub UpdateMouse(X As Single, y As Single, state As Long, button As Integer)
+    Public Sub UpdateMouse(X As Single, y As Single, State As Long, button As Integer)
         With Mouse
             .X = X
             .y = y
-            .state = state
+            .State = State
             .button = button
         End With
     End Sub
@@ -422,15 +424,16 @@ sth:
             If ECore.LockPage <> ECore.UpdatingPage Then Exit Function
         End If
         If Mouse.X >= X And Mouse.y >= y And Mouse.X <= X + w And Mouse.y <= y + h Then
+            If ECore.FreezeMode Then ECore.FreezeResetBegin = True
             If Debug_mouse Then
                 GdipSetSolidFillColor ECore.pB, argb(255, 27, 27, 27)
                 GdipFillEllipse ECore.UPage.GG, ECore.pB, X - 10, y - 10, 20, 20
                 GdipSetSolidFillColor ECore.pB, argb(80, 255, 0, 0)
                 GdipFillRectangle ECore.UPage.GG, ECore.pB, X, y, w, h
-                EF.Writes Mouse.state + 1, X - 10, y - 7, ECore.UPage.GG, argb(255, 255, 255, 255), 14, 20, 0, StringAlignmentCenter, FontStyleBold
+                EF.Writes Mouse.State + 1, X - 10, y - 7, ECore.UPage.GG, argb(255, 255, 255, 255), 14, 20, 0, StringAlignmentCenter, FontStyleBold
             End If
-            CheckMouse = Mouse.state + 1
-            If Mouse.state = 2 Then Mouse.state = 0
+            CheckMouse = Mouse.State + 1
+            If Mouse.State = 2 Then Mouse.State = 0
         End If
     End Function
     Public Function CheckMouse2() As MButtonState
@@ -443,18 +446,19 @@ sth:
             If ECore.LockPage <> ECore.UpdatingPage Then Exit Function
         End If
         If Mouse.X >= DrawF.X And Mouse.y >= DrawF.y And Mouse.X <= DrawF.X + DrawF.Width And Mouse.y <= DrawF.y + DrawF.Height Then
+            If ECore.FreezeMode Then ECore.FreezeResetBegin = True
             If Debug_mouse Then
                 GdipSetSolidFillColor ECore.pB, argb(255, 27, 27, 27)
                 GdipFillEllipse ECore.UPage.GG, ECore.pB, DrawF.X - 10, DrawF.y - 10, 20, 20
                 GdipSetSolidFillColor ECore.pB, argb(80, 0, 0, 255)
                 GdipFillRectangle ECore.UPage.GG, ECore.pB, DrawF.X, DrawF.y, DrawF.Width, DrawF.Height
-                EF.Writes Mouse.state + 1, DrawF.X - 10, DrawF.y - 7, ECore.UPage.GG, argb(255, 255, 255, 255), 14, 20, 0, StringAlignmentCenter, FontStyleBold
+                EF.Writes Mouse.State + 1, DrawF.X - 10, DrawF.y - 7, ECore.UPage.GG, argb(255, 255, 255, 255), 14, 20, 0, StringAlignmentCenter, FontStyleBold
             End If
-            CheckMouse2 = Mouse.state + 1
+            CheckMouse2 = Mouse.State + 1
             If DrawF.CrashIndex <> 0 Then
                 If ColorLists(DrawF.CrashIndex).IsAlpha((Mouse.X - DrawF.X) * DrawF.WSc, (Mouse.y - DrawF.y) * DrawF.HSc) = False Then CheckMouse2 = mMouseOut: Exit Function
             End If
-            If Mouse.state = 2 Then Mouse.state = 0
+            If Mouse.State = 2 Then Mouse.State = 0
         End If
     End Function
 '========================================================
@@ -488,11 +492,11 @@ sth:
             Exit Sub
         End If
         
-        Dim data As New GSaving
-        data.Create "Emerald.Core"
-        data.AutoSave = True
-        If Now - CDate(data.GetData("UpdateTime")) >= UpdateCheckInterval Or data.GetData("UpdateAble") = 1 Then
-            data.PutData "UpdateTime", Now
+        Dim Data As New GSaving
+        Data.Create "Emerald.Core"
+        Data.AutoSave = True
+        If Now - CDate(Data.GetData("UpdateTime")) >= UpdateCheckInterval Or Data.GetData("UpdateAble") = 1 Then
+            Data.PutData "UpdateTime", Now
             
             Dim xmlHttp As Object, Ret As String, Start As Long
             Set xmlHttp = PoolCreateObject("Microsoft.XMLHTTP")
@@ -512,17 +516,17 @@ sth:
             Debug.Print Now, "Emerald：检查版本完毕，最新版本号 " & Val(Ret)
             
             If Val(Ret) > Version And App.LogMode = 0 Then
-                data.PutData "UpdateAble", 1
+                Data.PutData "UpdateAble", 1
                 If MsgBox("发现Emerald存在新版本，您希望现在前往下载吗？", vbYesNo + 48, "Emerald") = vbNo Then Exit Sub
                 
                 ShellExecuteA 0, "open", "https://github.com/Red-Error404/Emerald/release", "", "", SW_SHOW
-                data.PutData "UpdateAble", 0
+                Data.PutData "UpdateAble", 0
             End If
         Else
-            Debug.Print Now, "Emerald：上次检查更新时间 " & CDate(data.GetData("UpdateTime"))
+            Debug.Print Now, "Emerald：上次检查更新时间 " & CDate(Data.GetData("UpdateTime"))
         End If
         
-        Set data = Nothing
+        Set Data = Nothing
         Err.Clear
     End Sub
 '========================================================
@@ -533,10 +537,10 @@ sth:
         AssetsTrees(UBound(AssetsTrees)).arg1 = arg1
         AssetsTrees(UBound(AssetsTrees)).arg2 = arg2
     End Function
-    Public Function FindAssetsTree(Path As String, arg1 As Variant, arg2 As Variant) As Integer
+    Public Function FindAssetsTree(path As String, arg1 As Variant, arg2 As Variant) As Integer
         On Error Resume Next
         For I = 1 To UBound(AssetsTrees)
-            If AssetsTrees(I).Path = Path And AssetsTrees(I).arg1 = arg1 And AssetsTrees(I).arg2 = arg2 Then
+            If AssetsTrees(I).path = path And AssetsTrees(I).arg1 = arg1 And AssetsTrees(I).arg2 = arg2 Then
                 If Err.Number <> 0 Then
                     Err.Clear
                 Else
@@ -545,9 +549,9 @@ sth:
             End If
         Next
     End Function
-    Public Function GetAssetsTree(Path As String) As AssetsTree
+    Public Function GetAssetsTree(path As String) As AssetsTree
         For I = 1 To UBound(AssetsTrees)
-            If AssetsTrees(I).Path = Path Then GetAssetsTree = AssetsTrees(I): Exit For
+            If AssetsTrees(I).path = path Then GetAssetsTree = AssetsTrees(I): Exit For
         Next
     End Function
 '========================================================

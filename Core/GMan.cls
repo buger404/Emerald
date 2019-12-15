@@ -29,22 +29,33 @@ Dim FirstPlay As Boolean
 Public CDC As Long, ODC As Long, FDC As Long, GG As Long, pB As Long, Pen As Long
 Public LastPage As String
 Public UpdatingPage As String, LockPage As String, UPage As GPage
+Public FreezeMode As Boolean, FreezeDelay As Long, FreezeResetBegin As Boolean
 Public FancyDeepth As Single
 Dim FMode As Boolean
 Dim CurrentPage As Integer
 Dim IsLayered As Boolean
 Dim ErrorMark As Boolean, ErrorMark2 As Boolean
 Dim F11KEYPress As Boolean, PageMode As Boolean
-'========================================================
+Dim FreezeTime As Long
+'=======================================================
 '   Init
+    Public Sub FreezeReset()
+        FreezeTime = GetTickCount
+    End Sub
+    Public Property Get FreezeAvailable() As Boolean
+        Dim Ret As Boolean
+        Ret = False
+        If FreezeMode Then Ret = (GetTickCount - FreezeTime >= FreezeDelay)
+        FreezeAvailable = Ret
+    End Property
     Public Property Get PageCount() As Long
         PageCount = UBound(Pages)
     End Property
-    Public Property Get PageName(Index As Integer) As String
-        PageName = Pages(Index).Name
+    Public Property Get PageName(index As Integer) As String
+        PageName = Pages(index).Name
     End Property
-    Public Property Get PageController(Index As Integer) As GPage
-        Set PageController = Pages(Index).p
+    Public Property Get PageController(index As Integer) As GPage
+        Set PageController = Pages(index).p
     End Property
     Public Property Get FancyMode() As Boolean
         FancyMode = FMode
@@ -65,6 +76,8 @@ Dim F11KEYPress As Boolean, PageMode As Boolean
         PoolCreateSolidFill argb(255, 255, 255, 255), pB
         PoolCreatePen1 argb(255, 255, 255, 255), 1, UnitPixel, Pen
         FancyDeepth = 0.3
+        FreezeDelay = 3000
+        Call FreezeReset
     End Sub
     Public Sub Layered(Optional WithAero As Boolean = False)
         SetWindowLongA GHwnd, GWL_EXSTYLE, GetWindowLongA(GHwnd, GWL_EXSTYLE) Or WS_EX_LAYERED
@@ -75,8 +88,8 @@ Dim F11KEYPress As Boolean, PageMode As Boolean
         PoolDeleteGraphics GG
         PoolDeleteBrush pB
         PoolDeletePen Pen
-        For i = 1 To UBound(Pages)
-            Pages(i).p.Dispose
+        For I = 1 To UBound(Pages)
+            Pages(I).p.Dispose
         Next
         'DeleteObject CDC
         'DeleteObject ODC
@@ -95,14 +108,14 @@ Dim F11KEYPress As Boolean, PageMode As Boolean
     End Property
     Public Property Let ActivePage(nPage As String)
         LastPage = mPage
-        For i = 1 To UBound(Pages)
-            If mPage = Pages(i).Name Then CallByName Pages(i).p.SrcClass, "Leave", VbMethod: Exit For
+        For I = 1 To UBound(Pages)
+            If mPage = Pages(I).Name Then CallByName Pages(I).p.SrcClass, "Leave", VbMethod: Exit For
         Next
         mPage = nPage
-        For i = 1 To UBound(Pages)
-            If nPage = Pages(i).Name Then
-                CallByName Pages(i).p.SrcClass, "Enter", VbMethod
-                Set aPage = Pages(i).p.SrcClass
+        For I = 1 To UBound(Pages)
+            If nPage = Pages(I).Name Then
+                CallByName Pages(I).p.SrcClass, "Enter", VbMethod
+                Set aPage = Pages(I).p.SrcClass
                 Exit For
             End If
         Next
@@ -121,7 +134,7 @@ Dim F11KEYPress As Boolean, PageMode As Boolean
         
         If ECore Is Me Then
             If (Not FirstPlay) Then
-                FirstPlay = True: SysPage.OpenTime = GetTickCount: SysPage.Index = 1
+                FirstPlay = True: SysPage.OpenTime = GetTickCount: SysPage.index = 1
                 Call NewTransform
             End If
             If (Not SysPage.DoneMark) Then
@@ -132,22 +145,22 @@ Dim F11KEYPress As Boolean, PageMode As Boolean
             End If
         End If
 
-        For i = 1 To UBound(Pages)
-            CurrentPage = i
-            If ActivePage = Pages(i).Name Or (Pages(i).p.TopPage And (Not ErrorMark)) Then
-                UpdatingPage = Pages(i).Name
-                Set UPage = Pages(i).p
-                Pages(i).p.Update
-                Pages(i).p.Display (CDC)
-                If Pages(i).Name = "ErrorScreen" Then ErrorMark2 = True
+        For I = 1 To UBound(Pages)
+            CurrentPage = I
+            If ActivePage = Pages(I).Name Or (Pages(I).p.TopPage And (Not ErrorMark)) Then
+                UpdatingPage = Pages(I).Name
+                Set UPage = Pages(I).p
+                Pages(I).p.Update
+                Pages(I).p.Display (CDC)
+                If Pages(I).Name = "ErrorScreen" Then ErrorMark2 = True
                 played = True
                 o = (GetActiveWindow = 0)
                 If o <> OutOfWindow Then
                     OutOfWindow = o
                     If OutOfWindow Then
-                        CallByName Pages(i).p.SrcClass, "Lostfocus", VbMethod
+                        CallByName Pages(I).p.SrcClass, "Lostfocus", VbMethod
                     Else
-                        CallByName Pages(i).p.SrcClass, "Gotfocus", VbMethod
+                        CallByName Pages(I).p.SrcClass, "Gotfocus", VbMethod
                     End If
                 End If
             End If
@@ -170,25 +183,25 @@ skipPage:
         
         If App.LogMode = 0 Then
             Dim SOrIndex As Integer
-            SOrIndex = SysPage.Index
-            SysPage.Index = 4
+            SOrIndex = SysPage.index
+            SysPage.index = 4
             SysPage.Page.Update
             SysPage.Page.Display (CDC)
-            SysPage.Index = SOrIndex
+            SysPage.index = SOrIndex
             
             If PageMode Then
-                SysPage.Index = 5
+                SysPage.index = 5
                 SysPage.Page.Update
                 SysPage.Page.Display (CDC)
-                SysPage.Index = SOrIndex
+                SysPage.index = SOrIndex
             End If
-            For i = 1 To UBound(SGS)
-                If i > UBound(SGS) Then Exit For
-                If SGS(i).ClearTime = ClearOnUpdate Then GoTo ClearSGS
-                If SGS(i).ClearTime = ClearOnOnce And GetTickCount - SGS(i).Time >= 1000 Then GoTo ClearSGS
+            For I = 1 To UBound(SGS)
+                If I > UBound(SGS) Then Exit For
+                If SGS(I).ClearTime = ClearOnUpdate Then GoTo ClearSGS
+                If SGS(I).ClearTime = ClearOnOnce And GetTickCount - SGS(I).Time >= 1000 Then GoTo ClearSGS
                 GoTo NoClear
 ClearSGS:
-                SGS(i) = SGS(UBound(SGS)): ReDim Preserve SGS(UBound(SGS) - 1): i = i - 1
+                SGS(I) = SGS(UBound(SGS)): ReDim Preserve SGS(UBound(SGS) - 1): I = I - 1
 NoClear:
             Next
             
@@ -219,8 +232,9 @@ NoClear:
         End If
         tFPS = tFPS + 1: FPSctt = FPSctt + (Timer * 1000 - t)
         
-        If Mouse.state = 2 Then Mouse.state = 0
+        If Mouse.State = 2 Then Mouse.State = 0
         
+        If FreezeResetBegin Then FreezeResetBegin = False: Call FreezeReset
     End Sub
 '========================================================
 '   Transform

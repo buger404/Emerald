@@ -1,17 +1,29 @@
 Attribute VB_Name = "AboutMe"
 '========================================================
 '   Emerald
-'   制作：Error 404（QQ 1361778219）
+'   制作：Error 404（QQ 1361778219，陈志琰）
+'   开源地址：
+'    ┗━Github：https://github.com/buger404/Emerald
+'    ┗━马云：https://gitee.com/buger404/Emerald
 '   邮箱：ris_vb@126.com
 '========================================================
 '   版本：参见GCore.Version
 '   面向游戏开发的轻量级绘图框架
 '   Emerald的诞生，离不开朋友们和Inter.Net群的支持，感谢你们。
+'========================================================
+'   作者使用自己制作的Emerald框架制作的游戏作品：
+'   1.传说之下同人：冰棍之下
+'   2.Moristory（森之物语）
+'   3.RandomPerson（摇号机）
+'   4.MuingIII（嘤悦3，未完工）
+'========================================================
 '   组成（标*号的表示非作者编写）：
 '   ┗━━━━调试功能
 '       ┗━━━━Debuginfo.frm：显示调试详细信息使用的窗口
 '       ┗━━━━DebugWindow.frm：显示调试工具栏使用的窗口
 '       ┗━━━━GDebug.cls：调试工具栏的界面绘制
+'       ┗━━━━DebugSwitch.bas：存放调试变量的模块
+'   ┗━━━━调试功能
 '   ┗━━━━*BASS（http://www.un4seen.com/）
 '       (BASS is an audio library for use in software on several platforms.)
 '       ┗━━━━*Bass.bas：Bass API 声明模块
@@ -27,12 +39,13 @@ Attribute VB_Name = "AboutMe"
 '       ┗━━━━GResource.cls：游戏资源管理
 '   ┗━━━━动画
 '       ┗━━━━GAnimation.cls：Emerald常规动画函数
+'       ┗━━━━Animations.bas：Emerald图像动画模块
 '   ┗━━━━碰撞箱
 '       ┗━━━━GCrashBox.cls：碰撞箱功能
 '   ┗━━━━*GDIPlus
 '       ┗━━━━*Gdiplus.bas：vIstaswx GDI+ 声明模块
 '   ┗━━━━其他
-'       ┗━━━━*aShadow.cls：网上复制的窗口阴影类模块
+'       ┗━━━━*aShadow.cls：网上复制的窗口阴影类模块（已经移除）
 '       ┗━━━━AeroEffect.bas：Aero效果
 '       ┗━━━━GCore.bas：Emerald部分核心功能
 '       ┗━━━━GSysPage.cls：Emerald页面的绘制
@@ -40,6 +53,14 @@ Attribute VB_Name = "AboutMe"
 '========================================================
 '   更新日志
 '========================================================
+'   更新内容(ver.1215)
+'   -添加FreezeMode
+'   更新内容(ver.1211)
+'   -修复Builder会替换Core.bas的问题
+'   -现在的图标位于\assets\sets\profile.png
+'   更新内容(ver.1209)
+'   -添加DPI适应可选
+'   -新的加载界面
 '   更新内容(ver.1208)
 '   -添加“花哨”模式
 '   -添加页面切换（F11）
