@@ -22,14 +22,14 @@ Public Sub Update()
     Page.Clear 0 'Çå¿Õ»­²¼
 
     Dim m As Integer
-    m = CheckMouse(GW - 60 - 19, 48, 36, 36)
-    If Page.ShowColorButton(1, GW - 60 - 19, 48, 36, 36, "¡Á", IIf(m = 0, argb(255, 128, 128, 128), argb(255, 255, 255, 255)), argb(0, 254, 84, 57), argb(255, 254, 84, 57), size:=18) = 2 Then
+    m = CheckMouse(GW - 50 - 19, 30, 36, 36)
+    If Page.ShowColorButton(1, GW - 50 - 19, 30, 36, 36, "¡Á", IIf(m = 0, argb(255, 128, 128, 128), argb(255, 255, 255, 255)), argb(0, 254, 84, 57), argb(255, 254, 84, 57), size:=18) = 2 Then
         Unload MainWindow
         End
     End If
 
-    m = CheckMouse(GW - 120 - 19, 48, 36, 36)
-    If Page.ShowColorButton(1, GW - 120 - 19, 48, 36, 36, "-", IIf(m = 0, argb(255, 128, 128, 128), argb(255, 255, 255, 255)), argb(0, 128, 128, 128), argb(100, 128, 128, 128), size:=18) = 2 Then
+    m = CheckMouse(GW - 110 - 19, 30, 36, 36)
+    If Page.ShowColorButton(1, GW - 110 - 19, 30, 36, 36, "-", IIf(m = 0, argb(255, 128, 128, 128), argb(255, 255, 255, 255)), argb(0, 128, 128, 128), argb(100, 128, 128, 128), size:=18) = 2 Then
         MainWindow.WindowState = 1
         Mouse.State = 0
     End If

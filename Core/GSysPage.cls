@@ -140,6 +140,7 @@ Public Sub SaveManDialog()
     End If
 End Sub
 Public Sub LOGODialog()
+    On Error Resume Next
 
     If EnterTime = 0 Then EnterTime = GetTickCount
     Dim tpro As Single, tpro2 As Single
@@ -159,23 +160,13 @@ Public Sub LOGODialog()
     Page.DrawImage "profile.png", GW / 2, GH / 2 - 90 * tpro, alpha:=1 * tpro, pos:=posOnCenter
     Page.DrawImage "elogo.png", GW / 2 - 115, GH - 45, alpha:=1 * tpro2, pos:=posOnCenter
     Page.Writes "Powered by Emerald", GW / 2 + 25, GH - 57, 18, argb(170 * tpro2, 27, 27, 27), align:=StringAlignmentCenter
-<<<<<<< HEAD
     
     Page.ShowLoading GW / 2 - 24, GH / 2 + GH * 0.25 - 24, 48, 48, 4, argb(255 * tpro2, 100, 62, 255), argb(255 * tpro2, 0, 176, 240), argb(255 * tpro2, 64, 218, 208)
     
-    Page.Writes App.ProductName, GW / 2, GH / 2 + 100 + (GH * 0.2 / 2 - 160) * tpro, 20, argb(255 * tpro, 27, 27, 27), align:=StringAlignmentCenter
+    Page.Writes App.ProductName, GW / 2, GH / 2 + 100 + (GH * 0.2 / 2 - 160) * tpro, 20, argb(255 * tpro, 32, 32, 32), align:=StringAlignmentCenter, style:=FontStyleBold
     
-    Page.Writes "正在启动 " & Int(pro * 100) & "%", GW / 2, GH / 2 + (GH * 0.2 / 2 + 17 - 40) * tpro2, 18, argb(200 * tpro2, 27, 27, 27), align:=StringAlignmentCenter
-    
-=======
-    
-    Page.ShowLoading GW / 2 - 24, GH / 2 + 100, 48, 48, 4, argb(255 * tpro2, 100, 62, 255), argb(255 * tpro2, 0, 176, 240), argb(255 * tpro2, 64, 218, 208)
-    
-    Page.Writes App.ProductName, GW / 2, GH / 2 + 100 + (GH * 0.2 / 2 - 160) * tpro, 20, argb(255 * tpro, 27, 27, 27), align:=StringAlignmentCenter
-    
-    Page.Writes "正在启动 " & Int(pro * 100) & "%", GW / 2, GH / 2 + (GH * 0.2 / 2 + 17 - 40) * tpro2, 18, argb(200 * tpro2, 27, 27, 27), align:=StringAlignmentCenter
-    
->>>>>>> 7da8aea3f1f11a7fbe211537042b7146cb726c86
+    Page.Writes "正在启动 " & Int(pro * 100) & "%", GW / 2, GH / 2 + (GH * 0.2 / 2 + 17 - 40) * tpro2, 18, argb(200 * tpro2, 64, 64, 64), align:=StringAlignmentCenter
+
     If DisableLOGO Then
         ECore.NewTransform transToLeft, 1000
         DoneMark = True
@@ -190,7 +181,7 @@ End Sub
 Public Sub SaveDialog()
     Page.Paint 0, 0, 0, 600, 76, argb(255, 242, 242, 242)
     Page.DrawImage "save.png", 40, 40, alpha:=1
-    Page.Writes "你希望该应用在以下位置保存数据吗？" & vbCrLf & ESave.Path, 40, 130, 18, argb(255, 64, 64, 64)
+    Page.Writes "你希望该应用在以下位置保存数据吗？" & vbCrLf & ESave.path, 40, 130, 18, argb(255, 64, 64, 64)
     
     Page.Writes "*如果不允许，该应用可能永远保持初始状态。", 40, 400 - 110, 16, argb(255, 96, 96, 96)
     
@@ -222,23 +213,19 @@ End Sub
 Public Sub Lostfocus()
 
 End Sub
-Public Sub AnimationDone(ID As Integer)
+Public Sub AnimationDone(id As Integer)
 
 End Sub
 Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
-    Page.Res.NewImages App.Path & "\assets\debug"
-<<<<<<< HEAD
-    If Dir(App.Path & "\assets\sets\profile.png") <> "" Then
-        Page.Res.newImage App.Path & "\assets\sets\profile.png", 148, 148, "profile.png"
+    Page.Res.NewImages App.path & "\assets\debug"
+    If Dir(App.path & "\assets\sets\profile.png") <> "" Then
+        Page.Res.newImage App.path & "\assets\sets\profile.png", 148, 148, "profile.png"
     Else
-        Page.Res.newImage App.Path & "\assets\debug\icon.png", 148, 148, "profile.png"
+        Page.Res.newImage App.path & "\assets\debug\icon.png", 148, 148, "profile.png"
     End If
-=======
-    Page.Res.newImage App.Path & "\assets\debug\icon.png", 148, 148, "profile.png"
->>>>>>> 7da8aea3f1f11a7fbe211537042b7146cb726c86
-    Page.Res.newImage App.Path & "\assets\debug\logo.png", 64, 64, "elogo.png"
+    Page.Res.newImage App.path & "\assets\debug\logo.png", 64, 64, "elogo.png"
     
     Page.TopPage = True
     

@@ -33,7 +33,7 @@ Public FreezeMode As Boolean, FreezeDelay As Long, FreezeResetBegin As Boolean
 Public FancyDeepth As Single
 Dim FMode As Boolean
 Dim CurrentPage As Integer
-Dim IsLayered As Boolean
+Public IsLayered As Boolean
 Dim ErrorMark As Boolean, ErrorMark2 As Boolean
 Dim F11KEYPress As Boolean, PageMode As Boolean
 Dim FreezeTime As Long

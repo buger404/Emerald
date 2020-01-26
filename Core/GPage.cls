@@ -854,7 +854,7 @@ ReShape:
             WaitChr = ""
         End If
         
-        Writes Text, X + Radius / 4, y + h / 2 - size / 0.75 / 2 + 2, size, TextColor, w - Radius / 2 - h, size / 0.75, StringAlignmentNear, style
+        Writes Text, X + Radius / 4, y + h / 2 - size / 0.75 / 2 - 1, size, TextColor, w - Radius / 2 - h, size / 0.75, StringAlignmentNear, style
         
         If TextHandle = VarPtr(Text) Then
             Dim w2 As Long, pro As Long, alpha As Single

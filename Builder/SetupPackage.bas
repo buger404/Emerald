@@ -120,17 +120,17 @@ Public Sub MakePackage(ByVal path As String, GMaker As String, GName As String, 
                 .Files(UBound(.Files)).Data = Data
                 .Files(UBound(.Files)).path = Files(I)
             End With
-            If PackPos = -1 Then WelcomePage.PackText = "Packing '" & Files(I) & "' ..."
+            If PackPos = -1 Then WelcomePage.PackText = "正在打包 '" & Files(I) & "' ..."
         Else
-            If PackPos = -1 Then WelcomePage.PackText = "Removing '" & Files(I) & "' ..."
+            If PackPos = -1 Then WelcomePage.PackText = "正在移除 '" & Files(I) & "' ..."
         End If
         ECore.Display: DoEvents
     Next
     
     '导出.emrpack文件
-    If PackPos = -1 Then WelcomePage.PackText = "Exporting emrpack ..."
-    If Dir(VBA.Environ("temp") & "\emrpack") <> "" Then Kill VBA.Environ("temp") & "\emrpack"
-    Open VBA.Environ("temp") & "\emrpack" For Binary As #1
+    If PackPos = -1 Then WelcomePage.PackText = "正在导出包 ..."
+    If Dir(VBA.Environ("temp") & "\emrpack.empack") <> "" Then Kill VBA.Environ("temp") & "\emrpack.empack"
+    Open VBA.Environ("temp") & "\emrpack.empack" For Binary As #1
     Put #1, , Package
     Close #1
 End Sub
@@ -140,6 +140,7 @@ Function DirAllFiles(ByVal path As String) As String()
     ReDim DirTasks(1), FileList(0)
     If Right(path, 1) <> "\" Then path = path & "\"
     DirTasks(1) = path
+    On Error Resume Next
     Do While UBound(DirTasks) > 0
         File = Dir(DirTasks(1))
         Do While File <> ""
@@ -224,7 +225,7 @@ Public Function SetupPack() As String
     On Error Resume Next
 
     Dim path As String
-    path = SSetupPath & "\"
+    path = SSetupPath & IIf(Right(SSetupPath, 1) <> "\", "\", "")
     
     Randomize
     LogPath = VBA.Environ("temp") & "\Emerald_Setup_" & Int(Rnd * 999999999 + 1111111111) & ".txt"
@@ -261,8 +262,8 @@ Public Function SetupPack() As String
         ECore.Display: DoEvents
     Next
     
-    Print #2, Now & "    " & "Copy: " & VBA.Environ("temp") & "\emrtempUninstall.exe" & " -> " & path & "Uninstall.exe"
-    FileCopy VBA.Environ("temp") & "\emrtempUninstall.exe", path & "Uninstall.exe"
+    'Print #2, Now & "    " & "Copy: " & VBA.Environ("temp") & "\emrtempUninstall.exe" & " -> " & path & "Uninstall.exe"
+    'FileCopy VBA.Environ("temp") & "\emrtempUninstall.exe", path & "Uninstall.exe"
     
     Dim RandomFolder As String
     Randomize
@@ -275,17 +276,20 @@ Public Function SetupPack() As String
     Close #1
     Print #2, Now & "    " & "Write: " & path & RandomFolder & "\setup.config"
     
-    If Dir(VBA.Environ("temp") & "\emrpack") <> "" Then Kill VBA.Environ("temp") & "\emrpack"
+    If Dir(VBA.Environ("temp") & "\emrpack.empack") <> "" Then Kill VBA.Environ("temp") & "\emrpack.empack"
     MakePackage path & RandomFolder, "none", "none", "none", "none", 0
     Print #2, Now & "    " & "Package: " & path & RandomFolder
+    If Dir(path & "\copyemruni.cmd") <> "" Then Kill path & "\copyemruni.cmd"
     
-    Open VBA.Environ("temp") & "\copyemr.cmd" For Output As #1
-    Print #1, "@echo off"
-    Print #1, "copy """ & VBA.Environ("temp") & "\emrtempUninstall.exe" & """ /b + """ & VBA.Environ("temp") & "\emrpack"" /b """ & path & "Uninstall.exe" & """"
-    Close #1
-    Print #2, Now & "    " & "Command: " & "copy """ & VBA.Environ("temp") & "\emrtempUninstall.exe" & """ /b + """ & VBA.Environ("temp") & "\emrpack"" /b """ & path & "Uninstall.exe" & """"
-    ShellExecuteA 0, "open", VBA.Environ("temp") & "\copyemr.cmd", "", "", SW_SHOW
-    Print #2, Now & "    " & "Run: " & VBA.Environ("temp") & "\copyemr.cmd"
+    Open path & "\copyemruni.cmd" For Output As #3
+    Print #3, "@echo off"
+    Print #3, "copy """ & VBA.Environ("temp") & "\emrtempUninstall.exe" & """ /b + """ & VBA.Environ("temp") & "\emrpack.empack"" /b """ & path & "Uninstall.exe" & """"
+    Print #3, "del """ & VBA.Environ("temp") & "\emrtempUninstall.exe" & """"
+    Print #3, "del """ & VBA.Environ("temp") & "\emrpack.empack" & """"
+    Close #3
+    Print #2, Now & "    " & "Command: " & "copy """ & VBA.Environ("temp") & "\emrtempUninstall.exe" & """ /b + """ & VBA.Environ("temp") & "\emrpack.empack"" /b """ & path & "Uninstall.exe" & """"
+    ShellExecuteA 0, "open", path & "\copyemruni.cmd", "", "", SW_SHOW
+    Print #2, Now & "    " & "Run: " & path & "\copyemruni.cmd"
     
     On Error Resume Next
     ECore.Display: DoEvents
@@ -311,10 +315,8 @@ Public Function SetupPack() As String
 last:
     Close #2
     
-    Kill VBA.Environ("temp") & "\emrtempUninstall.exe"
     Print #2, Now & "    " & "Delete: " & VBA.Environ("temp") & "\emrtempUninstall.exe"
-    Kill VBA.Environ("temp") & "\emrpack"
-    Print #2, Now & "    " & "Delete: " & VBA.Environ("temp") & "\emrpack"
+    Print #2, Now & "    " & "Delete: " & VBA.Environ("temp") & "\emrpack.empack"
     
     SetupPack = Err.Description
 End Function

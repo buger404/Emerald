@@ -123,15 +123,12 @@ Attribute VB_Name = "GCore"
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
-<<<<<<< HEAD
-    Public Const Version As Long = 19121501      'okay
-=======
-    Public Const Version As Long = 19120902      'fines
->>>>>>> 7da8aea3f1f11a7fbe211537042b7146cb726c86
+    Public Const Version As Long = 20012602      'oksi
     Public TextHandle As Long, WaitChr As String
     Public XPMode As Boolean
     Public Scales As Single
     Public FullScreenMark As Boolean
+    Public UsePaint As Boolean
     
     Public AssetsTrees() As AssetsTree
     Dim LastKeyUpRet As Boolean
@@ -186,6 +183,7 @@ Attribute VB_Name = "GCore"
         DebugSwitch.DebugMode = Val(Data.GetData("DebugMode"))
         DebugSwitch.DisableLOGO = Val(Data.GetData("DisableLOGO"))
         DebugSwitch.HideLOGO = Val(Data.GetData("HideLOGO"))
+        DebugSwitch.HideSuggest = Val(Data.GetData("HideSuggest"))
         DebugSwitch.UpdateCheckInterval = Val(Data.GetData("UpdateCheckInterval"))
         DebugSwitch.UpdateTimeOut = Val(Data.GetData("UpdateTimeOut"))
         
@@ -279,6 +277,7 @@ Attribute VB_Name = "GCore"
         
     End Sub
     Public Sub Suggest(Text As String, Clears As SuggestClearTime, Deepth As Long)
+        If DebugSwitch.HideSuggest Then Exit Sub
         ReDim Preserve SGS(UBound(SGS) + 1)
         With SGS(UBound(SGS))
             .Content = Text
@@ -318,6 +317,16 @@ Attribute VB_Name = "GCore"
             Dim Direction As Integer, Strong As Single
             Direction = IIf(wParam < 0, -1, 1): Strong = Abs(wParam / 7864320)
             ECore.Wheel Direction, Strong
+        End If
+        
+        If ECore.IsLayered Then
+            If ((uMsg = 132)) And (UsePaint = True) Then
+                ECore.Display
+            End If
+        Else
+            If ((uMsg = WM_PAINT)) And (UsePaint = True) Then
+                ECore.Display
+            End If
         End If
         
 last:
@@ -502,9 +511,9 @@ sth:
         If Now - CDate(Data.GetData("UpdateTime")) >= UpdateCheckInterval Or Data.GetData("UpdateAble") = 1 Then
             Data.PutData "UpdateTime", Now
             
-            Dim xmlHttp As Object, ret As String, Start As Long
+            Dim xmlHttp As Object, Ret As String, Start As Long
             Set xmlHttp = PoolCreateObject("Microsoft.XMLHTTP")
-            xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
+            xmlHttp.open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
             xmlHttp.send
                          
             Start = GetTickCount
@@ -515,15 +524,11 @@ sth:
                 End If
                 Sleep 10: DoEvents
             Loop
-            ret = xmlHttp.responseText
+            Ret = xmlHttp.responseText
             Set xmlHttp = Nothing
-            Debug.Print Now, "Emerald：检查版本完毕，最新版本号 " & Val(ret)
+            Debug.Print Now, "Emerald：检查版本完毕，最新版本号 " & Val(Ret)
             
-<<<<<<< HEAD
             If Val(Ret) > Version And App.LogMode = 0 Then
-=======
-            If Val(ret) > Version And App.LogMode = 0 Then
->>>>>>> 7da8aea3f1f11a7fbe211537042b7146cb726c86
                 Data.PutData "UpdateAble", 1
                 If MsgBox("发现Emerald存在新版本，您希望现在前往下载吗？", vbYesNo + 48, "Emerald") = vbNo Then Exit Sub
                 

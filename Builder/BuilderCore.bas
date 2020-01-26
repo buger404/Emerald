@@ -44,10 +44,12 @@ Public Sub Main()
     OPath = Replace(Trim(Command$), """", "")
     'OPath = "E:\Error 404\Muing III"
     'OPath = "E:\Error 404\Emerald 动画包含资源提取工具\"
+    'OPath = "E:\Projects\Rainbow"
+    
     Dim targetEXE As String
     targetEXE = App.path & "\" & App.EXEName & ".exe"
-    'targetEXE = "D:\MyDoc\Emerald\Export\Moristory - Installer.exe"
-    'targetEXE = "C:\Program Files\Moristory\Uninstall.exe"
+    'targetEXE = "D:\User\Document\Emerald\Export\Tap - Installer.exe"
+    'targetEXE = "C:\Program Files\Tap\Uninstall.exe"
     
     PackPos = -1
     If OPath = "" Then PackPos = FindPackage(targetEXE, 598000)
@@ -64,27 +66,29 @@ Public Sub Main()
         Close #1
         CopyMemory data2(0), Data(PackPos), UBound(Data) - PackPos + 1
         ReDim Preserve Data(PackPos - 1)
-        Open tempPath & "\setuppack.emrpack" For Binary As #1
-        Put #1, , data2
-        Close #1
+        Open tempPath & "\setuppack.emrpack" For Binary As #4
+        Put #4, , data2
+        Close #4
         If Dir(tempPath & "\emrtempUninstall.exe") <> "" Then Kill tempPath & "\emrtempUninstall.exe"
-        Open tempPath & "\emrtempUninstall.exe" For Binary As #1
-        Put #1, , Data
-        Close #1
-        Open tempPath & "\setuppack.emrpack" For Binary As #1
-        Get #1, , SPackage
-        Close #1
+        Sleep 1000
+        Open tempPath & "\emrtempUninstall.exe" For Binary As #4
+        Put #4, , Data
+        Close #4
+        Open tempPath & "\setuppack.emrpack" For Binary As #4
+        Get #4, , SPackage
+        Close #4
         If UBound(SPackage.Files) = 1 Then
             If SPackage.Files(1).path = "setup.config" Then
                 '执行卸载程序
                 CmdMark = "Uninstall"
-                Open App.path & "\setup.config" For Binary As #1
-                Put #1, , SPackage.Files(1).Data
-                Close #1
+                Open App.path & "\setup.config" For Binary As #4
+                Put #4, , SPackage.Files(1).Data
+                Close #4
                 GoTo UninstallGame
             End If
         End If
         
+        SetupMode = True
         MainWindow.Show
         MainWindow.Caption = SPackage.GameName & "  Installer"
         SetWindowLongA MainWindow.Hwnd, GWL_STYLE, _
@@ -99,7 +103,7 @@ Public Sub Main()
             Close #1
             SetupPage.Page.Res.newImage tempPath & "\setupappicon.png", 128, 128, "app.png"
         End If
-        SetupMode = True
+        
         SSetupPath = "C:\Program Files\" & SPackage.GameName
         Kill tempPath & "\setuppack.emrpack"
         ECore.ActivePage = "SetupPage"
@@ -139,11 +143,11 @@ UninstallGame:
     ECore.ActivePage = "SetupPage"
     ECore.Display
     DoEvents
-    If MsgBox("你确定现在要将 " & SPackage.GameName & " 从你的电脑完全清除吗？", 48 + vbYesNo, MainWindow.Caption) = vbNo Then Unload MainWindow: End
-    Dim ret As String
-    ret = UninPack
-    If ret <> "" Then
-        MsgBox "安装或卸载失败，请联系发布者，以下是错误信息：" & vbCrLf & ret, 16, MainWindow.Caption
+    If MsgBox("你确定现在要将 " & SPackage.GameName & " 从你的电脑完全清除吗？", 48 + vbYesNo, MainWindow.Caption) = vbNo Then End
+    Dim Ret As String
+    Ret = UninPack
+    If Ret <> "" Then
+        MsgBox "安装或卸载失败，请联系发布者，以下是错误信息：" & vbCrLf & Ret, 16, MainWindow.Caption
     End If
     SetupPage.Step = 5
     ECore.NewTransform transDarkTo, 1000
@@ -251,7 +255,7 @@ Public Sub CheckOnLineUpdate()
     If Now - CDate(Data.GetData("UpdateTime")) >= UpdateCheckInterval Or Data.GetData("UpdateAble") = 1 Then
         Data.PutData "UpdateTime", Now
         
-        Dim xmlHttp As Object, ret As String, Start As Long
+        Dim xmlHttp As Object, Ret As String, Start As Long
         Set xmlHttp = PoolCreateObject("Microsoft.XMLHTTP")
         xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
         xmlHttp.send
@@ -265,10 +269,10 @@ Public Sub CheckOnLineUpdate()
             ECore.Display
             Sleep 10: DoEvents
         Loop
-        ret = xmlHttp.responseText
+        Ret = xmlHttp.responseText
         Set xmlHttp = Nothing
 
-        NewVersion = Val(ret)
+        NewVersion = Val(Ret)
         Data.PutData "UpdateAble", 1
     Else
         NewVersion = Version

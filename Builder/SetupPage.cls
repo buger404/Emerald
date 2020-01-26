@@ -19,9 +19,9 @@ Attribute VB_Exposed = False
     Public ShowLog As Boolean, LaunchNow As Boolean
 '======================================
 Public Sub DrawStep5()
-    Page.ShowColorCheckBox ShowLog, GW / 2 - 100, GH / 2 - 20, 200, 20, "显示卸载程序报告", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
+    Page.ShowColorCheckBox ShowLog, GW / 2 - 100, GH / 2 - 20, 200, 20, "显示卸载程序报告", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 64, 64, 64), 18
 
-    If Page.ShowColorButton(2, GW / 2 - 70, GH - 150, 140, 40, "完成", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18) = 3 Then
+    If Page.ShowColorButton(0, GW / 2 - 70, GH - 120, 140, 40, "完成", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18) = 3 Then
         If ShowLog Then ShellExecuteA 0, "open", LogPath, "", "", SW_SHOW
         Unload MainWindow
         End
@@ -30,14 +30,14 @@ Public Sub DrawStep5()
 End Sub
 Public Sub DrawStep4()
     Page.ShowLoading GW / 2 - 100, GH / 2 - 160, 200, 200, 9, argb(255, 100, 62, 255), argb(255, 0, 176, 240), argb(255, 64, 218, 208)
-    Page.Writes SetupInfo, GW / 2, GH / 2 + 160, 24, argb(255, 64, 64, 64), align:=StringAlignmentCenter
-    Page.Writes format(Int(Progress * 1000) / 10, "0.0") & "%", GW / 2, GH / 2 + 210, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter
+    Page.Writes SetupInfo, GW / 2, GH - 130, 16, argb(255, 32, 32, 32), align:=StringAlignmentCenter
+    Page.Writes format(Int(Progress * 1000) / 10, "0.0") & "%", GW / 2, GH - 100, 16, argb(255, 32, 32, 32), align:=StringAlignmentCenter, style:=FontStyleBold
 End Sub
 Public Sub DrawStep3()
-    Page.ShowColorCheckBox LaunchNow, GW / 2 - 100, GH / 2 - 60, 200, 20, "立即启动", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
-    Page.ShowColorCheckBox ShowLog, GW / 2 - 100, GH / 2 - 20, 200, 20, "显示安装程序报告", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
+    Page.ShowColorCheckBox LaunchNow, GW / 2 - 100, GH / 2 - 60, 200, 20, "立即启动", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 64, 64, 64), 18
+    Page.ShowColorCheckBox ShowLog, GW / 2 - 100, GH / 2 - 20, 200, 20, "显示安装程序报告", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 64, 64, 64), 18
 
-    If Page.ShowColorButton(2, GW / 2 - 70, GH - 150, 140, 40, "完成", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18) = 3 Then
+    If Page.ShowColorButton(0, GW / 2 - 70, GH - 120, 140, 40, "完成安装", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18) = 3 Then
         If LaunchNow Then ShellExecuteA 0, "open", SSetupPath & "\app.exe", "", "", SW_SHOW
         If ShowLog Then ShellExecuteA 0, "open", LogPath, "", "", SW_SHOW
         Unload MainWindow
@@ -47,60 +47,44 @@ Public Sub DrawStep3()
 End Sub
 Public Sub DrawStep2()
     Page.ShowLoading GW / 2 - 100, GH / 2 - 160, 200, 200, 9, argb(255, 100, 62, 255), argb(255, 0, 176, 240), argb(255, 64, 218, 208)
-    Page.Writes SetupInfo, GW / 2, GH / 2 + 160, 24, argb(255, 64, 64, 64), align:=StringAlignmentCenter
-    Page.Writes format(Int(Progress * 1000) / 10, "0.0") & "%", GW / 2, GH / 2 + 210, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter
+    Page.Writes SetupInfo, GW / 2, GH - 130, 16, argb(255, 32, 32, 32), align:=StringAlignmentCenter
+    Page.Writes format(Int(Progress * 1000) / 10, "0.0") & "%", GW / 2, GH - 100, 16, argb(255, 32, 32, 32), align:=StringAlignmentCenter, style:=FontStyleBold
 End Sub
 Public Sub DrawStep1()
     Dim Points(), y As Long
-    ReDim Points(3)
+   
+   
+    Page.Writes "安装位置", 20, 60, 18, argb(255, 32, 32, 32), style:=FontStyleBold
+    Page.Writes "该程序将被安装在您的计算机的下列位置。", 20, 90, 18, argb(255, 64, 64, 64)
     
-    y = GH / 2 - 75
+    Page.Writes "您已选择信任该开发者：'" & SPackage.Maker & "'", 20, 440, 18, argb(255, 100, 62, 255), style:=FontStyleBold
     
-    Points(0) = 0: Points(1) = 0
-    Points(2) = 0: Points(3) = y
-    
-    Dim Step2 As Long
-    Step2 = Int(GW / 14)
-    
-    For X = 0 To (GW + Step2) Step Step2
-        ReDim Preserve Points(UBound(Points) + 2)
-        Points(UBound(Points) - 1) = X
-        Points(UBound(Points)) = y + Sin(GetTickCount / 200 + X / 10) * (GH * 0.2 / 12)
-    Next
-    
-    ReDim Preserve Points(UBound(Points) + 4)
-    Points(UBound(Points) - 3) = GW: Points(UBound(Points) - 2) = y
-    Points(UBound(Points) - 1) = GW: Points(UBound(Points)) = 0
-    
-    Page.PaintPolygon2 argb(255, 27, 27, 27), 0, Points(), True
-    
-    Page.Writes "安装位置", 100, GH / 2 + 50, 18, argb(255, 100, 62, 255)
-    
-    If Page.ShowEdit(SSetupPath, 2, 88, GH / 2 + 85, GW - 88 * 2 - 60, 40, argb(255, 96, 96, 96), argb(255, 255, 255, 255), argb(255, 242, 242, 242), argb(255, 100, 62, 255), 90, size:=18) = 4 Then
+    If Page.ShowEdit(SSetupPath, 0, 20, 150, GW - 40, 40, argb(255, 64, 64, 64), argb(255, 242, 242, 242), argb(255, 232, 232, 232), argb(255, 100, 62, 255), size:=18) = 4 Then
         On Error GoTo ErrHandler
         CreateFolder SSetupPath
 ErrHandler:
         If Err.Number <> 0 Then SSetupPath = "C:\Program Files\" & SPackage.GameName: MsgBox "请使用其他目录。", 48
     End If
     
-    If Page.ShowColorButton(2, 88 + (GW - 88 * 2 - 60) + 20, GH / 2 + 85, 40, 40, "...", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18) = 3 Then
+    If Page.ShowColorButton(0, GW - 80 - 20, 200, 80, 40, "浏览", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), size:=18) = 3 Then
         SSetupPath = GetDirName
+        SSetupPath = SSetupPath & IIf(Right(SSetupPath, 1) <> "\", "\", "") & SPackage.GameName
         On Error GoTo ErrHandler2
         CreateFolder SSetupPath
 ErrHandler2:
         If Err.Number <> 0 Then SSetupPath = "C:\Program Files\" & SPackage.GameName: MsgBox "请使用其他目录。", 48
     End If
     
-    Page.ShowColorCheckBox LnkSwitch, 98, GH / 2 + 260, 200, 20, "创建桌面快捷方式", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
+    Page.ShowColorCheckBox LnkSwitch, 20, GH - 210, 200, 20, "创建桌面快捷方式", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 32, 32, 32), 18
 
-    If Page.ShowColorButton(2, GW - 200, GH - 130, 140, 40, "开始", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18) = 3 Then
+    If Page.ShowColorButton(0, GW / 2 - 70, GH - 120, 140, 40, "确认", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18) = 3 Then
         SetupInfo = "正在准备 ..."
         Step = 2
         ECore.NewTransform transDarkTo, 1000
         Dim Ret As String
         Ret = SetupPack
         If Ret <> "" Then
-            MsgBox "安装失败，请联系开发者，以下是错误信息：" & vbCrLf & Ret, 16, MainWindow.Caption
+            'MsgBox "安装失败，请联系开发者，以下是错误信息：" & vbCrLf & Ret, 16, MainWindow.Caption
         End If
         ECore.NewTransform transDarkTo, 1000
         Step = 3
@@ -108,36 +92,20 @@ ErrHandler2:
 End Sub
 Public Sub DrawStep0()
     Dim Points(), y As Long
-    ReDim Points(3)
-    
-    y = GH / 2 - 75
-    
-    Points(0) = 0: Points(1) = 0
-    Points(2) = 0: Points(3) = y
-    
-    Dim Step2 As Long
-    Step2 = Int(GW / 14)
-    
-    For X = 0 To (GW + Step2) Step Step2
-        ReDim Preserve Points(UBound(Points) + 2)
-        Points(UBound(Points) - 1) = X
-        Points(UBound(Points)) = y + Sin(GetTickCount / 200 + X / 10) * (GH * 0.2 / 12)
-    Next
-    
-    ReDim Preserve Points(UBound(Points) + 4)
-    Points(UBound(Points) - 3) = GW: Points(UBound(Points) - 2) = y
-    Points(UBound(Points) - 1) = GW: Points(UBound(Points)) = 0
-    
-    Page.PaintPolygon2 argb(255, 27, 27, 27), 0, Points(), True
 
-    Page.Paint 1, GW / 2, GH / 2 - 80, 96, 96, argb(255, 92, 228, 220), pos:=posOnCenter
-    Page.DrawImageEx "app.png", GW / 2, GH / 2 - 80, 96, 96, posOnCenter
+    Page.Paint 1, 100, 122, 64, 64, argb(255, 92, 228, 220), pos:=posOnCenter
+    Page.Paint 0, 0, 220, RGW, 400, argb(255, 242, 242, 242)
     
-    Page.Writes SPackage.GameName, GW / 2, GH / 2 + 10, 24, argb(255, 64, 64, 64), align:=StringAlignmentCenter
-    Page.Writes "制作：" & SPackage.Maker, GW / 2, GH / 2 + 50, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter
-    Page.Writes "(" & SPackage.GameDescribe & ")", GW / 2, GH / 2 + 80, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter
+    Page.DrawImageEx "app.png", 100, 122, 64, 64, posOnCenter
     
-    If Page.ShowColorButton(2, GW / 2 - 70, GH - 150, 140, 40, "安装", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18) = 3 Then
+    Page.Writes SPackage.GameName, 150, 93, 18, argb(255, 32, 32, 32)
+    Page.Writes "开发者：" & SPackage.Maker, 150, 123, 18, argb(255, 64, 64, 64)
+    
+    Page.Writes "总计" & UBound(SPackage.Files) & "个文件将会被输出", 40, 240, 18, argb(255, 32, 32, 32)
+    Page.Writes SPackage.GameDescribe, 40, 280, 18, argb(255, 64, 64, 64), RGW - 80, 100
+    
+    If Page.ShowColorButton(0, GW / 2 - 70, GH - 120, 140, 40, "安装", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18) = 3 Then
+        If MsgBox("确定要信任此程序的开发者：'" & SPackage.Maker & "'吗？" & vbCrLf & "并安装此程序到您的计算机。", vbYesNo + 48, "安装警告") = vbNo Then Exit Sub
         Step = 1
         ECore.NewTransform transDarkTo, 1000
     End If
@@ -152,15 +120,17 @@ Public Sub Update()
     If Step <> 2 And Step <> 4 Then Call DrawTitle
 End Sub
 Public Sub DrawTitle()
+    Page.Paint 0, 0, 0, RGW, 36, argb(255, 232, 232, 232)
+
     Dim m As Integer
-    m = CheckMouse(GW - 60 - 19, 48, 36, 36)
-    If Page.ShowColorButton(1, GW - 60 - 19, 35, 36, 36, "×", IIf(m = 0, argb(180, 255, 255, 255), argb(255, 255, 255, 255)), argb(100, 254, 84, 57), argb(255, 254, 84, 57), size:=18) = 2 Then
+    m = CheckMouse(GW - 36 - 8, 0, 36, 36)
+    If Page.ShowColorButton(0, GW - 36 - 8, 0, 37, 36, "×", IIf(m = 0, argb(255, 27, 27, 27), argb(255, 255, 255, 255)), argb(255, 232, 232, 232), argb(255, 254, 84, 57), size:=18) = 2 Then
         Unload MainWindow
         End
     End If
 
-    m = CheckMouse(GW - 120 - 19, 48, 36, 36)
-    If Page.ShowColorButton(1, GW - 120 - 19, 35, 36, 36, "-", IIf(m = 0, argb(180, 255, 255, 255), argb(255, 255, 255, 255)), argb(100, 128, 128, 128), argb(255, 128, 128, 128), size:=18) = 2 Then
+    m = CheckMouse(GW - 72 - 8, 0, 36, 36)
+    If Page.ShowColorButton(0, GW - 72 - 8, 0, 37, 36, "-", IIf(m = 0, argb(255, 27, 27, 27), argb(255, 255, 255, 255)), argb(255, 232, 232, 232), argb(255, 128, 128, 128), size:=18) = 2 Then
         MainWindow.WindowState = 1
         Mouse.State = 0
     End If

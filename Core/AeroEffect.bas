@@ -32,7 +32,7 @@ Private Type MARGINS
     cyTopHeight As Long
 End Type
 
-Public Declare Function SetWindowCompositionAttribute Lib "user32.dll" (ByVal Hwnd As Long, ByRef data As WindowsCompostionAttributeData) As Long
+Public Declare Function SetWindowCompositionAttribute Lib "user32.dll" (ByVal Hwnd As Long, ByRef Data As WindowsCompostionAttributeData) As Long
 
 Enum WindowCompositionAttribute
     WCA_ACCENT_POLICY = 19
@@ -40,7 +40,7 @@ End Enum
 
 Type WindowsCompostionAttributeData
     Attribute As WindowCompositionAttribute
-    data As Long
+    Data As Long
     SizeOfData As Integer
 End Type
 
@@ -49,19 +49,20 @@ Enum AccentState
     ACCENT_ENABLE_GRADIENT = 1
     ACCENT_ENABLE_TRANSPARENTGRADIENT = 2
     ACCENT_ENABLE_BLURBEHIND = 3
-    ACCENT_INVALID_STATE = 4
+    ACCENT_ENABLE_ACRYLICBLURBEHIND = 4
+    ACCENT_INVALID_STATE = 5
 End Enum
 
 Type AccentPolicy
-    state As AccentState
+    State As AccentState
     flags As Integer
     GradientColor As Integer
-    ID As Integer
+    id As Integer
 End Type
 
 Public Sub Win10Blur(Hwnd As Long)
     Dim Accent As AccentPolicy
-    Accent.state = 3
+    Accent.State = 3
     
     Dim AccentStructSize As Long
     AccentStructSize = 16
@@ -69,23 +70,23 @@ Public Sub Win10Blur(Hwnd As Long)
     Dim AccentPtr As Long
     AccentPtr = VarPtr(Accent)
     
-    Dim data As WindowsCompostionAttributeData
-    With data
+    Dim Data As WindowsCompostionAttributeData
+    With Data
         .Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY
         .SizeOfData = 16
-        .data = AccentPtr
+        .Data = AccentPtr
     End With
     
-    SetWindowCompositionAttribute ByVal Hwnd, data
+    SetWindowCompositionAttribute ByVal Hwnd, Data
 End Sub
 
 Sub Win7Aeros(Hwnd As Long)
-    Dim b As DWM_BLURBEHIND
-    b.dwFlags = DWM_BB_ENABLE
-    b.fEnable = True
-    b.fTransitionOnMaximized = True
-    b.hRgnBlur = vbNull
-    DwmEnableBlurBehindWindow Hwnd, b
+    Dim B As DWM_BLURBEHIND
+    B.dwFlags = DWM_BB_ENABLE
+    B.fEnable = True
+    B.fTransitionOnMaximized = True
+    B.hRgnBlur = vbNull
+    DwmEnableBlurBehindWindow Hwnd, B
 End Sub
 
 Sub BlurWindow(Hwnd As Long)

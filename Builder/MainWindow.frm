@@ -8,6 +8,7 @@ Begin VB.Form MainWindow
    ClientLeft      =   12
    ClientTop       =   12
    ClientWidth     =   9660
+   DrawMode        =   14  'Copy Pen
    Icon            =   "MainWindow.frx":0000
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
@@ -33,6 +34,7 @@ Attribute VB_Exposed = False
     Dim EC As GMan
 '==================================================
 Private Sub DrawTimer_Timer()
+    If App.LogMode <> 0 Then Exit Sub
     '绘制
     If EC.ActivePage = "" Then Exit Sub
     EC.Display
@@ -45,25 +47,19 @@ End Sub
 
 Private Sub Form_Load()
     '初始化Emerald
-    StartEmerald Me.Hwnd, 991, 754
-    'ScaleGame 0.7, ScaleDefault
-<<<<<<< HEAD
+    If SetupMode Then
+        StartEmerald Me.Hwnd, 401, 613
+    Else
+        StartEmerald Me.Hwnd, 991, 754
+    End If
+    'ScaleGame 1.2, ScaleDefault
 
-=======
-    
->>>>>>> 7da8aea3f1f11a7fbe211537042b7146cb726c86
     DebugSwitch.HideLOGO = 1
     DebugSwitch.DisableLOGO = 1
     
     '创建字体
     Set EF = New GFont
-    If PackPos = -1 Then
-        EF.AddFont App.path & "\Builder.UI.otf"
-        EF.MakeFont "Abadi MT Extra Light"
-        'EF.MakeFont "微软雅黑"
-    Else
-        EF.MakeFont "微软雅黑"
-    End If
+    EF.MakeFont "微软雅黑"
     
     '创建页面管理器
     Set EC = New GMan
@@ -87,12 +83,13 @@ Private Sub Form_Load()
         Set SetupPage = New SetupPage
     End If
 
-    ECore.FreezeMode = True
+    'ECore.FreezeMode = True
 
     '设置活动页面
     If PackPos = -1 Then EC.ActivePage = "WelcomePage"
     
-    DrawTimer.Enabled = True
+    UsePaint = True
+    If App.LogMode = 0 Then DrawTimer.Enabled = True
 End Sub
 
 Private Sub Form_MouseDown(button As Integer, Shift As Integer, X As Single, y As Single)
