@@ -26,7 +26,7 @@ Dim Pages() As Page, Transform As Transform
 Dim mPage As String, aPage As Object
 Dim OutOfWindow As Boolean
 Dim FirstPlay As Boolean
-Public CDC As Long, ODC As Long, FDC As Long, GG As Long, pB As Long, Pen As Long
+Public CDC As Long, ODC As Long, FDC As Long, NDC As Long, GG As Long, NGG As Long, pB As Long, Pen As Long
 Public LastPage As String
 Public UpdatingPage As String, LockPage As String, UPage As GPage
 Public FreezeMode As Boolean, FreezeDelay As Long, FreezeResetBegin As Boolean
@@ -70,7 +70,9 @@ Dim FreezeTime As Long
         CDC = CreateCDC(RGW, RGH)
         ODC = CreateCDC(RGW, RGH)
         FDC = CreateCDC(RGW, RGH)
+        NDC = CreateCDC(RGW, RGH)
         PoolCreateFromHdc CDC, GG
+        PoolCreateFromHdc NDC, NGG
         GdipSetSmoothingMode GG, SmoothingModeAntiAlias
         GdipSetTextRenderingHint GG, TextRenderingHintAntiAlias
         PoolCreateSolidFill argb(255, 255, 255, 255), pB
@@ -145,6 +147,17 @@ Dim FreezeTime As Long
             End If
         End If
 
+        ChoosePosition = False
+        If IsKeyPress(VK_DECIMAL) And (App.LogMode = 0) Then
+            Dim OrIndex As Integer
+            OrIndex = SysPage.index
+            SysPage.index = 6
+            SysPage.Page.Update
+            GdipGraphicsClear NGG, 0
+            SysPage.Page.Display NDC
+            SysPage.index = OrIndex
+        End If
+            
         For I = 1 To UBound(Pages)
             CurrentPage = I
             If ActivePage = Pages(I).Name Or (Pages(I).p.TopPage And (Not ErrorMark)) Then
@@ -212,6 +225,10 @@ NoClear:
                 End If
                 FPSct = FPSctt: FPSctt = 0
             End If
+        End If
+        
+        If IsKeyPress(VK_DECIMAL) And (App.LogMode = 0) Then
+            PaintDC NDC, CDC, 0, 0, alpha:=1
         End If
         
         If FMode Then PaintDC CDC, FDC, 0, 0, alpha:=FancyDeepth

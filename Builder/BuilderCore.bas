@@ -45,6 +45,7 @@ Public Sub Main()
     'OPath = "E:\Error 404\Muing III"
     'OPath = "E:\Error 404\Emerald 动画包含资源提取工具\"
     'OPath = "E:\Projects\Rainbow"
+    'OPath = "D:\Test\"
     
     Dim targetEXE As String
     targetEXE = App.path & "\" & App.EXEName & ".exe"
@@ -113,7 +114,7 @@ Public Sub Main()
     EmrPC.AFileHeader = "Emerald Project Config File"
     Call GetVBIDEPath
     If VBIDEPath = "" Then
-        MsgBox "Emerald requires Visual Basic 6.0 .", 16
+        MsgBox "Emerald 需要 Visual Basic 6.0 。", 16
         End
     End If
     MainWindow.Show
@@ -281,7 +282,7 @@ End Sub
 
 Public Function GetDirName() As String
     Dim bi As BROWSEINFO
-    Dim r As Long
+    Dim R As Long
     Dim pidl As Long
     Dim path As String
     Dim pos As Integer
@@ -291,8 +292,8 @@ Public Function GetDirName() As String
     bi.ulFlags = 1
     pidl = SHBrowseForFolder(bi)
     path = Space$(512)
-    r = SHGetPathFromIDList(ByVal pidl&, ByVal path)
-    If r Then
+    R = SHGetPathFromIDList(ByVal pidl&, ByVal path)
+    If R Then
     pos = InStr(path, Chr$(0))
     GetDirName = Left(path, pos - 1)
     Else: GetDirName = ""

@@ -34,7 +34,6 @@ Attribute VB_Exposed = False
     Dim EC As GMan
 '==================================================
 Private Sub DrawTimer_Timer()
-    If App.LogMode <> 0 Then Exit Sub
     '绘制
     If EC.ActivePage = "" Then Exit Sub
     EC.Display
@@ -88,8 +87,7 @@ Private Sub Form_Load()
     '设置活动页面
     If PackPos = -1 Then EC.ActivePage = "WelcomePage"
     
-    UsePaint = True
-    If App.LogMode = 0 Then DrawTimer.Enabled = True
+    DrawTimer.Enabled = True
 End Sub
 
 Private Sub Form_MouseDown(button As Integer, Shift As Integer, X As Single, y As Single)

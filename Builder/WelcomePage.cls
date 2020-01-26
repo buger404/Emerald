@@ -322,7 +322,7 @@ Public Sub DrawProject()
     Page.Writes EmrPC.Name, 381, 170, 18, argb(255, 242, 242, 242)
     Page.Writes "ÖÆ×÷ÈË", 380, 235, 18, argb(255, 34, 208, 196)
     'Page.Writes EmrPC.Maker, 381, 270, 18, argb(255, 242, 242, 242)
-    If Page.ShowEdit(EmrPC.Maker, 0, 373, 270 - 5 + 2, 280, 30, argb(255, 242, 242, 242), argb(0, 255, 255, 255), argb(50, 242, 242, 242), argb(255, 34, 208, 196), 50, size:=18) = 4 Then
+    If Page.ShowEdit(EmrPC.Maker, 0, 380, 270 - 5 + 2, 280, 30, argb(255, 242, 242, 242), argb(0, 255, 255, 255), argb(50, 242, 242, 242), argb(255, 34, 208, 196), size:=18) = 4 Then
         Open OPath & "\.emerald" For Binary As #1
         Put #1, , EmrPC
         Close #1
@@ -621,7 +621,9 @@ Public Sub Update()
         Cliped = 2
     End If
     
-    Page.Clear argb(0, 0, 0, 0): Page.DrawImage "background.png", 0, 0, alpha:=1: Cliped = 1
+    Page.Clear argb(0, 0, 0, 0)
+    Page.DrawImage "background" & IIf((ESave.GetData("Emerald 3.1") = "") Or (ReadProject = False And OPath <> "" And Dir(OPath & "\.emerald") = ""), "2", "") & ".png", 0, 0, alpha:=1
+    If Cliped = 0 Then Cliped = 1
     
     'Page.PaintLine 342, 32 + 24, 342, GH - 40 - 24 + 1, argb(255, 235, 235, 235), 1
     
@@ -678,11 +680,11 @@ SkipThis:
         Case 5: DrawAbout
     End Select
      
-    If ESave.GetData("Emerald 3.0") = "" And Cliped >= 1 Then
+    If ESave.GetData("Emerald 3.1") = "" And Cliped = 2 Then
         ECore.ActivePage = "ToNewPage"
         Exit Sub
     End If
-    If ReadProject = False And OPath <> "" And Cliped >= 1 Then
+    If ReadProject = False And OPath <> "" And Cliped = 2 Then
         ReadProject = True
         If Dir(OPath & "\.emerald") = "" Then
             ECore.ActivePage = "ToNewPage"

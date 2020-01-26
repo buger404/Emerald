@@ -18,6 +18,7 @@ Public BDC As Long
 Public Key As Integer
 Public OpenTime As Long, DoneMark As Boolean, DoneStep As Integer
 Public DataPage As Integer
+Dim RectMode As Integer
 Dim ChangeTime As Long, LastLoadPro As Single, LastLoadPro2 As Single
 Dim max2 As Long
 Dim LOGO As Long, bitmap As Long
@@ -36,7 +37,97 @@ Public Sub Update()
         Call SuggestionDialog
         Case 5
         Call PageDialog
+        Case 6
+        Call DesignDialog
     End Select
+End Sub
+Public Sub DesignDialog()
+    Page.Clear argb(60, 0, 0, 0)
+    ChoosePosition = True
+    
+    Dim OX As Long, OY As Long
+    Dim m As Integer
+    m = CheckMouse(0, 0, RGW, RGH)
+    
+    If m >= MButtonState.mMouseDown And Mouse.button = 1 Then
+        If RectMode = 0 Then
+            With ChooseRect
+                .Left = Mouse.X
+                .top = Mouse.Y
+                .Right = Mouse.X
+                .Bottom = Mouse.Y
+            End With
+            RectMode = 1
+        End If
+        
+        With ChooseRect
+            .Right = Mouse.X
+            .Bottom = Mouse.Y
+        End With
+            
+        If m = MButtonState.mMouseUp Then
+            If ChooseRect.Right < ChooseRect.Left Then
+                OX = ChooseRect.Left: ChooseRect.Left = ChooseRect.Right: ChooseRect.Right = OX
+            End If
+            If ChooseRect.Bottom < ChooseRect.top Then
+                OY = ChooseRect.top: ChooseRect.top = ChooseRect.Bottom: ChooseRect.Bottom = OY
+            End If
+            RectMode = 0
+        End If
+    End If
+    'Page.Paint 1, Mouse.X, Mouse.y, 20, 20, argb(128, 255, 255, 255), pos:=posOnCenter
+    Dim yes As Boolean
+    If UBound(ChooseLines) = 0 Then
+        For I = 1 To 14
+            yes = (Abs(Mouse.X - I / 14 * RGW) < 5)
+            Page.PaintLine I / 14 * RGW, 0, I / 14 * RGW, RGH, argb(IIf(yes, 225, 30) + IIf(I = 7, 30, 0), 255, 255, 255), 2
+            If yes And (m > 1) Then
+                If ChooseRect.Left = ChooseRect.Right Then ChooseRect.Left = I / 14 * RGW
+                ChooseRect.Right = I / 14 * RGW
+            End If
+            yes = (Abs(Mouse.Y - I / 14 * RGH) < 5)
+            Page.PaintLine 0, I / 14 * RGH, RGW, I / 14 * RGH, argb(IIf(yes, 225, 30) + IIf(I = 7, 30, 0), 255, 255, 255), 2
+            If yes And (m > 1) Then
+                If ChooseRect.top = ChooseRect.Bottom Then ChooseRect.top = I / 14 * RGH
+                ChooseRect.Bottom = I / 14 * RGH
+            End If
+        Next
+    End If
+    
+    Dim NRect As RECT
+    NRect = ChooseRect
+    
+    If NRect.Right < NRect.Left Then
+        OX = NRect.Left: NRect.Left = NRect.Right: NRect.Right = OX
+    End If
+    If NRect.Bottom < NRect.top Then
+        OY = NRect.top: NRect.top = NRect.Bottom: NRect.Bottom = OY
+    End If
+    Page.Paint 0, NRect.Left, NRect.top, NRect.Right - NRect.Left, NRect.Bottom - NRect.top, argb(128, 255, 255, 255)
+    Page.Writes "(" & NRect.Left & "," & NRect.top & ") - (" & NRect.Right - NRect.Left & "," & NRect.Bottom - NRect.top & ")", (NRect.Left + NRect.Right) / 2, (NRect.top + NRect.Bottom) / 2 - 9 / 0.75 - 1, 18, argb(255, 255, 255, 255), align:=StringAlignmentCenter, style:=FontStyleBold
+    
+    If m = MButtonState.mMouseUp And Mouse.button = 2 Then
+        On Error Resume Next
+        Clipboard.Clear
+        Clipboard.SetText NRect.Left & "," & NRect.top & "," & NRect.Right - NRect.Left & "," & NRect.Bottom - NRect.top
+        MsgBox "复制成功！", 64, "Emerald 界面设计器"
+        Mouse.State = 0
+    End If
+    
+    Page.Writes "(" & Mouse.X & "," & Mouse.Y & ")", Mouse.X + 24, Mouse.Y + 24, 18, argb(255, 255, 255, 255), style:=FontStyleBold
+
+    For I = 1 To UBound(ChooseLines)
+        Page.Paint 0, ChooseLines(I).R.Left, ChooseLines(I).R.top, ChooseLines(I).R.Right, ChooseLines(I).R.Bottom, argb(108, 0, 0, 255)
+        If ChooseLines(I).Mode = 0 Then
+            Page.PaintLine ChooseLines(I).Data, 0, ChooseLines(I).Data, RGH, argb(255, 0, 0, 255), 1
+        Else
+            Page.PaintLine 0, ChooseLines(I).Data, RGW, ChooseLines(I).Data, argb(255, 0, 0, 255), 1
+        End If
+    Next
+    ReDim ChooseLines(0)
+    
+    Page.PaintLine 0, Mouse.Y, RGW, Mouse.Y, argb(200, 255, 0, 0), 2
+    Page.PaintLine Mouse.X, 0, Mouse.X, RGH, argb(200, 255, 0, 0), 2
 End Sub
 Public Sub PageDialog()
     Page.Clear argb(0, 0, 0, 0)
@@ -218,6 +309,8 @@ Public Sub AnimationDone(id As Integer)
 End Sub
 Private Sub Class_Initialize()
     Set Page = New GPage
+    Page.IsSystem = True
+    
     Page.Create Me
     Page.Res.NewImages App.path & "\assets\debug"
     If Dir(App.path & "\assets\sets\profile.png") <> "" Then

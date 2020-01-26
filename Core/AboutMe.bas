@@ -58,6 +58,9 @@ Attribute VB_Name = "AboutMe"
 '   -重置Builder UI
 '   -添加WM_PAINT绘制模式
 '   -现在可以关闭建议中心
+'   -修复UI问题
+'   -添加界面设计器
+'   -图片不存在的提示
 '   更新内容(ver.1215)
 '   -添加FreezeMode
 '   更新内容(ver.1211)

@@ -78,8 +78,9 @@ Private Sub Form_Load()
     Set Page = New GPage
     Set Console = New GDebug
     
+    Page.IsSystem = True
     Page.Create Console
-    Page.Res.NewImages App.Path & "\assets\debug", 64, 64
+    Page.Res.NewImages App.path & "\assets\debug", 64, 64
     
     Set Console.Page = Page
     Console.PageMark = 1
@@ -103,34 +104,34 @@ Private Sub Form_Load()
 
 End Sub
 
-Private Sub Form_MouseDown(button As Integer, Shift As Integer, X As Single, y As Single)
-    If y <= 40 And button = 1 Then
+Private Sub Form_MouseDown(button As Integer, Shift As Integer, X As Single, Y As Single)
+    If Y <= 40 And button = 1 Then
         ReleaseCapture
         SendMessageA Me.Hwnd, WM_SYSCOMMAND, SC_MOVE Or HTCAPTION, 0
     End If
-    Call Form_MouseMove(button, Shift, X, y)
+    Call Form_MouseMove(button, Shift, X, Y)
     If button = 1 Then
-        If Console.NeedScroll And X >= Console.GW - 20 And X <= Console.GW - 10 And y >= 40 Then
+        If Console.NeedScroll And X >= Console.GW - 20 And X <= Console.GW - 10 And Y >= 40 Then
             SetCapture Me.Hwnd
             ScrollMode = True
         End If
     End If
 End Sub
 
-Private Sub Form_MouseMove(button As Integer, Shift As Integer, X As Single, y As Single)
+Private Sub Form_MouseMove(button As Integer, Shift As Integer, X As Single, Y As Single)
     If button = 1 Then
         If Console.NeedScroll And ScrollMode Then
             Dim MaxY As Single
             MaxY = (Console.CuY - Console.GH + 80) / 3220
-            Console.sy = (y - 60) / (Console.GH - 60 - 20) * MaxY
+            Console.sy = (Y - 60) / (Console.GH - 60 - 20) * MaxY
             If Console.sy < 0 Then Console.sy = 0
             If Console.sy > MaxY Then Console.sy = MaxY
         End If
     End If
 End Sub
 
-Private Sub Form_MouseUp(button As Integer, Shift As Integer, X As Single, y As Single)
-    Call Form_MouseMove(button, Shift, X, y)
+Private Sub Form_MouseUp(button As Integer, Shift As Integer, X As Single, Y As Single)
+    Call Form_MouseMove(button, Shift, X, Y)
     If ScrollMode Then ReleaseCapture: ScrollMode = False
 End Sub
 

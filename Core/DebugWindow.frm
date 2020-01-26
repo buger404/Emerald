@@ -46,6 +46,7 @@ Private Sub Form_Load()
     Set Page = New GPage
     Set Charge = New GDebug
     
+    Page.IsSystem = True
     Page.Create Charge
     Page.Res.NewImages App.path & "\assets\debug", 64, 64
     

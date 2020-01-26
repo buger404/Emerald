@@ -21,7 +21,7 @@ Attribute VB_Exposed = False
 '======================================
 Public Sub DrawPage0()
     Page.DrawImageEx "emerald.png", GW / 2, GH / 2 - 80, 128, 128, posOnCenter
-    Page.Writes "欢迎使用 Emerald 3.0", GW / 2, GH / 2 + 30, 24, argb(255, 64, 64, 64), align:=StringAlignmentCenter, animation:=1
+    Page.Writes "欢迎使用 Emerald 3.1", GW / 2, GH / 2 + 30, 24, argb(255, 64, 64, 64), align:=StringAlignmentCenter, animation:=1
     Page.Writes "更棒的UI和用户体验", GW / 2, GH / 2 + 70, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter, animation:=2
     
     If Page.ShowColorButton(0, GW / 2 - 70, GH - 150, 140, 40, "开始吧", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18) = 3 Then
@@ -52,7 +52,7 @@ Public Sub DrawPage2()
     Page.DrawImageEx "user.png", GW / 2, GH / 2 - 120, 128, 128, posOnCenter
     Page.Writes "留下你的足迹", GW / 2, GH / 2 - 10, 24, argb(255, 64, 64, 64), align:=StringAlignmentCenter, animation:=1
     Page.Writes "告诉我你的名字，它将会显示在你的游戏中。", GW / 2, GH / 2 + 30, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter, animation:=2
-    Page.ShowEdit Maker, 2, GW / 2 - 250, GH / 2 + 80, 500, 40, argb(255, 96, 96, 96), argb(255, 242, 242, 242), argb(255, 232, 232, 232), argb(255, 100, 62, 255), 50, size:=18
+    Page.ShowEdit Maker, 0, GW / 2 - 250, GH / 2 + 80, 500, 40, argb(255, 96, 96, 96), argb(255, 242, 242, 242), argb(255, 232, 232, 232), argb(255, 100, 62, 255), 50, size:=18
     If Page.ShowColorButton(0, GW / 2 - 70, GH - 150, 140, 40, "确定", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18, style:=FontStyleBold) = 3 Then
         If Maker = "" Then MsgBox "请告诉我你的名字。", 64: Exit Sub
         ESave.PutData "Maker", Maker
@@ -81,8 +81,13 @@ Public Sub DrawPage3()
                 FileCopy App.path & "\Example\Emerald Page.cls", VBIDEPath & "Template\Classes\Emerald Page.cls"
             End If
             If CreateContentMenu Then OperContentMenu False
-            ESave.PutData "Emerald 3.0", "√"
-            ECore.NewTransform transToRight, 1000, "WelcomePage"
+            ESave.PutData "Emerald 3.1", "√"
+            
+            GdipResetClip WelcomePage.Page.GG
+            SelectClipRgn GCore.GDC, 0
+            SelectClipRgn ECore.CDC, 0
+            WelcomePage.Cliped = 0
+            ECore.ActivePage = "WelcomePage"
         End If
     End If
 End Sub
@@ -111,19 +116,18 @@ Public Sub DrawPage4()
     End If
 End Sub
 Public Sub DrawPage5()
-    Page.DrawImageEx "emerald.png", 100, 100, 64, 64, posOnCenter
-    Page.Writes "你好", 169, 74, 24, argb(255, 64, 64, 64)
-    Page.Writes "开始创建我们的游戏", 170, 108, 18, argb(255, 96, 96, 96)
+    Page.Writes "欢迎使用 Emerald 游戏创建向导", 70, 104, 18, argb(255, 64, 64, 64)
+    Page.Writes "使用此向导快速创建您的游戏", 70, 128, 18, argb(255, 96, 96, 96)
     
-    Page.Writes "游戏名称", 70, 200, 24, argb(255, 100, 62, 255)
-    Page.ShowEdit ProjectName, 2, 63, 240, 500, 30, argb(255, 96, 96, 96), argb(0, 255, 255, 255), argb(255, 242, 242, 242), argb(255, 100, 62, 255), 50, size:=18
+    Page.Writes "欲创建游戏的名称", 70, 200, 18, argb(255, 100, 62, 255)
+    Page.ShowEdit ProjectName, 0, 70, 240, 500, 30, argb(255, 96, 96, 96), argb(0, 255, 255, 255), argb(255, 242, 242, 242), argb(255, 100, 62, 255), size:=18
 
-    Page.Writes "选项", 70, 320, 24, argb(255, 100, 62, 255)
+    Page.Writes "选项", 70, 320, 18, argb(255, 100, 62, 255)
     Page.ShowColorCheckBox InitWindow, 73, 360, 500, 20, "创建好一个游戏窗口", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
     Page.ShowColorCheckBox InitPage, 73, 390, 500, 20, "创建好一个游戏页面", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
     Page.ShowColorCheckBox OpenPro, 73, 420, 500, 20, "在我创建完之后打开工程", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
 
-    If Page.ShowColorButton(2, GW / 2 - 70, GH - 120, 140, 40, "好的", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18, style:=FontStyleBold) = 3 Then
+    If Page.ShowColorButton(0, GW / 2 - 70, GH - 120, 140, 40, "好的", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18, style:=FontStyleBold) = 3 Then
         If CheckFileName(ProjectName) = False Or ProjectName = "" Then MsgBox "这个游戏名称不能被接受呢。换一个吧。", 64: Exit Sub
         
         If Dir(OPath & "\core", vbDirectory) = "" Then MkDir OPath & "\core"
@@ -171,7 +175,12 @@ Public Sub DrawPage5()
         Put #1, , EmrPC
         Close #1
         
-        ECore.NewTransform transToRight, 1000, "WelcomePage"
+        GdipResetClip WelcomePage.Page.GG
+        SelectClipRgn GCore.GDC, 0
+        SelectClipRgn ECore.CDC, 0
+        WelcomePage.Cliped = 0
+        ECore.ActivePage = "WelcomePage"
+        
         WelcomePage.UpdateProject
         WelcomePage.WriteCache
         
@@ -181,8 +190,9 @@ End Sub
 Public Sub Update()
     '游戏每一帧的过程（绘制过程请放在此处）
     
-    Page.Clear argb(255, 255, 255, 255) '清空画布
-
+    Page.Clear 0 '清空画布
+    Page.DrawImage "background2.png", 0, 0, alpha:=1
+    
     CallByName Me, "DrawPage" & PageIndex, VbMethod
 End Sub
 Public Sub Wheel(Direction As Integer, Depth As Single)
@@ -197,6 +207,7 @@ Public Sub Enter()
     Page.StartAnimation 1, 500
     Page.StartAnimation 2, 750
     ProjectName = "Project1"
+    Maker = ESave.GetData("Maker")
 End Sub
 Public Sub Leave()
     '页面离开事件
@@ -216,7 +227,7 @@ Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
     '导入游戏资源
-    If PackPos = -1 Then Page.Res.NewImages App.path & "\assets"
+    If PackPos = -1 Then Page.Res.NewImages App.path & "\assets", 0.75
     '创建页面
     ECore.Add Page, "ToNewPage"
     
