@@ -61,45 +61,46 @@ Attribute VB_Name = "DebugSwitch"
 '======================================================
 '   警告：不要修改下列代码
     Public DebugMode As Integer, DisableLOGO As Integer, HideLOGO As Integer, HideSuggest As Integer, UpdateCheckInterval As Long, UpdateTimeOut As Long
-    Public Debug_focus As Boolean, Debug_pos As Boolean, Debug_data As Boolean, Debug_mouse As Boolean
+    Public Debug_focus As Boolean, Debug_pos As Boolean, Debug_data As Boolean, Debug_mouse As Boolean, Debug_umode As Integer
     Public ChoosePosition As Boolean, ChooseRect As RECT
     Public ChooseLines() As ChooseLine
+    Public FPSRecord(20) As Long
     Public Type ChooseLine
-        Mode As Integer
+        mode As Integer
         Data As Long
         R As RECT
     End Type
-    Public Sub JudgeChoosePosition(ByVal X As Long, ByVal Y As Long, ByVal W As Long, ByVal H As Long)
+    Public Sub JudgeChoosePosition(ByVal X As Long, ByVal y As Long, ByVal W As Long, ByVal H As Long)
         If (Abs(Mouse.X - X) < 5) Then
             ReDim Preserve ChooseLines(UBound(ChooseLines) + 1)
-            ChooseLines(UBound(ChooseLines)).Mode = 0
+            ChooseLines(UBound(ChooseLines)).mode = 0
             ChooseLines(UBound(ChooseLines)).Data = X
             With ChooseLines(UBound(ChooseLines)).R
-                .Left = X: .top = Y: .Right = W: .Bottom = H
+                .Left = X: .top = y: .Right = W: .Bottom = H
             End With
         End If
-        If (Abs(Mouse.Y - Y) < 5) Then
+        If (Abs(Mouse.y - y) < 5) Then
             ReDim Preserve ChooseLines(UBound(ChooseLines) + 1)
-            ChooseLines(UBound(ChooseLines)).Mode = 1
-            ChooseLines(UBound(ChooseLines)).Data = Y
+            ChooseLines(UBound(ChooseLines)).mode = 1
+            ChooseLines(UBound(ChooseLines)).Data = y
             With ChooseLines(UBound(ChooseLines)).R
-                .Left = X: .top = Y: .Right = W: .Bottom = H
+                .Left = X: .top = y: .Right = W: .Bottom = H
             End With
         End If
         If (Abs(Mouse.X - (X + W)) < 5) Then
             ReDim Preserve ChooseLines(UBound(ChooseLines) + 1)
-            ChooseLines(UBound(ChooseLines)).Mode = 0
+            ChooseLines(UBound(ChooseLines)).mode = 0
             ChooseLines(UBound(ChooseLines)).Data = X + W
             With ChooseLines(UBound(ChooseLines)).R
-                .Left = X: .top = Y: .Right = W: .Bottom = H
+                .Left = X: .top = y: .Right = W: .Bottom = H
             End With
         End If
-        If (Abs(Mouse.Y - (Y + H)) < 5) Then
+        If (Abs(Mouse.y - (y + H)) < 5) Then
             ReDim Preserve ChooseLines(UBound(ChooseLines) + 1)
-            ChooseLines(UBound(ChooseLines)).Mode = 1
-            ChooseLines(UBound(ChooseLines)).Data = Y + H
+            ChooseLines(UBound(ChooseLines)).mode = 1
+            ChooseLines(UBound(ChooseLines)).Data = y + H
             With ChooseLines(UBound(ChooseLines)).R
-                .Left = X: .top = Y: .Right = W: .Bottom = H
+                .Left = X: .top = y: .Right = W: .Bottom = H
             End With
         End If
     End Sub

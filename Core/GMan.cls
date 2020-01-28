@@ -43,6 +43,7 @@ Dim FreezeTime As Long
         FreezeTime = GetTickCount
     End Sub
     Public Property Get FreezeAvailable() As Boolean
+        If Not FreezeMode Then Exit Property
         Dim Ret As Boolean
         Ret = False
         If FreezeMode Then Ret = (GetTickCount - FreezeTime >= FreezeDelay)
@@ -224,6 +225,10 @@ NoClear:
                     Suggest "FPS¹ýµÍ¡£", ClearOnOnce, 2
                 End If
                 FPSct = FPSctt: FPSctt = 0
+                For I = 0 To 19
+                    FPSRecord(I) = FPSRecord(I + 1)
+                Next
+                FPSRecord(20) = FPS
             End If
         End If
         

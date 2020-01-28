@@ -53,16 +53,16 @@ Public Sub DesignDialog()
         If RectMode = 0 Then
             With ChooseRect
                 .Left = Mouse.X
-                .top = Mouse.Y
+                .top = Mouse.y
                 .Right = Mouse.X
-                .Bottom = Mouse.Y
+                .Bottom = Mouse.y
             End With
             RectMode = 1
         End If
         
         With ChooseRect
             .Right = Mouse.X
-            .Bottom = Mouse.Y
+            .Bottom = Mouse.y
         End With
             
         If m = MButtonState.mMouseUp Then
@@ -82,17 +82,40 @@ Public Sub DesignDialog()
             yes = (Abs(Mouse.X - I / 14 * RGW) < 5)
             Page.PaintLine I / 14 * RGW, 0, I / 14 * RGW, RGH, argb(IIf(yes, 225, 30) + IIf(I = 7, 30, 0), 255, 255, 255), 2
             If yes And (m > 1) Then
-                If ChooseRect.Left = ChooseRect.Right Then ChooseRect.Left = I / 14 * RGW
-                ChooseRect.Right = I / 14 * RGW
+                If Debug_umode = 2 Then
+                    If ChooseRect.Left = ChooseRect.Right Then ChooseRect.Left = I / 14 * RGW
+                    ChooseRect.Right = I / 14 * RGW
+                End If
             End If
-            yes = (Abs(Mouse.Y - I / 14 * RGH) < 5)
+            yes = (Abs(Mouse.y - I / 14 * RGH) < 5)
             Page.PaintLine 0, I / 14 * RGH, RGW, I / 14 * RGH, argb(IIf(yes, 225, 30) + IIf(I = 7, 30, 0), 255, 255, 255), 2
             If yes And (m > 1) Then
-                If ChooseRect.top = ChooseRect.Bottom Then ChooseRect.top = I / 14 * RGH
-                ChooseRect.Bottom = I / 14 * RGH
+                If Debug_umode = 2 Then
+                    If ChooseRect.top = ChooseRect.Bottom Then ChooseRect.top = I / 14 * RGH
+                    ChooseRect.Bottom = I / 14 * RGH
+                End If
             End If
         Next
     End If
+    
+    For I = 1 To UBound(ChooseLines)
+        Page.Paint 0, ChooseLines(I).R.Left, ChooseLines(I).R.top, ChooseLines(I).R.Right, ChooseLines(I).R.Bottom, argb(108, 0, 0, 255)
+        If ChooseLines(I).mode = 0 Then
+            Page.PaintLine ChooseLines(I).Data, 0, ChooseLines(I).Data, RGH, argb(255, 0, 0, 255), 1
+        Else
+            Page.PaintLine 0, ChooseLines(I).Data, RGW, ChooseLines(I).Data, argb(255, 0, 0, 255), 1
+        End If
+        If Debug_umode = 1 And m > 1 Then
+            If ChooseLines(I).mode = 0 Then
+                If ChooseRect.Left = ChooseRect.Right Then ChooseRect.Left = ChooseLines(I).Data
+                ChooseRect.Right = ChooseLines(I).Data
+            Else
+                If ChooseRect.top = ChooseRect.Bottom Then ChooseRect.top = ChooseLines(I).Data
+                ChooseRect.Bottom = ChooseLines(I).Data
+            End If
+        End If
+    Next
+    ReDim ChooseLines(0)
     
     Dim NRect As RECT
     NRect = ChooseRect
@@ -114,19 +137,9 @@ Public Sub DesignDialog()
         Mouse.State = 0
     End If
     
-    Page.Writes "(" & Mouse.X & "," & Mouse.Y & ")", Mouse.X + 24, Mouse.Y + 24, 18, argb(255, 255, 255, 255), style:=FontStyleBold
-
-    For I = 1 To UBound(ChooseLines)
-        Page.Paint 0, ChooseLines(I).R.Left, ChooseLines(I).R.top, ChooseLines(I).R.Right, ChooseLines(I).R.Bottom, argb(108, 0, 0, 255)
-        If ChooseLines(I).Mode = 0 Then
-            Page.PaintLine ChooseLines(I).Data, 0, ChooseLines(I).Data, RGH, argb(255, 0, 0, 255), 1
-        Else
-            Page.PaintLine 0, ChooseLines(I).Data, RGW, ChooseLines(I).Data, argb(255, 0, 0, 255), 1
-        End If
-    Next
-    ReDim ChooseLines(0)
+    Page.Writes "(" & Mouse.X & "," & Mouse.y & ")", Mouse.X + 24, Mouse.y + 24, 18, argb(255, 255, 255, 255), style:=FontStyleBold
     
-    Page.PaintLine 0, Mouse.Y, RGW, Mouse.Y, argb(200, 255, 0, 0), 2
+    Page.PaintLine 0, Mouse.y, RGW, Mouse.y, argb(200, 255, 0, 0), 2
     Page.PaintLine Mouse.X, 0, Mouse.X, RGH, argb(200, 255, 0, 0), 2
 End Sub
 Public Sub PageDialog()

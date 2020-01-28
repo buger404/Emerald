@@ -23,10 +23,10 @@ End Function
 Public Function IsCrash() As Boolean
 
     Dim StartX As Long, StartY As Long, EndX As Long, EndY As Long
-    If tF.x > DrawF.x Then
-        StartX = tF.x: EndX = DrawF.x + DrawF.Width
+    If tF.X > DrawF.X Then
+        StartX = tF.X: EndX = DrawF.X + DrawF.Width
     Else
-        StartX = DrawF.x: EndX = tF.x + tF.Width
+        StartX = DrawF.X: EndX = tF.X + tF.Width
     End If
     If tF.y > DrawF.y Then
         StartY = tF.y: EndY = DrawF.y + DrawF.Height
@@ -50,12 +50,12 @@ Public Function IsCrash() As Boolean
     w2 = UBound(ColorLists(DrawF.CrashIndex).IsAlpha, 1)
     h2 = UBound(ColorLists(DrawF.CrashIndex).IsAlpha, 2)
     
-    For x = StartX - tF.x To EndX - tF.x
+    For X = StartX - tF.X To EndX - tF.X
         For y = StartY - tF.y To EndY - tF.y
-            If x * tF.WSc <= w1 And y * tF.HSc <= h1 And x >= 0 And y >= 0 Then
-                If ColorLists(tF.CrashIndex).IsAlpha(x * tF.WSc, y * tF.HSc) Then
+            If X * tF.WSc <= w1 And y * tF.HSc <= h1 And X >= 0 And y >= 0 Then
+                If ColorLists(tF.CrashIndex).IsAlpha(X * tF.WSc, y * tF.HSc) Then
                     Ret = True
-                    X2 = (x + tF.x - DrawF.x) * DrawF.WSc
+                    X2 = (X + tF.X - DrawF.X) * DrawF.WSc
                     Y2 = (y + tF.y - DrawF.y) * DrawF.HSc
                     If X2 <= w2 And Y2 <= h2 And X2 >= 0 And Y2 >= 0 Then
                         Ret = Ret And ColorLists(DrawF.CrashIndex).IsAlpha(X2, Y2)

@@ -23,8 +23,8 @@ Dim Hwnd As Long, mRate As Long, mVolume As Single
     Public Property Get IsPlaying() As Boolean
         IsPlaying = (BASS_ChannelIsActive(Hwnd) <> 0)
     End Property
-    Public Property Get length() As Double
-        length = BASS_ChannelBytes2Seconds(Hwnd, BASS_ChannelGetLength(Hwnd, BASS_POS_BYTE))
+    Public Property Get Length() As Double
+        Length = BASS_ChannelBytes2Seconds(Hwnd, BASS_ChannelGetLength(Hwnd, BASS_POS_BYTE))
     End Property
     Public Property Get position() As Double
         position = BASS_ChannelBytes2Seconds(Hwnd, BASS_ChannelGetPosition(Hwnd, BASS_POS_BYTE))
@@ -42,23 +42,23 @@ Dim Hwnd As Long, mRate As Long, mVolume As Single
     Public Property Get rate() As Single
         rate = mRate
     End Property
-    Public Property Let rate(r As Single)
-        BASS_ChannelSetAttribute Hwnd, BASS_ATTRIB_FREQ, 44100 * r
-        mRate = r
+    Public Property Let rate(R As Single)
+        BASS_ChannelSetAttribute Hwnd, BASS_ATTRIB_FREQ, 44100 * R
+        mRate = R
     End Property
 '========================================================
 '   Init
     Private Sub Class_Initialize()
         mVolume = 0.5: mRate = 1
     End Sub
-    Public Sub Create(ByVal path As String)
+    Public Sub Create(ByVal Path As String)
         If Not BassInstalled Then
-            BASS_Init -1, 44100, BASS_DEVICE_3D, Hwnd, 0
+            BASS_Init -1, 44100, BASS_DEVICE_3D, GHwnd, 0
             BassInstalled = True
         End If
         
         If Hwnd <> 0 Then Call Dispose
-        Hwnd = BASS_StreamCreateFile(BASSFALSE, StrPtr(path), 0, 0, 0)
+        Hwnd = BASS_StreamCreateFile(BASSFALSE, StrPtr(Path), 0, 0, 0)
         BASS_ChannelSetAttribute Hwnd, BASS_ATTRIB_VOL, mVolume
         BASS_ChannelSetAttribute Hwnd, BASS_ATTRIB_FREQ, 44100 * mRate
     End Sub
@@ -84,30 +84,30 @@ Dim Hwnd As Long, mRate As Long, mVolume As Single
 '   MusicMap
     Function GetMusicMap() As Single()
         On Error Resume Next
-        Dim i As Long, di As Long, j As Long, returns(512) As Single
+        Dim I As Long, di As Long, J As Long, returns(512) As Single
         Dim tmp As Long
         
         If BASS_ChannelIsActive(Hwnd) <> BASS_ACTIVE_PLAYING Then Exit Function
         
         Call BASS_ChannelGetData(Hwnd, FFTData(0), BASS_DATA_FFT1024)
         
-        For i = 0 To UBound(FFTData) - 1
-            di = Int(Abs(FFTData(i)) * 7500)
-            j = i Mod 129
+        For I = 0 To UBound(FFTData) - 1
+            di = Int(Abs(FFTData(I)) * 7500)
+            J = I Mod 129
             If di > 1500 Then di = 1500
-            If di >= FFTPeacks(j) Then
-                FFTPeacks(j) = di
+            If di >= FFTPeacks(J) Then
+                FFTPeacks(J) = di
             Else
-                FFTPeacks(j) = FFTPeacks(j) - 10
+                FFTPeacks(J) = FFTPeacks(J) - 10
             End If
-            If di >= FFTFallOff(j) Then
-                FFTFallOff(j) = di
+            If di >= FFTFallOff(J) Then
+                FFTFallOff(J) = di
             Else
-                FFTFallOff(j) = FFTFallOff(j) - 30
+                FFTFallOff(J) = FFTFallOff(J) - 30
             End If
-            If (1500 - FFTPeacks(j)) > 1500 Then FFTPeacks(j) = 0
-            If (1500 - FFTFallOff(j)) > 1500 Then FFTFallOff(j) = 0
-            returns(i) = FFTFallOff(j)
+            If (1500 - FFTPeacks(J)) > 1500 Then FFTPeacks(J) = 0
+            If (1500 - FFTFallOff(J)) > 1500 Then FFTFallOff(J) = 0
+            returns(I) = FFTFallOff(J)
         Next
         GetMusicMap = returns
     End Function

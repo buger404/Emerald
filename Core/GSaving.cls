@@ -23,7 +23,7 @@ Private Type SaveFile
 End Type
 Dim MySave As SaveFile
 Public AutoSave As Boolean
-Public sToken As Boolean, path As String
+Public sToken As Boolean, Path As String
 Public Key As String
 '========================================================
 '   Init
@@ -32,9 +32,9 @@ Public Key As String
     
         If XPMode Then
             If Dir("C:\Emerad\", vbDirectory) = "" Then MkDir "C:\Emerad\"
-            path = "C:\Emerad\" & Name
+            Path = "C:\Emerad\" & Name
         Else
-            path = "C:\Users\" & PoolCreateObject("Wscript.Network").Username & "\AppData\Local\" & Name
+            Path = "C:\Users\" & PoolCreateObject("Wscript.Network").Username & "\AppData\Local\" & Name
         End If
         
         AutoSave = True
@@ -42,11 +42,11 @@ Public Key As String
         If Not IsMissing(BMKey) Then Key = BMKey
         
         ReDim MySave.Data(0)
-        If Dir(path & "\", vbDirectory) = "" Then
+        If Dir(Path & "\", vbDirectory) = "" Then
             If Name <> "Emerald.Core" Then
                 SysPage.index = 0: SysPage.Key = 0
                 If XPMode Then
-                    SysPage.Key = MsgBox("你希望该应用在以下位置保存数据吗？" & vbCrLf & ESave.path & vbCrLf & "*如果不允许，该应用可能永远保持初始状态。", 64 + vbYesNo) = vbYes
+                    SysPage.Key = MsgBox("你希望该应用在以下位置保存数据吗？" & vbCrLf & ESave.Path & vbCrLf & "*如果不允许，该应用可能永远保持初始状态。", 64 + vbYesNo) = vbYes
                 Else
                     Dim Win As Object
                     Set Win = StartScreenDialog(600, 400, SysPage)
@@ -57,14 +57,14 @@ Public Key As String
                     Unload Win
                 End If
                 
-                If SysPage.Key = 1 Then MkDir path & "\": Create = True
+                If SysPage.Key = 1 Then MkDir Path & "\": Create = True
             Else
-                MkDir path & "\"
+                MkDir Path & "\"
             End If
         Else
-            If Dir(path & "\save") <> "" Then
+            If Dir(Path & "\save") <> "" Then
                 On Error GoTo ErrHandle
-                Open path & "\save" For Binary As #1
+                Open Path & "\save" For Binary As #1
                 Get #1, , MySave
                 Close #1
                 Call CheckSave
@@ -110,7 +110,7 @@ ErrHandle:
     End Function
     Public Sub Save()
         If sToken = False Then Exit Sub
-        Open path & "\save" For Binary As #1
+        Open Path & "\save" For Binary As #1
         Put #1, , MySave
         Close #1
     End Sub

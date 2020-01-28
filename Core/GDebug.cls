@@ -153,7 +153,7 @@ Private Sub CheckUpdate(force As Boolean)
     If Now - CDate(Data.GetData("UpdateTime")) >= UpdateCheckInterval Or force Or Data.GetData("UpdateAble") = 1 Then
         Data.PutData "UpdateTime", Now
         
-        Dim xmlHttp As Object, ret As String, Start As Long
+        Dim xmlHttp As Object, Ret As String, Start As Long
         
         SetConsoleColor colors.DefaultText
         WriteLine "Emerald: connecting to the server"
@@ -183,14 +183,14 @@ Private Sub CheckUpdate(force As Boolean)
             Debuginfo.UpdateTimer_Timer
             Sleep 10: DoEvents
         Loop
-        ret = xmlHttp.responseText
+        Ret = xmlHttp.responseText
         Set xmlHttp = Nothing
         SetConsoleColor colors.SuccessText
-        WriteLine "Emerald-Success: the lastest version from the server " & Val(ret)
+        WriteLine "Emerald-Success: the lastest version from the server " & Val(Ret)
         SetConsoleColor colors.ContentText
         WriteLine "Emerald: current version " & Version
         
-        If Val(ret) > Version And App.LogMode = 0 Then
+        If Val(Ret) > Version And App.LogMode = 0 Then
             SetConsoleColor colors.SuccessText
             WriteLine "Emerald: update available , plz visit 'https://github.com/Red-Error404/Emerald/release' to download ."
             Exit Sub
@@ -868,24 +868,52 @@ Public Sub Update()
     If PageMark = 1 Then Call Update2: Exit Sub
 
     On Error Resume Next
+    Dim W As Long, H As Long, pro As Single
+    W = GW / 21
+    Dim LY(20) As Long
+    For I = 0 To 20
+        H = (FPSRecord(I) - 24) / 40 * (GH - 7)
+        If H <= 0 Then H = 1
+        If H > GH - 7 Then H = GH - 7
+        LY(I) = GH - H
+        If I > 0 Then
+            pro = Cubic(H / GH, 0, 1, 1, 1)
+            Page.PaintLine I * W - W, LY(I - 1), I * W, LY(I), argb(pro * 40 + 20, 255, 255, 255), 2
+        End If
+    Next
     
-    Page.PaintLine -1, GH - 1, GW * 1, GH - 1, argb(255, 0, 183, 195), 2
-    If FPS <> 0 Then Page.Writes FPS & "/" & Int(1000 / Int(FPSct / FPS)), 15, 14, 34, argb(205, 182, 174, 173)
+    If FPS <> 0 Then
+        Dim TColor As Long
+        Select Case FPS
+            Case Is >= 60: TColor = argb(255, 9, 241, 117)
+            Case Is >= 32: TColor = argb(255, 0, 176, 240)
+            Case Is >= 24: TColor = argb(255, 253, 86, 60)
+            Case Else: TColor = argb(255, 255, 0, 0)
+        End Select
+        Page.Writes "FPS:" & FPS & "/" & Int(1000 / Int(FPSct / FPS)), 55, 16, 18, TColor, 120
+    End If
     
-    Page.DrawImage "mouse" & Mouse.button & ".png", GW - 138, 78 / 2 - 64 / 2, alpha:=1
-    If Debug_mouse Then Page.Paint 0, GW - 74 - 64, 0, 64, 79, argb(50, 128, 128, 128)
+    Page.DrawImage "profile.png", 5, 54 / 2 - 48 / 2 + 1, alpha:=1
     
-    Page.DrawImage "menu.png", GW - 74, 78 / 2 - 64 / 2, alpha:=1
-    If Debuginfo.Visible Then Page.Paint 0, GW - 74, 0, 64, 79, argb(50, 128, 128, 128)
-    
-    Page.DrawImage "focus.png", GW - 202, 78 / 2 - 64 / 2, alpha:=1
-    If Debug_focus Then Page.Paint 0, GW - 202, 0, 64, 79, argb(50, 128, 128, 128)
-    
-    Page.DrawImage "pos.png", GW - 202 - 64, 78 / 2 - 64 / 2, alpha:=1
-    If Debug_pos Then Page.Paint 0, GW - 202 - 64, 0, 64, 79, argb(50, 128, 128, 128)
-    
-    Page.DrawImage "data.png", GW - 202 - 128, 78 / 2 - 64 / 2, alpha:=1
-    If Debug_data Then Page.Paint 0, GW - 202 - 128, 0, 64, 79, argb(50, 128, 128, 128)
+    If Debug_mouse Then Page.Paint 0, GW - 48, 0, 49, GH, argb(60, 255, 255, 255)
+    Page.DrawImage "mouse" & Mouse.button & ".png", GW - 48, 54 / 2 - 48 / 2 + 1, alpha:=1
+
+    If Debuginfo.Visible Then Page.Paint 0, GW - 48 * 3, 0, 49, GH, argb(60, 255, 255, 255)
+    Page.DrawImage "menu.png", GW - 48 * 3, 54 / 2 - 48 / 2 + 1, alpha:=1
+
+    If Debug_umode Then Page.Paint 0, GW - 48 * 5, 0, 49, GH, argb(60, 255, 255, 255)
+    Page.DrawImage "u" & Debug_umode & ".png", GW - 48 * 5, 54 / 2 - 48 / 2 + 1, alpha:=1
+
+    If Debug_pos Then Page.Paint 0, GW - 48 * 4, 0, 49, GH, argb(60, 255, 255, 255)
+    Page.DrawImage "pos.png", GW - 48 * 4, 54 / 2 - 48 / 2 + 1, alpha:=1
+
+    If Debug_data Then Page.Paint 0, GW - 48 * 2, 0, 49, GH, argb(60, 255, 255, 255)
+    Page.DrawImage "data.png", GW - 48 * 2, 54 / 2 - 48 / 2 + 1, alpha:=1
+
+    Page.Paint 0, 0, 0, GW + 1, 6, argb(255, 36, 173, 243)
+    If FPS <> 0 Then
+        Page.Paint 0, 0, 0, FPS / Int(1000 / Int(FPSct / FPS)) * (GW + 1), 6, argb(255, 130, 221, 255)
+    End If
 End Sub
 Public Sub Wheel(Direction As Integer, Depth As Single)
 

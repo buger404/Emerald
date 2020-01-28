@@ -82,7 +82,7 @@ Private Sub Form_Load()
         Set SetupPage = New SetupPage
     End If
 
-    'ECore.FreezeMode = True
+    ECore.FreezeMode = True
 
     '设置活动页面
     If PackPos = -1 Then EC.ActivePage = "WelcomePage"

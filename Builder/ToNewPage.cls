@@ -24,7 +24,7 @@ Public Sub DrawPage0()
     Page.Writes "欢迎使用 Emerald 3.1", GW / 2, GH / 2 + 30, 24, argb(255, 64, 64, 64), align:=StringAlignmentCenter, animation:=1
     Page.Writes "更棒的UI和用户体验", GW / 2, GH / 2 + 70, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter, animation:=2
     
-    If Page.ShowColorButton(0, GW / 2 - 70, GH - 150, 140, 40, "开始吧", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18) = 3 Then
+    If Page.ShowColorButton(0, GW / 2 - 70, GH - 150, 140, 40, "开始吧", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 75, 210, 255), 40, size:=18) = 3 Then
         If IsRegCreated("HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\DisplayIcon") Then
             PageIndex = 1
         Else
@@ -37,7 +37,7 @@ Public Sub DrawPage1()
     Page.DrawImageEx "old.png", GW / 2, GH / 2 - 80, 128, 128, posOnCenter
     Page.Writes "开始之前", GW / 2, GH / 2 + 30, 24, argb(255, 64, 64, 64), align:=StringAlignmentCenter, animation:=1
     Page.Writes "你必须卸载旧版本的Emerald", GW / 2, GH / 2 + 70, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter, animation:=2
-    If Page.ShowColorButton(0, GW / 2 - 70, GH - 150, 140, 40, "卸载", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18) = 3 Then
+    If Page.ShowColorButton(0, GW / 2 - 70, GH - 150, 140, 40, "卸载", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 75, 210, 255), 40, size:=18) = 3 Then
         Dim Error As String
         Error = UninstallOld
         If Error <> "" Then
@@ -52,8 +52,8 @@ Public Sub DrawPage2()
     Page.DrawImageEx "user.png", GW / 2, GH / 2 - 120, 128, 128, posOnCenter
     Page.Writes "留下你的足迹", GW / 2, GH / 2 - 10, 24, argb(255, 64, 64, 64), align:=StringAlignmentCenter, animation:=1
     Page.Writes "告诉我你的名字，它将会显示在你的游戏中。", GW / 2, GH / 2 + 30, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter, animation:=2
-    Page.ShowEdit Maker, 0, GW / 2 - 250, GH / 2 + 80, 500, 40, argb(255, 96, 96, 96), argb(255, 242, 242, 242), argb(255, 232, 232, 232), argb(255, 100, 62, 255), 50, size:=18
-    If Page.ShowColorButton(0, GW / 2 - 70, GH - 150, 140, 40, "确定", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18, style:=FontStyleBold) = 3 Then
+    Page.ShowEdit Maker, 0, GW / 2 - 250, GH / 2 + 80, 500, 40, argb(255, 96, 96, 96), argb(255, 242, 242, 242), argb(255, 232, 232, 232), argb(255, 35, 170, 242), 50, size:=18
+    If Page.ShowColorButton(0, GW / 2 - 70, GH - 150, 140, 40, "确定", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 75, 210, 255), 40, size:=18, style:=FontStyleBold) = 3 Then
         If Maker = "" Then MsgBox "请告诉我你的名字。", 64: Exit Sub
         ESave.PutData "Maker", Maker
         PageIndex = 3
@@ -62,19 +62,19 @@ Public Sub DrawPage2()
 End Sub
 Public Sub DrawPage3()
     Page.Writes "最后一步 ...", GW / 2, 200, 24, argb(255, 64, 64, 64), align:=StringAlignmentCenter, animation:=1
-    Page.ShowColorCheckBox AcceptMIT, GW / 2 - 150, 350, 300, 20, "我会遵守MIT开源协议的", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
-    Page.ShowColorCheckBox CopyModel, GW / 2 - 150, 390, 300, 20, "请将示例文件复制到我的VB目录中", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
-    Page.ShowColorCheckBox CreateContentMenu, GW / 2 - 150, 430, 300, 20, "在右键菜单中添加Emerald", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
+    Page.ShowColorCheckBox AcceptMIT, GW / 2 - 150, 350, 300, 20, "我会遵守MIT开源协议的", argb(255, 198, 198, 198), argb(255, 35, 170, 242), argb(255, 96, 96, 96), 18
+    Page.ShowColorCheckBox CopyModel, GW / 2 - 150, 390, 300, 20, "请将示例文件复制到我的VB目录中", argb(255, 198, 198, 198), argb(255, 35, 170, 242), argb(255, 96, 96, 96), 18
+    Page.ShowColorCheckBox CreateContentMenu, GW / 2 - 150, 430, 300, 20, "在右键菜单中添加Emerald", argb(255, 198, 198, 198), argb(255, 35, 170, 242), argb(255, 96, 96, 96), 18
     
     Dim m As Long
     m = CheckMouse(55, GH - 80, 200, 20)
-    Page.Writes "MIT开源协议是什么？", 55, GH - 80, 18, IIf(m = 0, argb(255, 96, 96, 96), argb(255, 100, 62, 255)), 200, 20, StringAlignmentNear, FontStyleUnderline
+    Page.Writes "MIT开源协议是什么？", 55, GH - 80, 18, IIf(m = 0, argb(255, 96, 96, 96), argb(255, 35, 170, 242)), 200, 20, StringAlignmentNear, FontStyleUnderline
     If m = 3 Then
         ShellExecuteA 0, "open", "https://github.com/buger404/Emerald/blob/master/LICENSE", "", "", SW_SHOW
     End If
     
     If AcceptMIT Then
-        If Page.ShowColorButton(0, GW / 2 - 70, GH - 170, 140, 40, "好啦", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18, style:=FontStyleBold) = 3 Then
+        If Page.ShowColorButton(0, GW / 2 - 70, GH - 170, 140, 40, "好啦", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 75, 210, 255), 40, size:=18, style:=FontStyleBold) = 3 Then
             If CopyModel Then
                 If Dir(VBIDEPath & "Template", vbDirectory) = "" Then MkDir VBIDEPath & "Template"
                 FileCopy App.path & "\Example\Emerald Window.frm", VBIDEPath & "Template\Forms\Emerald Window.frm"
@@ -96,7 +96,7 @@ Public Sub DrawPage4()
     Page.Writes "欢迎使用 Emerald 3.0", GW / 2, GH / 2 + 30, 24, argb(255, 64, 64, 64), align:=StringAlignmentCenter, animation:=1
     Page.Writes "你的工程信息需要更新", GW / 2, GH / 2 + 70, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter, animation:=2
     
-    If Page.ShowColorButton(0, GW / 2 - 70, GH - 150, 140, 40, "更新", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18) = 3 Then
+    If Page.ShowColorButton(0, GW / 2 - 70, GH - 150, 140, 40, "更新", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 75, 210, 255), 40, size:=18) = 3 Then
         Dim temp As String
         'On Error Resume Next
         Open OPath & "\.emerald" For Input As #1
@@ -119,15 +119,15 @@ Public Sub DrawPage5()
     Page.Writes "欢迎使用 Emerald 游戏创建向导", 70, 104, 18, argb(255, 64, 64, 64)
     Page.Writes "使用此向导快速创建您的游戏", 70, 128, 18, argb(255, 96, 96, 96)
     
-    Page.Writes "欲创建游戏的名称", 70, 200, 18, argb(255, 100, 62, 255)
-    Page.ShowEdit ProjectName, 0, 70, 240, 500, 30, argb(255, 96, 96, 96), argb(0, 255, 255, 255), argb(255, 242, 242, 242), argb(255, 100, 62, 255), size:=18
+    Page.Writes "欲创建游戏的名称", 70, 200, 18, argb(255, 35, 170, 242)
+    Page.ShowEdit ProjectName, 0, 70, 240, 500, 30, argb(255, 96, 96, 96), argb(0, 255, 255, 255), argb(255, 242, 242, 242), argb(255, 35, 170, 242), size:=18
 
-    Page.Writes "选项", 70, 320, 18, argb(255, 100, 62, 255)
-    Page.ShowColorCheckBox InitWindow, 73, 360, 500, 20, "创建好一个游戏窗口", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
-    Page.ShowColorCheckBox InitPage, 73, 390, 500, 20, "创建好一个游戏页面", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
-    Page.ShowColorCheckBox OpenPro, 73, 420, 500, 20, "在我创建完之后打开工程", argb(255, 198, 198, 198), argb(255, 100, 62, 255), argb(255, 96, 96, 96), 18
+    Page.Writes "选项", 70, 320, 18, argb(255, 35, 170, 242)
+    Page.ShowColorCheckBox InitWindow, 73, 360, 500, 20, "创建好一个游戏窗口", argb(255, 198, 198, 198), argb(255, 35, 170, 242), argb(255, 96, 96, 96), 18
+    Page.ShowColorCheckBox InitPage, 73, 390, 500, 20, "创建好一个游戏页面", argb(255, 198, 198, 198), argb(255, 35, 170, 242), argb(255, 96, 96, 96), 18
+    Page.ShowColorCheckBox OpenPro, 73, 420, 500, 20, "在我创建完之后打开工程", argb(255, 198, 198, 198), argb(255, 35, 170, 242), argb(255, 96, 96, 96), 18
 
-    If Page.ShowColorButton(0, GW / 2 - 70, GH - 120, 140, 40, "好的", argb(255, 255, 255, 255), argb(255, 100, 62, 255), argb(255, 140, 102, 255), 40, size:=18, style:=FontStyleBold) = 3 Then
+    If Page.ShowColorButton(0, GW / 2 - 70, GH - 120, 140, 40, "好的", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 75, 210, 255), 40, size:=18, style:=FontStyleBold) = 3 Then
         If CheckFileName(ProjectName) = False Or ProjectName = "" Then MsgBox "这个游戏名称不能被接受呢。换一个吧。", 64: Exit Sub
         
         If Dir(OPath & "\core", vbDirectory) = "" Then MkDir OPath & "\core"
