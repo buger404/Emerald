@@ -423,7 +423,7 @@ ReCopy:
                     SetConsoleColor colors.DefaultText
                     WriteLine "Active page : " & ECore.ActivePage
                     WriteLine "FPS " & FPS & " , max FPS " & Int(1000 / Int(FPSct / FPS)) & " (per frame " & Int(FPSct / FPS) & " ms)"
-                    WriteLine "Button " & Mouse.button & " , click state " & Mouse.State & " , in (" & Mouse.X & "," & Mouse.y & ")"
+                    WriteLine "Button " & Mouse.button & " , click state " & Mouse.State & " , in (" & Mouse.X & "," & Mouse.Y & ")"
                     NewLine
                     SetConsoleColor colors.HighLightText
                     WriteLine "Visual Basic 6.0 IDE"
@@ -688,7 +688,7 @@ ReCopy:
             Call BackLine: Call ClearLine
             SetConsoleColor colors.DefaultText
             Select Case Params(1)
-                Case "": WriteWord "Button " & Mouse.button & " , click state " & Mouse.State & " , in (" & Mouse.X & "," & Mouse.y & ")"
+                Case "": WriteWord "Button " & Mouse.button & " , click state " & Mouse.State & " , in (" & Mouse.X & "," & Mouse.Y & ")"
                 Case "-help"
                     WriteWord "No any commands ."
                     Call ExitExec
@@ -805,7 +805,7 @@ Public Sub Update2()
         SetConsoleColor colors.HighLightText
         WriteLine Version
         SetConsoleColor colors.ContentText
-        WriteLine "Copyright (C) 2019 Error404 all rights reserved ."
+        WriteLine "Copyright (C) 2019-2020 Error404 all rights reserved ."
         NewLine
         SetConsoleColor colors.DefaultText
         WriteWord "Project name : "
@@ -840,17 +840,17 @@ Public Sub Update2()
     
     PaintDC ConsoleDC, Page.CDC, 20, 40, 0, sy * 3222, GW - 40, IIf(3222 - sy * 3222 < GH, 3222 - sy * 3222, GH), 1
     
-    Dim pro As Long, alpha As Single
+    Dim pro As Long, Alpha As Single
 
     pro = GetTickCount Mod 1000
     If pro <= 700 Then
-        alpha = 1 - Cubic(pro / 700, 0, 1, 1, 1)
+        Alpha = 1 - Cubic(pro / 700, 0, 1, 1, 1)
     Else
-        alpha = Cubic((pro - 700) / 300, 0, 1, 1, 1)
+        Alpha = Cubic((pro - 700) / 300, 0, 1, 1, 1)
     End If
     Page.Writes InputingText, CuX + 20, CuY - sy * 3222 + 40, 16, argb(255, 242, 242, 242)
     
-    If GetActiveWindow = Debuginfo.Hwnd Then Page.Paint 0, CuX + 20 + EF.GetWidth(Page.GG, InputingText, 16, StringAlignmentNear, FontStyleRegular), CuY - sy * 3222 + 40, 3, 20, argb(alpha * 255, 255, 255, 255)
+    If GetActiveWindow = Debuginfo.Hwnd Then Page.Paint 0, CuX + 20 + EF.GetWidth(Page.GG, InputingText, 16, StringAlignmentNear, FontStyleRegular), CuY - sy * 3222 + 40, 3, 20, argb(Alpha * 255, 255, 255, 255)
     
     If CuY + 80 >= GH Then
         Dim MaxY As Single
@@ -893,22 +893,22 @@ Public Sub Update()
         Page.Writes "FPS:" & FPS & "/" & Int(1000 / Int(FPSct / FPS)), 55, 16, 18, TColor, 120
     End If
     
-    Page.DrawImage "profile.png", 5, 54 / 2 - 48 / 2 + 1, alpha:=1
+    Page.DrawImage "profile.png", 5, 54 / 2 - 48 / 2 + 1, Alpha:=1
     
     If Debug_mouse Then Page.Paint 0, GW - 48, 0, 49, GH, argb(60, 255, 255, 255)
-    Page.DrawImage "mouse" & Mouse.button & ".png", GW - 48, 54 / 2 - 48 / 2 + 1, alpha:=1
+    Page.DrawImage "mouse" & Mouse.button & ".png", GW - 48, 54 / 2 - 48 / 2 + 1, Alpha:=1
 
     If Debuginfo.Visible Then Page.Paint 0, GW - 48 * 3, 0, 49, GH, argb(60, 255, 255, 255)
-    Page.DrawImage "menu.png", GW - 48 * 3, 54 / 2 - 48 / 2 + 1, alpha:=1
+    Page.DrawImage "menu.png", GW - 48 * 3, 54 / 2 - 48 / 2 + 1, Alpha:=1
 
     If Debug_umode Then Page.Paint 0, GW - 48 * 5, 0, 49, GH, argb(60, 255, 255, 255)
-    Page.DrawImage "u" & Debug_umode & ".png", GW - 48 * 5, 54 / 2 - 48 / 2 + 1, alpha:=1
+    Page.DrawImage "u" & Debug_umode & ".png", GW - 48 * 5, 54 / 2 - 48 / 2 + 1, Alpha:=1
 
     If Debug_pos Then Page.Paint 0, GW - 48 * 4, 0, 49, GH, argb(60, 255, 255, 255)
-    Page.DrawImage "pos.png", GW - 48 * 4, 54 / 2 - 48 / 2 + 1, alpha:=1
+    Page.DrawImage "pos.png", GW - 48 * 4, 54 / 2 - 48 / 2 + 1, Alpha:=1
 
     If Debug_data Then Page.Paint 0, GW - 48 * 2, 0, 49, GH, argb(60, 255, 255, 255)
-    Page.DrawImage "data.png", GW - 48 * 2, 54 / 2 - 48 / 2 + 1, alpha:=1
+    Page.DrawImage "data.png", GW - 48 * 2, 54 / 2 - 48 / 2 + 1, Alpha:=1
 
     Page.Paint 0, 0, 0, GW + 1, 6, argb(255, 36, 173, 243)
     If FPS <> 0 Then

@@ -97,6 +97,7 @@ Public Sub Main()
         MainWindow.WindowState = 1
         MainWindow.WindowState = 0
         MainWindow.SetFocus
+        ShowWindow MainWindow.Hwnd, SW_SHOW
         
         If SPackage.Files(0).path <> "" Then
             Open tempPath & "\setupappicon.png" For Binary As #1
@@ -139,6 +140,8 @@ UninstallGame:
     MainWindow.WindowState = 1
     MainWindow.WindowState = 0
     MainWindow.SetFocus
+    ShowWindow MainWindow.Hwnd, SW_SHOW
+    
     Kill tempPath & "\setuppack.emrpack"
     SetupPage.Step = 4
     ECore.ActivePage = "SetupPage"

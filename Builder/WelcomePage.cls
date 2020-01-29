@@ -366,13 +366,13 @@ Public Sub DrawProject()
     max = Int(UBound(UFiles) / 6) + 1
     Page.Writes FileIndex + 1 & "/" & max, 600, 430 + 30 * 7 + 5, 18, argb(255, 242, 242, 242), 120, 20, align:=StringAlignmentCenter
     If FileIndex + 1 > 1 Then
-        If Page.ShowColorButton(1, 600, 430 + 30 * 7 + 5, 20, 20, "<", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 64, 255, 226), 40, size:=16) = 3 Then
+        If Page.ShowColorButton(1, 600, 430 + 30 * 7 + 5, 20, 20, "<", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 75, 210, 255), 40, size:=16) = 3 Then
             FileIndex = FileIndex - 1
             ECore.NewTransform
         End If
     End If
     If FileIndex + 1 < max Then
-        If Page.ShowColorButton(1, 700, 430 + 30 * 7 + 5, 20, 20, ">", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 64, 255, 226), 40, size:=16) = 3 Then
+        If Page.ShowColorButton(1, 700, 430 + 30 * 7 + 5, 20, 20, ">", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 75, 210, 255), 40, size:=16) = 3 Then
             FileIndex = FileIndex + 1
             ECore.NewTransform
         End If
@@ -381,7 +381,7 @@ Public Sub DrawProject()
     
     Page.ShowColorCheckBox BackupSwitch, 384, GH - 80, 200, 20, "同时创建备份", argb(255, 242, 242, 242), argb(255, 35, 170, 242), argb(255, 242, 242, 242), 18
 
-    If Page.ShowColorButton(0, GW - 180, GH - 82, 120, 30, IIf(ReplaceAccept = 0, "替换代码", "确认替换 (" & Round(5 - (GetTickCount - ReplaceAccept) / 1000) & "s)"), argb(255, 255, 255, 255), IIf(ReplaceAccept = 0, argb(255, 35, 170, 242), argb(255, 254, 84, 57)), IIf(ReplaceAccept = 0, argb(255, 64, 255, 226), argb(255, 255, 124, 97)), 40, size:=18) = 3 Then
+    If Page.ShowColorButton(0, GW - 180, GH - 82, 120, 30, IIf(ReplaceAccept = 0, "替换代码", "确认替换 (" & Round(5 - (GetTickCount - ReplaceAccept) / 1000) & "s)"), argb(255, 255, 255, 255), IIf(ReplaceAccept = 0, argb(255, 35, 170, 242), argb(255, 254, 84, 57)), IIf(ReplaceAccept = 0, argb(255, 75, 210, 255), argb(255, 255, 124, 97)), 40, size:=18) = 3 Then
         If ReplaceAccept > 0 Then
             ReplaceAccept = -1
             Call ReplaceProject
@@ -417,7 +417,7 @@ Public Sub DrawBackup()
         End If
         Page.Writes Left(BackupList(I).Name, 22) & IIf(Len(BackupList(I).Name) > 22, "...", "") & "  (" & BackupList(I).FileCount & " 个文件)", 392, 120 + 70 * (I - BackupIndex * 6) - 2, 18, argb(255, 255, 255, 255)
         Page.Writes BackupList(I).Date & " (" & BackupList(I).size & "字节)", 392, 120 + 70 * (I - BackupIndex * 6) - 2 + 25, 18, argb(255, 192, 192, 192)
-        If Page.ShowColorButton(0, GW - 170, 117 + 70 * (I - BackupIndex * 6) + 8, 100, 30, IIf(BackupList(I).UseTime = 0, "还原", "确认 (" & Round(5 - (GetTickCount - BackupList(I).UseTime) / 1000) & "s)"), argb(255, 255, 255, 255), IIf(BackupList(I).UseTime = 0, argb(255, 35, 170, 242), argb(255, 254, 84, 57)), IIf(BackupList(I).UseTime = 0, argb(255, 64, 255, 226), argb(255, 255, 124, 97)), 40, size:=18) = 3 Then
+        If Page.ShowColorButton(0, GW - 170, 117 + 70 * (I - BackupIndex * 6) + 8, 100, 30, IIf(BackupList(I).UseTime = 0, "还原", "确认 (" & Round(5 - (GetTickCount - BackupList(I).UseTime) / 1000) & "s)"), argb(255, 255, 255, 255), IIf(BackupList(I).UseTime = 0, argb(255, 35, 170, 242), argb(255, 254, 84, 57)), IIf(BackupList(I).UseTime = 0, argb(255, 75, 210, 255), argb(255, 255, 124, 97)), 40, size:=18) = 3 Then
             If BackupList(I).UseTime > 0 Then
                 If BackupList(I).size = -1 Then
                     ShellExecuteA 0, "open", OPath & "\.emr\backup\", "", "", SW_SHOW
@@ -464,13 +464,13 @@ Public Sub DrawBackup()
     max = Int(UBound(BackupList) / 6) + 1
     Page.Writes BackupIndex + 1 & "/" & max, 600, 430 + 30 * 7 + 5, 18, argb(255, 242, 242, 242), 120, 20, align:=StringAlignmentCenter
     If BackupIndex + 1 > 1 Then
-        If Page.ShowColorButton(1, 600, 430 + 30 * 7 + 5, 20, 20, "<", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 64, 255, 226), 40, size:=16) = 3 Then
+        If Page.ShowColorButton(1, 600, 430 + 30 * 7 + 5, 20, 20, "<", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 75, 210, 255), 40, size:=16) = 3 Then
             BackupIndex = BackupIndex - 1
             ECore.NewTransform
         End If
     End If
     If BackupIndex + 1 < max Then
-        If Page.ShowColorButton(1, 700, 430 + 30 * 7 + 5, 20, 20, ">", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 64, 255, 226), 40, size:=16) = 3 Then
+        If Page.ShowColorButton(1, 700, 430 + 30 * 7 + 5, 20, 20, ">", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 75, 210, 255), 40, size:=16) = 3 Then
             BackupIndex = BackupIndex + 1
             ECore.NewTransform
         End If
@@ -506,7 +506,7 @@ Public Sub DrawPackage()
         Page.Writes "我们无法继续制作安装包。", 381, 205, 18, argb(255, 242, 242, 242)
     Else
         Page.Writes "一切准备就绪！", 381, 205, 18, argb(255, 242, 242, 242)
-        If Page.ShowColorButton(0, GW - 220, GH - 112, 150, 40, "制作", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 64, 255, 226), 40, size:=18) = 3 Then
+        If Page.ShowColorButton(0, GW - 220, GH - 112, 150, 40, "制作", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 75, 210, 255), 40, size:=18) = 3 Then
             PackState = 1: PackText = "正在准备..."
             Call BuildInstaller
             PackState = 0
@@ -622,7 +622,7 @@ Public Sub Update()
     End If
     
     Page.Clear argb(0, 0, 0, 0)
-    Page.DrawImage "background" & IIf((ESave.GetData("Emerald 3.1") = "") Or (ReadProject = False And OPath <> "" And Dir(OPath & "\.emerald") = ""), "2", "") & ".png", 0, 0, alpha:=1
+    Page.DrawImage "background" & IIf((ESave.GetData("Emerald 3.1") = "") Or (ReadProject = False And OPath <> "" And Dir(OPath & "\.emerald") = ""), "2", "") & ".png", 0, 0, Alpha:=1
     If Cliped = 0 Then Cliped = 1
     
     'Page.PaintLine 342, 32 + 24, 342, GH - 40 - 24 + 1, argb(255, 235, 235, 235), 1
@@ -657,19 +657,19 @@ Public Sub Update()
 SkipThis:
     Next
     
-    Page.DrawImage "project.png", 60, 135, alpha:=1
+    Page.DrawImage "project.png", 60, 135, Alpha:=1
     Page.Writes "工程", 110, 135, 18, argb(255, 255, 255, 255)
     
-    Page.DrawImage "backup.png", 60, 135 + 50, alpha:=1
+    Page.DrawImage "backup.png", 60, 135 + 50, Alpha:=1
     Page.Writes "备份", 110, 135 + 50, 18, argb(255, 255, 255, 255)
     
-    Page.DrawImage "package.png", 60, 135 + 50 * 2, alpha:=1
+    Page.DrawImage "package.png", 60, 135 + 50 * 2, Alpha:=1
     Page.Writes "打包", 110, 135 + 50 * 2, 18, argb(255, 255, 255, 255)
     
-    Page.DrawImage "settings.png", 60, 135 + 50 * 3, alpha:=1
+    Page.DrawImage "settings.png", 60, 135 + 50 * 3, Alpha:=1
     Page.Writes "设置", 110, 135 + 50 * 3, 18, argb(255, 255, 255, 255)
     
-    Page.DrawImage "information.png", 60, 135 + 50 * 4, alpha:=1
+    Page.DrawImage "information.png", 60, 135 + 50 * 4, Alpha:=1
     Page.Writes "关于", 110, 135 + 50 * 4, 18, argb(255, 255, 255, 255)
     
     Select Case PageIndex

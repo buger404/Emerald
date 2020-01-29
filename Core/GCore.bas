@@ -8,7 +8,7 @@ Attribute VB_Name = "GCore"
         State As Integer
         button As Integer
         X As Single
-        y As Single
+        Y As Single
     End Type
     Public Enum PlayStateMark
         musStopped = 0
@@ -84,7 +84,7 @@ Attribute VB_Name = "GCore"
     End Enum
     Public Type GraphicsBound
         X As Single
-        y As Single
+        Y As Single
         Width As Single
         Height As Single
         WSc As Single
@@ -112,6 +112,12 @@ Attribute VB_Name = "GCore"
         ScaleFullScreen = 1
         ScaleSuitable = 2
     End Enum
+    Public Type ScrollArea
+        Width As Long
+        Height As Long
+        Graphics As Long
+        DC As Long
+    End Type
     Public SGS() As Suggestion, SGTime As Long
     Public ColorLists() As ColorCollection
     Public ECore As GMan, EF As GFont, EAni As Object, ESave As GSaving, EMusic As GMusicList
@@ -123,7 +129,7 @@ Attribute VB_Name = "GCore"
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
-    Public Const Version As Long = 20012801      'oka
+    Public Const Version As Long = 20012901      'okayy
     Public TextHandle As Long, WaitChr As String
     Public XPMode As Boolean
     Public Scales As Single
@@ -166,6 +172,31 @@ Attribute VB_Name = "GCore"
         Data.PutData "HideLOGO", HideLOGO
         Data.PutData "UpdateCheckInterval", UpdateCheckInterval
         Data.PutData "UpdateTimeOut", UpdateTimeOut
+    End Sub
+    Public Function CreateScrollArea(ByVal Width As Long, ByVal Height As Long) As ScrollArea
+        With CreateScrollArea
+            .DC = CreateCDC(Width, Height)
+            PoolCreateFromHdc .DC, .Graphics
+            .Width = Width
+            .Height = Height
+            GdipSetSmoothingMode .Graphics, SmoothingModeAntiAlias
+            GdipSetTextRenderingHint .Graphics, TextRenderingHintAntiAlias
+        End With
+    End Function
+    Public Sub StartScrollArea(Page As GPage, Area As ScrollArea)
+        If Page.ScrollMode Then Suggest "请先结束上一个卷轴区域。", ClearOnUpdate, 1: Exit Sub
+        Page.OODC = Page.CDC: Page.OOGG = Page.GG
+        Page.CDC = Area.DC: Page.GG = Area.Graphics
+        Page.ScrollWidth = Area.Width: Page.ScrollHeight = Area.Height
+        Page.ScrollMode = True
+    End Sub
+    Public Sub EndScrollArea(Page As GPage, ByVal X As Long, ByVal Y As Long, ByVal CX As Long, ByVal CY As Long, Optional ByVal Width As Long = -1, Optional ByVal Height As Long = -1, Optional ByVal Alpha As Single = 1)
+        If Not Page.ScrollMode Then Suggest "请先启动一个卷轴区域。", ClearOnUpdate, 1: Exit Sub
+        If Width = -1 Then Width = Page.ScrollWidth
+        If Height = -1 Then Height = Page.ScrollHeight
+        PaintDC Page.CDC, Page.OODC, X, Y, CX, CY, Width, Height, Alpha
+        Page.CDC = Page.OODC: Page.GG = Page.OOGG
+        Page.ScrollMode = False
     End Sub
     Public Sub GetSettings(Optional SkipDebug As Boolean = False)
         If App.LogMode <> 0 And SkipDebug = False Then Exit Sub
@@ -385,28 +416,28 @@ sth:
         '画~
         PoolDeleteEffect e '垃圾处理
     End Sub
-    Public Sub PaintDC(DC As Long, destDC As Long, Optional X As Long = 0, Optional y As Long = 0, Optional cx As Long = 0, Optional cy As Long = 0, Optional cw, Optional ch, Optional alpha)
+    Public Sub PaintDC(DC As Long, destDC As Long, Optional X As Long = 0, Optional Y As Long = 0, Optional CX As Long = 0, Optional CY As Long = 0, Optional cw, Optional ch, Optional Alpha)
         Dim B As BLENDFUNCTION, index As Integer, bl As Long
         
-        If Not IsMissing(alpha) Then
-            If alpha < 0 Then alpha = 0
-            If alpha > 1 Then alpha = 1
+        If Not IsMissing(Alpha) Then
+            If Alpha < 0 Then Alpha = 0
+            If Alpha > 1 Then Alpha = 1
             With B
                 .AlphaFormat = &H1
                 .BlendFlags = &H0
                 .BlendOp = 0
-                .SourceConstantAlpha = Int(alpha * 255)
+                .SourceConstantAlpha = Int(Alpha * 255)
             End With
             CopyMemory bl, B, 4
         End If
         
-        If IsMissing(cw) Then cw = RGW - cx
-        If IsMissing(ch) Then ch = RGH - cy
+        If IsMissing(cw) Then cw = RGW - CX
+        If IsMissing(ch) Then ch = RGH - CY
         
-        If IsMissing(alpha) Then
-            BitBlt destDC, X, y, cw, ch, DC, cx, cy, vbSrcCopy
+        If IsMissing(Alpha) Then
+            BitBlt destDC, X, Y, cw, ch, DC, CX, CY, vbSrcCopy
         Else
-            AlphaBlend destDC, X, y, cw, ch, DC, cx, cy, cw, ch, bl
+            AlphaBlend destDC, X, Y, cw, ch, DC, CX, CY, cw, ch, bl
         End If
     End Sub
     Function Cubic(t As Single, arg0 As Single, arg1 As Single, arg2 As Single, arg3 As Single) As Single
@@ -416,36 +447,36 @@ sth:
     End Function
 '========================================================
 '   Mouse
-    Public Sub UpdateMouse(X As Single, y As Single, State As Long, button As Integer)
+    Public Sub UpdateMouse(X As Single, Y As Single, State As Long, button As Integer)
         With Mouse
             .X = X
-            .y = y
+            .Y = Y
             .State = State
             .button = button
         End With
     End Sub
-    Public Function CheckMouse(ByVal X As Long, ByVal y As Long, ByVal W As Long, ByVal H As Long) As MButtonState
+    Public Function CheckMouse(ByVal X As Long, ByVal Y As Long, ByVal W As Long, ByVal H As Long) As MButtonState
         'Return Value:0=none,1=in,2=down,3=up
         If Scales <> 1 Then
-            X = X * Scales: y = y * Scales
+            X = X * Scales: Y = Y * Scales
             W = W * Scales
             H = H * Scales
         End If
         If Debug_mouse Then
             GdipSetSolidFillColor ECore.pB, argb(20, 255, 0, 0)
-            GdipFillRectangle ECore.UPage.GG, ECore.pB, X, y, W, H
+            GdipFillRectangle ECore.UPage.GG, ECore.pB, X, Y, W, H
         End If
         If ECore.LockPage <> "" Then
             If ECore.LockPage <> ECore.UpdatingPage Then Exit Function
         End If
-        If Mouse.X >= X And Mouse.y >= y And Mouse.X <= X + W And Mouse.y <= y + H Then
+        If Mouse.X >= X And Mouse.Y >= Y And Mouse.X <= X + W And Mouse.Y <= Y + H Then
             If ECore.FreezeMode Then ECore.FreezeResetBegin = True
             If Debug_mouse Then
                 GdipSetSolidFillColor ECore.pB, argb(255, 27, 27, 27)
-                GdipFillEllipse ECore.UPage.GG, ECore.pB, X - 10, y - 10, 20, 20
+                GdipFillEllipse ECore.UPage.GG, ECore.pB, X - 10, Y - 10, 20, 20
                 GdipSetSolidFillColor ECore.pB, argb(80, 255, 0, 0)
-                GdipFillRectangle ECore.UPage.GG, ECore.pB, X, y, W, H
-                EF.Writes Mouse.State + 1, X - 10, y - 7, ECore.UPage.GG, argb(255, 255, 255, 255), 14, 20, 0, StringAlignmentCenter, FontStyleBold
+                GdipFillRectangle ECore.UPage.GG, ECore.pB, X, Y, W, H
+                EF.Writes Mouse.State + 1, X - 10, Y - 7, ECore.UPage.GG, argb(255, 255, 255, 255), 14, 20, 0, StringAlignmentCenter, FontStyleBold
             End If
             CheckMouse = Mouse.State + 1
             If Mouse.State = 2 Then Mouse.State = 0
@@ -455,23 +486,23 @@ sth:
         'Return Value:0=none,1=in,2=down,3=up
         If Debug_mouse Then
             GdipSetSolidFillColor ECore.pB, argb(20, 0, 0, 255)
-            GdipFillRectangle ECore.UPage.GG, ECore.pB, DrawF.X, DrawF.y, DrawF.Width, DrawF.Height
+            GdipFillRectangle ECore.UPage.GG, ECore.pB, DrawF.X, DrawF.Y, DrawF.Width, DrawF.Height
         End If
         If ECore.LockPage <> "" Then
             If ECore.LockPage <> ECore.UpdatingPage Then Exit Function
         End If
-        If Mouse.X >= DrawF.X And Mouse.y >= DrawF.y And Mouse.X <= DrawF.X + DrawF.Width And Mouse.y <= DrawF.y + DrawF.Height Then
+        If Mouse.X >= DrawF.X And Mouse.Y >= DrawF.Y And Mouse.X <= DrawF.X + DrawF.Width And Mouse.Y <= DrawF.Y + DrawF.Height Then
             If ECore.FreezeMode Then ECore.FreezeResetBegin = True
             If Debug_mouse Then
                 GdipSetSolidFillColor ECore.pB, argb(255, 27, 27, 27)
-                GdipFillEllipse ECore.UPage.GG, ECore.pB, DrawF.X - 10, DrawF.y - 10, 20, 20
+                GdipFillEllipse ECore.UPage.GG, ECore.pB, DrawF.X - 10, DrawF.Y - 10, 20, 20
                 GdipSetSolidFillColor ECore.pB, argb(80, 0, 0, 255)
-                GdipFillRectangle ECore.UPage.GG, ECore.pB, DrawF.X, DrawF.y, DrawF.Width, DrawF.Height
-                EF.Writes Mouse.State + 1, DrawF.X - 10, DrawF.y - 7, ECore.UPage.GG, argb(255, 255, 255, 255), 14, 20, 0, StringAlignmentCenter, FontStyleBold
+                GdipFillRectangle ECore.UPage.GG, ECore.pB, DrawF.X, DrawF.Y, DrawF.Width, DrawF.Height
+                EF.Writes Mouse.State + 1, DrawF.X - 10, DrawF.Y - 7, ECore.UPage.GG, argb(255, 255, 255, 255), 14, 20, 0, StringAlignmentCenter, FontStyleBold
             End If
             CheckMouse2 = Mouse.State + 1
             If DrawF.CrashIndex <> 0 Then
-                If ColorLists(DrawF.CrashIndex).IsAlpha((Mouse.X - DrawF.X) * DrawF.WSc, (Mouse.y - DrawF.y) * DrawF.HSc) = False Then CheckMouse2 = mMouseOut: Exit Function
+                If ColorLists(DrawF.CrashIndex).IsAlpha((Mouse.X - DrawF.X) * DrawF.WSc, (Mouse.Y - DrawF.Y) * DrawF.HSc) = False Then CheckMouse2 = mMouseOut: Exit Function
             End If
             If Mouse.State = 2 Then Mouse.State = 0
         End If
