@@ -63,7 +63,7 @@ End Type
 Public Sub Win10Blur(Hwnd As Long)
     Dim Accent As AccentPolicy
     Accent.State = 3
-    
+
     Dim AccentStructSize As Long
     AccentStructSize = 16
     

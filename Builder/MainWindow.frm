@@ -35,6 +35,13 @@ Attribute VB_Exposed = False
 '==================================================
 Private Sub DrawTimer_Timer()
     '绘制
+    NowY = NowY + (TargetY - NowY) / 10
+    If Me.top <> NowY Then Me.top = NowY
+    If Me.top > Screen.Height + Me.Height * 1.5 Then
+        Unload Me
+        End
+    End If
+    
     If EC.ActivePage = "" Then Exit Sub
     EC.Display
 End Sub
@@ -49,7 +56,7 @@ Private Sub Form_Load()
     If SetupMode Then
         StartEmerald Me.Hwnd, 401, 613
     Else
-        StartEmerald Me.Hwnd, 991, 754
+        StartEmerald Me.Hwnd, 701 * 0.8, 661 * 0.8
     End If
     'ScaleGame 1.2, ScaleDefault
 
@@ -82,11 +89,15 @@ Private Sub Form_Load()
         Set SetupPage = New SetupPage
     End If
 
-    ECore.FreezeMode = True
+    'ECore.FreezeMode = True
 
     '设置活动页面
     If PackPos = -1 Then EC.ActivePage = "WelcomePage"
     
+    Me.Show
+    NowY = Screen.Height + Me.Height
+    TargetY = Me.top
+    Me.top = Screen.Height + Me.Height
     DrawTimer.Enabled = True
 End Sub
 

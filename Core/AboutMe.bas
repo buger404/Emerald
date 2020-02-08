@@ -4,7 +4,7 @@ Attribute VB_Name = "AboutMe"
 '   制作：Error 404（QQ 1361778219，陈志琰）
 '   开源地址：
 '    ┗━Github：https://github.com/buger404/Emerald
-'    ┗━马云：https://gitee.com/buger404/Emerald
+'    ┗━码云：https://gitee.com/buger404/Emerald
 '   邮箱：ris_vb@126.com
 '========================================================
 '   版本：参见GCore.Version
@@ -15,7 +15,8 @@ Attribute VB_Name = "AboutMe"
 '   1.传说之下同人：冰棍之下
 '   2.Moristory（森之物语）
 '   3.RandomPerson（摇号机）
-'   4.MuingIII（嘤悦3，未完工）
+'   4.2048
+'   将陆续推出Emerald示例工程
 '========================================================
 '   组成（标*号的表示非作者编写）：
 '   ┗━━━━调试功能
@@ -23,7 +24,6 @@ Attribute VB_Name = "AboutMe"
 '       ┗━━━━DebugWindow.frm：显示调试工具栏使用的窗口
 '       ┗━━━━GDebug.cls：调试工具栏的界面绘制
 '       ┗━━━━DebugSwitch.bas：存放调试变量的模块
-'   ┗━━━━调试功能
 '   ┗━━━━*BASS（http://www.un4seen.com/）
 '       (BASS is an audio library for use in software on several platforms.)
 '       ┗━━━━*Bass.bas：Bass API 声明模块
@@ -52,6 +52,11 @@ Attribute VB_Name = "AboutMe"
 '========================================================
 '   更新日志
 '========================================================
+'   更新内容(ver.200208)
+'   -新增三种信息框
+'   -全新的字体渲染模式（DEMO）
+'   -Writes方法支持绘制空心字体
+'   -全新Builder界面
 '   更新内容(ver.200129)
 '   -全新的卷轴模式
 '   -不加载错误资源

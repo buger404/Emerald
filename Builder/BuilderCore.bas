@@ -5,6 +5,7 @@ Public OPath As String, PackPos As Long
 Public WelcomePage As WelcomePage, TitleBar As TitleBar, SetupPage As SetupPage
 Public ToNewPage As ToNewPage
 Public LnkSwitch As Boolean
+Public NowY As Long, TargetY As Long
 Public Type EmrPConfig
     AFileHeader As String
     Name As String
@@ -44,6 +45,7 @@ Public Sub Main()
     OPath = Replace(Trim(Command$), """", "")
     'OPath = "E:\Error 404\Muing III"
     'OPath = "E:\Error 404\Emerald 动画包含资源提取工具\"
+    'OPath = "E:\Projects\Moristory2"
     'OPath = "E:\Projects\Rainbow"
     'OPath = "D:\Test\"
     

@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 'Emerald Ïà¹Ø´úÂë
 
 Private Type MusicL
-    name As String
+    Name As String
     Music As GMusic
 End Type
 Public HotLoad As Boolean
@@ -44,24 +44,24 @@ Dim List() As MusicL
             ReDim Preserve List(UBound(List) + 1)
             Set List(UBound(List)).Music = New GMusic
             List(UBound(List)).Music.Create Folder & File
-            List(UBound(List)).name = File
+            List(UBound(List)).Name = File
             File = Dir()
         Loop
     End Sub
 '========================================================
 '   Play
-    Public Sub Play(name As String)
-        For i = 1 To UBound(List)
-            If List(i).name = name Then List(i).Music.Play: Exit Sub
+    Public Sub Play(Name As String)
+        For I = 1 To UBound(List)
+            If List(I).Name = Name Then List(I).Music.Play: Exit Sub
         Next
         
         If HotLoad Then
-            For i = 1 To UBound(AssetsFolder)
-                If IsExitAFile(AssetsFolder(i) & name) Then
+            For I = 1 To UBound(AssetsFolder)
+                If IsExitAFile(AssetsFolder(I) & Name) Then
                     ReDim Preserve List(UBound(List) + 1)
                     Set List(UBound(List)).Music = New GMusic
-                    List(UBound(List)).Music.Create AssetsFolder(i) & name
-                    List(UBound(List)).name = name
+                    List(UBound(List)).Music.Create AssetsFolder(I) & Name
+                    List(UBound(List)).Name = Name
                     List(UBound(List)).Music.Play
                     Exit For
                 End If

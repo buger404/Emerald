@@ -51,10 +51,11 @@ Private Sub Form_Load()
     Page.Create Charge
     Page.Res.NewImages App.path & "\assets\debug", 48, 48
     If Dir(App.path & "\assets\sets\profile.png") <> "" Then
-        Page.Res.newImage App.path & "\assets\sets\profile.png", 48, 48, "profile.png"
+        Page.Res.newImage App.path & "\assets\sets\profile.png", 36, 36, "profile.png"
     Else
-        Page.Res.newImage App.path & "\assets\debug\icon.png", 48, 48, "profile.png"
+        Page.Res.newImage App.path & "\assets\debug\icon.png", 36, 36, "profile.png"
     End If
+    Page.Res.ClipCircle "profile.png"
     
     Set Charge.Page = Page
     

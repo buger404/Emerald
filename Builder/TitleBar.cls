@@ -14,33 +14,30 @@ Attribute VB_Exposed = False
 '======================================
 '   页面绘制器
     Dim Page As GPage
+    Dim SX As Long, SY As Long
 '======================================
 
 Public Sub Update()
     '绘制事件
     
     Page.Clear 0 '清空画布
-
-    Dim m As Integer
-    m = CheckMouse(GW - 50 - 19, 30, 36, 36)
-    If Page.ShowColorButton(1, GW - 50 - 19, 30, 36, 36, "×", IIf(m = 0, argb(255, 128, 128, 128), argb(255, 255, 255, 255)), argb(0, 254, 84, 57), argb(255, 254, 84, 57), size:=18) = 2 Then
-        Unload MainWindow
-        End
-    End If
-
-    m = CheckMouse(GW - 110 - 19, 30, 36, 36)
-    If Page.ShowColorButton(1, GW - 110 - 19, 30, 36, 36, "-", IIf(m = 0, argb(255, 128, 128, 128), argb(255, 255, 255, 255)), argb(0, 128, 128, 128), argb(100, 128, 128, 128), size:=18) = 2 Then
-        MainWindow.WindowState = 1
-        Mouse.State = 0
-    End If
     
-    m = CheckMouse(0, 12, GW - 120, 30 + 16 / 0.75)
+    m = CheckMouse(231, 8, 98, 94)
     If m >= 1 And Mouse.button = 1 Then
+        If SX = -1 Then
+            SX = MainWindow.Left: SY = MainWindow.top
+        End If
         ReleaseCapture
         SendMessageA MainWindow.Hwnd, WM_SYSCOMMAND, SC_MOVE Or HTCAPTION, 0
+        NowY = MainWindow.top: TargetY = MainWindow.top
         Mouse.State = 0
     End If
-    If m = 3 Then Mouse.State = 0
+    If m = 2 Then
+        If MainWindow.Left = SX And MainWindow.top = SY Then
+            TargetY = Screen.Height + MainWindow.Height * 2
+        End If
+        SX = -1: Mouse.State = 0: Mouse.button = 0
+    End If
 End Sub
 Public Sub Wheel(Direction As Integer, Depth As Single)
     '鼠标滚轮事件
@@ -70,7 +67,7 @@ Private Sub Class_Initialize()
     Page.TopPage = True '置顶页面
     '创建页面
     ECore.Add Page, "TitleBar"
-    
+    SX = -1
     '===============================================
     '   如果需要添加动画，请放置在此处
     

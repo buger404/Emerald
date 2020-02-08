@@ -120,15 +120,15 @@ Public Sub MakePackage(ByVal path As String, GMaker As String, GName As String, 
                 .Files(UBound(.Files)).Data = Data
                 .Files(UBound(.Files)).path = Files(I)
             End With
-            If PackPos = -1 Then WelcomePage.PackText = "正在打包 '" & Files(I) & "' ..."
+            If PackPos = -1 Then WelcomePage.PackText = "打包 '" & Files(I) & "' ..."
         Else
-            If PackPos = -1 Then WelcomePage.PackText = "正在移除 '" & Files(I) & "' ..."
+            If PackPos = -1 Then WelcomePage.PackText = "排除 '" & Files(I) & "' ..."
         End If
         ECore.Display: DoEvents
     Next
     
     '导出.emrpack文件
-    If PackPos = -1 Then WelcomePage.PackText = "正在导出包 ..."
+    If PackPos = -1 Then WelcomePage.PackText = "导出包 ..."
     If Dir(VBA.Environ("temp") & "\emrpack.empack") <> "" Then Kill VBA.Environ("temp") & "\emrpack.empack"
     Open VBA.Environ("temp") & "\emrpack.empack" For Binary As #1
     Put #1, , Package

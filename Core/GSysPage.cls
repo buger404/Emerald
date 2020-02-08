@@ -18,6 +18,7 @@ Public BDC As Long
 Public Key As Integer
 Public OpenTime As Long, DoneMark As Boolean, DoneStep As Integer
 Public DataPage As Integer
+Public MsgButton As Integer
 Dim RectMode As Integer
 Dim ChangeTime As Long, LastLoadPro As Single, LastLoadPro2 As Single
 Dim max2 As Long
@@ -39,6 +40,108 @@ Public Sub Update()
         Call PageDialog
         Case 6
         Call DesignDialog
+        Case 7
+        Call MsgDialog
+    End Select
+End Sub
+Public Sub ScreenMsgDrawer()
+    Dim m As MButtonState
+    
+    Page.Clear 0
+    PaintDC BDC, Page.CDC, alpha:=1
+    
+    Page.Paint 0, 0, 0, RGW + 1, RGH + 1, argb(80, 0, 0, 0)
+    
+    Page.Writes MsgContent, RGW / 2, RGH / 2 - 10, 20, argb(255, 255, 255, 255), align:=StringAlignmentCenter, BorderColor:=argb(160, 16, 16, 16), BorderSize:=1, style:=FontStyleBold
+
+    m = CheckMouse(0, 0, RGW, RGH)
+    
+    If m = mMouseUp Then Me.MsgButton = 1
+End Sub
+Public Sub TipMsgDrawer()
+    Dim m As MButtonState
+    
+    Dim pro As Single, bpro As Single
+    If MsgBtnFocusTime <> 0 Then
+        pro = (GetTickCount - MsgBtnFocusTime) / 500
+        If pro > 1 Then pro = 1
+        pro = Cubic(pro, 0, 1, 1, 1)
+        If MsgBtnFocus = -1 Then
+            bpro = 1 - pro
+        Else
+            bpro = pro
+        End If
+    End If
+    
+    Page.Clear 0
+    PaintDC BDC, Page.CDC, MsgX, MsgY, MsgX, MsgY, MsgW, MsgH, (1 - bpro)
+    
+    Dim BkC As Long
+    BkC = IIf(MsgTipColor = 1, argb(120 * (1 - bpro), 255, 255, 255), argb(120 * (1 - bpro), 0, 0, 0))
+    Page.Paint 0, MsgX, MsgY, MsgW + 1, MsgH + 1, BkC
+    
+    DrawF = MsgBoundRect
+    m = CheckMouse2
+    If m = mMouseOut Then
+        MsgBoundRect.X = -404: MsgTipTime = 0
+        Me.MsgButton = 1: MsgBtnFocusTime = GetTickCount: MsgBtnFocus = 0
+    End If
+    
+    Page.Writes MsgContent, MsgX + 20, MsgY + 4, 18, IIf(MsgTipColor = 1, argb(255 * (1 - bpro), 0, 0, 0), argb(255 * (1 - bpro), 255, 255, 255)), style:=FontStyleBold
+
+    'Page.Paint 0, MsgX, MsgY, MsgW + 1, MsgH + 1, IIf(MsgTipColor = 1, argb(40, 255, 255, 255), argb(40, 0, 0, 0)), style:=1
+End Sub
+Public Sub SimpleMsgDrawer()
+    Dim m As MButtonState
+    
+    Page.Clear 0
+    PaintDC BDC, Page.CDC, alpha:=1
+    
+    Page.Paint 0, 0, 0, RGW + 1, RGH + 1, argb(80, 0, 0, 0)
+    
+    Page.Paint 2, RGW / 2, RGH / 2, MsgW, MsgH, argb(255, 255, 255, 255), 20, pos:=posOnCenter
+    
+    Page.Writes MsgTitle, RGW / 2, RGH / 2 - MsgH / 2 + 20, 18, argb(255, 0, 0, 0), style:=FontStyleBold, align:=StringAlignmentCenter
+    Page.Writes MsgContent, RGW / 2 - MsgW / 2 + 20, RGH / 2 - MsgH / 2 + 60, 18, argb(255, 64, 64, 70), MsgW - 40, MsgH - 60 - 35 - 20, StringAlignmentCenter
+
+    Dim pro As Single, bpro As Single
+    If MsgBtnFocusTime <> 0 Then
+        pro = (GetTickCount - MsgBtnFocusTime) / 500
+        If pro > 1 Then pro = 1
+        pro = Cubic(pro, 0, 1, 1, 1)
+        If MsgBtnFocus = -1 Then
+            bpro = 1 - pro
+        Else
+            bpro = pro
+        End If
+    End If
+    Page.Paint 2, RGW / 2, RGH / 2 + MsgH / 2 - 20 - 20, MsgW * 0.9, 40, argb(255, 232 + (65 - 232) * bpro, 232 + (204 - 232) * bpro, 232 + (194 - 232) * bpro), 100, pos:=posOnCenter
+    m = CheckMouse2
+    Dim WSplit As Long, I As Integer, basey As Long, basex As Long
+    basex = RGW / 2 - MsgW * 0.9 / 2
+    basey = RGH / 2 + MsgH / 2 - 20 - 20 - 20
+    WSplit = MsgW * 0.9 / (UBound(MsgButtons) + 1)
+    For I = 0 To UBound(MsgButtons)
+        If I < UBound(MsgButtons) Then Page.Paint 0, basex + WSplit * (I + 1) * IIf(I <> MsgBtnFocus, 1 - bpro, 1) - 2, basey + 4, 4, 32, argb(50 * (1 - bpro) + 1, 0, 0, 0)
+        Page.Writes MsgButtons(I), basex + WSplit * I * IIf(I = MsgBtnFocus, 1 - bpro, 1), basey + 6, 18, argb(255 * IIf(I <> MsgBtnFocus, 1 - bpro, 1), 36 + (255 - 36) * IIf(I = MsgBtnFocus, bpro, 0), 36 + (255 - 36) * IIf(I = MsgBtnFocus, bpro, 0), 36 + (255 - 36) * IIf(I = MsgBtnFocus, bpro, 0)), WSplit * IIf(I <> MsgBtnFocus, 1 - bpro, 1) + 1 + (MsgW * 0.9 - WSplit) * IIf(I = MsgBtnFocus, bpro, 0), 22, StringAlignmentCenter, IIf(I = MsgBtnFocus, FontStyleBold, FontStyleRegular)
+        If MsgBtnFocus = -1 And m > 0 Then
+            If Mouse.X >= basex + WSplit * I And Mouse.X <= basex + WSplit * (I + 1) Then
+                MsgBtnFocus = I: MsgBtnFocusTime = GetTickCount
+            End If
+        End If
+    Next
+    If MsgBtnFocus <> -1 And m >= mMouseDown Then
+        Me.MsgButton = MsgBtnFocus
+    End If
+    If MsgBtnFocus <> -1 And m = 0 Then
+        MsgBtnFocus = -1: MsgBtnFocusTime = GetTickCount
+    End If
+End Sub
+Public Sub MsgDialog()
+    Select Case MsgType
+        Case 1: Call SimpleMsgDrawer
+        Case 2: Call ScreenMsgDrawer
+        Case 3: Call TipMsgDrawer
     End Select
 End Sub
 Public Sub DesignDialog()
@@ -168,35 +271,9 @@ End Sub
 Public Sub SuggestionDialog()
     Page.Clear argb(0, 0, 0, 0)
     If IsKeyPress(VK_F12) Then
-        If UBound(SGS) = 0 Then
-            MsgBox "没有任何建议。", 48, "Emerald 建议中心"
-        Else
-            Dim Ret As String, sRet As String
-            Ret = "共 " & UBound(SGS) & " 项建议。" & vbCrLf & vbCrLf
-            For I = 1 To UBound(SGS)
-                Select Case SGS(I).Deepth
-                    Case 0: sRet = "(无关紧要)"
-                    Case 1: sRet = "(需要留意)"
-                    Case 2: sRet = "(*紧急)"
-                    Case 3: sRet = "(*非常紧急*)"
-                End Select
-                Ret = Ret & sRet & "    " & SGS(I).Content & vbCrLf
-            Next
-            MsgBox Ret, 48, "Emerald 建议中心"
-        End If
+        Call ShowSuggestion
     End If
-    If GetTickCount - SGTime <= 3000 And UBound(SGS) <> 0 Then
-        Dim pro As Single
-        
-        If GetTickCount Mod 600 < 300 Then
-            pro = 0.6 + (GetTickCount Mod 300) / 300 * 0.4
-        Else
-            pro = 1 - (GetTickCount Mod 300) / 300 * 0.4
-        End If
-        
-        Page.Paint 2, GW / 2, GH / 2, 300, 40, argb(255 * pro, 255, 84, 57), 100, pos:=posOnCenter
-        Page.Writes "共 " & UBound(SGS) & " 项建议 (F12)", GW / 2, GH / 2 - 8 / 0.75, 16, argb(255, 255, 255, 255), align:=StringAlignmentCenter
-    End If
+
 End Sub
 Public Sub SaveManDialog()
     Page.Clear argb(220, 242, 242, 249)
@@ -326,6 +403,7 @@ Private Sub Class_Initialize()
     
     Page.Create Me
     Page.Res.NewImages App.path & "\assets\debug"
+    BDC = CreateCDC(RGW, RGH)
     If Dir(App.path & "\assets\sets\profile.png") <> "" Then
         Page.Res.newImage App.path & "\assets\sets\profile.png", 148, 148, "profile.png"
     Else
@@ -335,6 +413,6 @@ Private Sub Class_Initialize()
     
     Page.TopPage = True
     
-    BDC = CreateCDC(GW, GH)
+
 End Sub
 

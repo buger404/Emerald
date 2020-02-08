@@ -17,6 +17,7 @@ Attribute VB_Exposed = False
     Public PageIndex As Integer, Cliped As Integer
     Public CMError As String
     Public StartTime As Long
+    Public BackupC As Integer
     Dim ReadProject As Boolean
     Private Type UpdateFiles
         Name As String
@@ -42,6 +43,8 @@ Public Sub ScanBackup()
     Dim File As String, Backup As EmrBackup
     File = Dir(OPath & "\.emr\*.emrbackup")
     ReDim BackupList(0)
+    BackupC = 1
+    
     Do While File <> ""
         Open OPath & "\.emr\" & File For Binary As #1
         Get #1, , Backup
@@ -53,6 +56,7 @@ Public Sub ScanBackup()
                 .FileCount = UBound(Backup.Files)
                 .Name = Split(File, ".emrbackup")(0)
                 If .Name = "" Then .Name = "null"
+                If .Name = EmrPC.LastBranch Then BackupC = UBound(BackupList)
                 .size = FileLen(OPath & "\.emr\" & File)
             End With
         End If
@@ -62,12 +66,13 @@ Public Sub ScanBackup()
     If Dir(OPath & "\.emr\backup", vbDirectory) <> "" Then
         ReDim Preserve BackupList(UBound(BackupList) + 1)
         With BackupList(UBound(BackupList))
-            .Date = "未知"
+            .Date = "使用远古版本Builder建立的备份"
             .FileCount = -1
-            .Name = "远古版本的Emerald创建的备份"
+            .Name = "远古"
             .size = -1
         End With
     End If
+    
 End Sub
 Public Sub WriteCache()
     Dim Cache As EmrBackup
@@ -289,40 +294,51 @@ Public Sub DrawAbout()
         ECore.NewTransform transFadeIn, 1000
     End If
 
-    Page.Writes "版本", 381, 135, 18, argb(255, 35, 170, 242)
-    Page.Writes "当前Builder版本号：" & Version, 381, 170, 18, argb(255, 242, 242, 242)
-    Page.Writes "当前Emerald版本号：" & Version, 381, 200, 18, argb(255, 242, 242, 242)
-    Page.Writes "关于", 381, 265, 18, argb(255, 35, 170, 242)
-    Page.Writes "由Error404(QQ 1361778219)制作", 381, 305, 18, argb(255, 242, 242, 242)
-    Page.Writes "支持", 381, 365, 18, argb(255, 35, 170, 242)
-    Page.Writes "QQ群 : Inter.Net / Redstone", 381, 405, 18, argb(255, 242, 242, 242)
-    Page.Writes "南笙", 381, 435, 18, argb(255, 242, 242, 242)
-    Page.Writes "更新计划", 381, 505, 18, argb(255, 35, 170, 242)
+    Page.Writes "框架版本", 85, 190, 18, argb(255, 0, 0, 0)
+    Page.Writes "20" & Mid(Version, 1, 2) & "." & Val(Mid(Version, 3, 2)) & "." & Val(Mid(Version, 5, 2)) & " 第" & Val(Mid(Version, 7, 2)) & "次版本", 200, 190, 18, argb(200, 32, 32, 36)
+    Page.Writes "制作", 85, 230, 18, argb(255, 0, 0, 0)
+    Page.Writes "Error404 (QQ 1361778219)", 200, 230, 18, argb(200, 32, 32, 36)
+    Page.Writes "支持", 85, 270, 18, argb(255, 0, 0, 0)
+    Page.Writes "Inter.Net，南笙", 200, 270, 18, argb(200, 32, 32, 36)
+    Page.Writes "更新", 85, 310, 18, argb(255, 0, 0, 0)
     If NewVersion = 0 Then
-        Page.ShowLoading 386, 545, 20, 20, 4, argb(255, 35, 170, 242), argb(255, 0, 176, 240), argb(255, 64, 218, 208)
-        Page.Writes "正在连接服务器...", 416, 547, 18, argb(255, 242, 242, 242)
+        Page.ShowLoading 200, 310 + 2, 20, 20, 3, argb(255, 0, 120, 215), argb(255, 0, 176, 240), argb(160, 64, 218, 208)
+        Page.Writes "正在检查更新...", 230, 310, 18, argb(200, 32, 32, 36)
     ElseIf NewVersion = 3 Then
-        Page.Writes "连接超时。", 381, 547, 18, argb(255, 254, 84, 57)
+        Page.Writes "连接超时", 200, 310, 18, argb(200, 254, 84, 57)
     ElseIf NewVersion > Version Then
-        Page.Writes "更新可用，点击此处下载。", 381, 547, 18, argb(255, 35, 170, 242), 200, 20, style:=FontStyleUnderline
+        Page.Writes "更新可用", 200, 310, 18, argb(255, 35, 170, 242), 200, 22, style:=FontStyleUnderline
         If CheckMouse2 = mMouseUp Then ShellExecuteA 0, "open", "https://github.com/buger404/Emerald/releases", "", "", SW_SHOW
     Else
-        Page.Writes "已经是最新版了。", 381, 547, 18, argb(255, 242, 242, 242)
+        Page.Writes "官方最新版", 200, 310, 18, argb(200, 32, 32, 36)
     End If
     
-    Page.Writes "使用帮助", 381, 605, 18, argb(255, 35, 170, 242)
-    m = CheckMouse(381, 645, 170, 20)
-    Page.Writes "Github : Emerald Wiki", 381, 645, 18, IIf(m = 0, argb(255, 242, 242, 242), argb(255, 35, 170, 242)), 200, 20, style:=FontStyleUnderline
+    Page.Writes "使用帮助", 85, 430, 18, argb(255, 0, 0, 0)
+    m = CheckMouse(200, 430, 195, 20)
+    Page.Writes "Github : Emerald Wiki", 200, 430, 18, IIf(m = 0, argb(200, 32, 32, 36), argb(255, 60, 205, 195)), 200, 25, style:=FontStyleUnderline
     If m = 3 Then ShellExecuteA 0, "open", "https://github.com/buger404/Emerald/wiki", "", "", SW_SHOW
     m = IIf(m = 0, MousePointerConstants.vbDefault, MousePointerConstants.vbArrowQuestion)
     If Screen.MousePointer <> m Then Screen.MousePointer = m
+    
+    Dim Data As String
+    Page.Writes "检查间隔", 85, 350, 18, argb(255, 0, 0, 0)
+    Data = ESave.GetData("UpdateCheckInterval") & "天"
+    Page.ShowEdit Data, 0, 200, 350 - 1, 280, 30, argb(200, 32, 32, 36), argb(0, 16, 16, 24), argb(255, 242, 242, 242), argb(255, 62, 206, 196), size:=18
+    Data = Replace(Data, "天", "")
+    If Data <> ESave.GetData("UpdateCheckInterval") Then ESave.PutData "UpdateCheckInterval", Val(Data)
+    Page.Writes "超时时间", 85, 390, 18, argb(255, 0, 0, 0)
+    Dim data2 As String
+    data2 = ESave.GetData("UpdateTimeOut") & "ms"
+    Page.ShowEdit data2, 0, 200, 390 - 1, 280, 30, argb(200, 32, 32, 36), argb(0, 16, 16, 24), argb(255, 242, 242, 242), argb(255, 62, 206, 196), size:=18
+    data2 = Replace(data2, "ms", "")
+    If data2 <> ESave.GetData("UpdateTimeOut") Then ESave.PutData "UpdateTimeOut", Val(data2)
+
 End Sub
 Public Sub DrawProject()
-    Page.Writes "游戏名称", 380, 135, 18, argb(255, 35, 170, 242)
-    Page.Writes EmrPC.Name, 381, 170, 18, argb(255, 242, 242, 242)
-    Page.Writes "制作人", 380, 235, 18, argb(255, 35, 170, 242)
-    'Page.Writes EmrPC.Maker, 381, 270, 18, argb(255, 242, 242, 242)
-    If Page.ShowEdit(EmrPC.Maker, 0, 380, 270 - 5 + 2, 280, 30, argb(255, 242, 242, 242), argb(0, 255, 255, 255), argb(50, 242, 242, 242), argb(255, 35, 170, 242), size:=18) = 4 Then
+    Page.Writes "项目名称", 85, 190, 18, argb(255, 0, 0, 0)
+    Page.Writes EmrPC.Name, 200, 190, 18, argb(200, 32, 32, 36)
+    Page.Writes "开发者", 85, 230, 18, argb(255, 0, 0, 0)
+    If Page.ShowEdit(EmrPC.Maker, 0, 200, 230 - 1, 280, 30, argb(200, 32, 32, 36), argb(0, 16, 16, 24), argb(255, 242, 242, 242), argb(255, 62, 206, 196), size:=18) = 4 Then
         Open OPath & "\.emerald" For Binary As #1
         Put #1, , EmrPC
         Close #1
@@ -330,58 +346,47 @@ Public Sub DrawProject()
     
     Dim m As Long
     
-    Page.Writes "使用的Emerald版本号" & IIf(UBound(UFiles) > 0, " (更新可用)", ""), 380, 335, 18, IIf(UBound(UFiles) > 0, argb(255, 254, 84, 57), argb(255, 35, 170, 242))
-    Page.Writes "V" & EmrPC.Version & IIf(UBound(UFiles) > 0, " -> V" & Version, ""), 381, 370, 18, argb(255, 242, 242, 242)
+    Page.Writes "框架版本", 85, 270, 18, IIf(UBound(UFiles) > 0, argb(255, 254, 84, 57), argb(255, 0, 0, 0))
+    Page.Writes "V" & EmrPC.Version & IIf(UBound(UFiles) > 0, " -> V" & Version, ""), 200, 270, 18, argb(200, 32, 32, 36)
     
     If UBound(UFiles) = 0 Then Exit Sub
     If ReplaceAccept = -1 Then
-        Page.ShowLoading 600, 460, 128, 128, 3, argb(255, 35, 170, 242), argb(255, 0, 176, 240), argb(255, 64, 218, 208)
+        Page.ShowLoading GW / 2 - 24, 355, 48, 48, 3, argb(255, 0, 120, 215), argb(255, 0, 176, 240), argb(160, 64, 218, 208)
         Exit Sub
     End If
-    
-    m = CheckMouse(381, 400, 570, 20)
-    Page.Writes "最后一次更新【吧", 381, 400, 18, IIf(m > 0, argb(255, 35, 170, 242), argb(255, 242, 242, 242)), 570, 20, style:=FontStyleUnderline
-    If m = 3 Then ShellExecuteA 0, "open", "https://github.com/buger404/Emerald/releases", "", "", SW_SHOW
-    m = IIf(m = 0, MousePointerConstants.vbDefault, MousePointerConstants.vbArrowQuestion)
-    If Screen.MousePointer <> m Then Screen.MousePointer = m
     
     Dim UColor(3) As Long, UText(3) As String
     UColor(1) = argb(255, 67, 219, 210): UText(1) = "新增"
     UColor(2) = argb(255, 35, 170, 242): UText(2) = "更新"
     UColor(3) = argb(255, 254, 84, 57): UText(3) = "替换"
     
-    For I = FileIndex * 6 + 1 To FileIndex * 6 + 5 + 1
+    For I = FileIndex * 3 + 1 To FileIndex * 3 + 2 + 1
         If I > UBound(UFiles) Or I < 1 Then Exit For
-        Page.Paint 0, 372, 430 + 30 * (I - FileIndex * 6) - 5 - 8, 558, 31, IIf(I Mod 2 = 0, argb(0, 242, 242, 242), argb(50, 255, 255, 255))
-        Page.Paint 1, 372 + 5, 431 + 30 * (I - FileIndex * 6) + 1 - 8, 15, 15, IIf(UFiles(I).ReplaceMark, argb(255, 254, 84, 57), argb(255, 168, 168, 168))
+        Page.Paint 1, 85 + 3, 310 + 30 * (I - FileIndex * 3) - 30 + 3, 15, 15, IIf(UFiles(I).ReplaceMark, UColor(UFiles(I).Kind), argb(255, 200, 200, 200))
         If CheckMouse2 = mMouseUp Then UFiles(I).ReplaceMark = Not UFiles(I).ReplaceMark
-        Page.Writes UFiles(I).Name, 501 + 15, 428 + 30 * (I - FileIndex * 6) - 8, 18, argb(255, 255, 255, 255)
-        Page.Paint 0, 382 + 15, 430 + 30 * (I - FileIndex * 6) - 8, 80, 20, UColor(UFiles(I).Kind)
-        Page.DrawImageEx UFiles(I).Image, 388 + 80 + 5 + 15, 430 + 30 * (I - FileIndex * 6) - 8, 20, 20
-        Page.Writes UText(UFiles(I).Kind), 382 + 15, 428 + 30 * (I - FileIndex * 6) - 8, 16, argb(255, 255, 255, 255), 80, 20, StringAlignmentCenter, FontStyleBold
-        Page.Writes IIf(UFiles(I).IncraseByte > 0, "+", "") & UFiles(I).IncraseByte & " 字节", GW - 80, 428 + 30 * (I - FileIndex * 6) - 8, 18, argb(255, 192, 192, 192), align:=StringAlignmentFar
+        Page.Writes UFiles(I).Name, 200, 310 + 30 * (I - FileIndex * 3) - 30, 18, IIf(UFiles(I).ReplaceMark, argb(200, 16, 16, 24), argb(255, 160, 160, 160))
+        Page.Writes UText(UFiles(I).Kind), 110, 310 + 30 * (I - FileIndex * 3) - 30, 18, IIf(UFiles(I).ReplaceMark, UColor(UFiles(I).Kind), argb(255, 160, 160, 160))
+        Page.Writes IIf(UFiles(I).IncraseByte > 0, "+", "") & UFiles(I).IncraseByte & " 字节", GW - 80, 310 + 30 * (I - FileIndex * 3) - 30, 18, argb(255, 96, 96, 100), align:=StringAlignmentFar
     Next
     
     Dim max As Long
-    max = Int(UBound(UFiles) / 6) + 1
-    Page.Writes FileIndex + 1 & "/" & max, 600, 430 + 30 * 7 + 5, 18, argb(255, 242, 242, 242), 120, 20, align:=StringAlignmentCenter
+    max = Int(UBound(UFiles) / 3) + 1
+    
     If FileIndex + 1 > 1 Then
-        If Page.ShowColorButton(1, 600, 430 + 30 * 7 + 5, 20, 20, "<", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 75, 210, 255), 40, size:=16) = 3 Then
+        If Page.ShowColorButton(1, 40, 338, 40, 40, "<", argb(255, 16, 16, 24), argb(0, 35, 170, 242), argb(128, 65, 207, 197), 40, size:=16) = 3 Then
             FileIndex = FileIndex - 1
-            ECore.NewTransform
         End If
     End If
     If FileIndex + 1 < max Then
-        If Page.ShowColorButton(1, 700, 430 + 30 * 7 + 5, 20, 20, ">", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 75, 210, 255), 40, size:=16) = 3 Then
+        If Page.ShowColorButton(1, GW - 80, 338, 40, 40, ">", argb(255, 16, 16, 24), argb(0, 35, 170, 242), argb(128, 65, 207, 197), 40, size:=16) = 3 Then
             FileIndex = FileIndex + 1
-            ECore.NewTransform
         End If
     End If
     If FileIndex + 1 > max Then FileIndex = max - 1
     
-    Page.ShowColorCheckBox BackupSwitch, 384, GH - 80, 200, 20, "同时创建备份", argb(255, 242, 242, 242), argb(255, 35, 170, 242), argb(255, 242, 242, 242), 18
-
-    If Page.ShowColorButton(0, GW - 180, GH - 82, 120, 30, IIf(ReplaceAccept = 0, "替换代码", "确认替换 (" & Round(5 - (GetTickCount - ReplaceAccept) / 1000) & "s)"), argb(255, 255, 255, 255), IIf(ReplaceAccept = 0, argb(255, 35, 170, 242), argb(255, 254, 84, 57)), IIf(ReplaceAccept = 0, argb(255, 75, 210, 255), argb(255, 255, 124, 97)), 40, size:=18) = 3 Then
+    BackupSwitch = True
+    
+    If Page.ShowColorButton(2, GW / 2 - 200, GH - 110, 400, 40, IIf(ReplaceAccept = 0, "替换代码", "确认替换 (" & Round(5 - (GetTickCount - ReplaceAccept) / 1000) & "s)"), argb(255, 255, 255, 255), IIf(ReplaceAccept = 0, argb(255, 103, 226, 217), argb(255, 254, 84, 57)), IIf(ReplaceAccept = 0, argb(255, 60, 205, 195), argb(255, 255, 124, 97)), 40, size:=18, style:=FontStyleBold) = 3 Then
         If ReplaceAccept > 0 Then
             ReplaceAccept = -1
             Call ReplaceProject
@@ -391,100 +396,95 @@ Public Sub DrawProject()
         Else
             ReplaceAccept = GetTickCount
         End If
-        ECore.NewTransform
     End If
-    If GetTickCount - ReplaceAccept >= 5000 And ReplaceAccept > 0 Then ReplaceAccept = 0: ECore.NewTransform
+    If GetTickCount - ReplaceAccept >= 5000 And ReplaceAccept > 0 Then ReplaceAccept = 0
 End Sub
 Public Sub DrawBackup()
-    Page.Writes "备份清单", 381, 135, 18, argb(255, 35, 170, 242)
-    
+
     For I = 1 To UBound(BackupList)
         If BackupList(I).UseTime = -1 Then
-            Page.ShowLoading 600, 340, 128, 128, 3, argb(255, 35, 170, 242), argb(255, 0, 176, 240), argb(255, 64, 218, 208)
+            Page.ShowLoading GW / 2 - 24, 355, 48, 48, 3, argb(255, 0, 120, 215), argb(255, 0, 176, 240), argb(160, 64, 218, 208)
             Exit Sub
         End If
     Next
     
-    For I = BackupIndex * 6 + 1 To BackupIndex * 6 + 5 + 1
+    For I = BackupIndex * 3 + 1 To BackupIndex * 3 + 2 + 1
         If I > UBound(BackupList) Or I < 1 Then Exit For
-        If I Mod 2 = 1 Then
-            'Page.Paint 0, 380, 120 + 70 * (I - BackupIndex * 6) - 5 - 8, 560, 71, argb(255, 242, 242, 242)
+
+        Page.Writes "备份" & I, 85, 190 + 70 * (I - BackupIndex * 3) - 70, 18, argb(IIf(BackupC = I, 255, 120), 0, 0, 0), style:=IIf(BackupC = I, FontStyleBold, FontStyleRegular)
+        If BackupList(I).FileCount = -1 Then
+            Page.Writes BackupList(I).Date, 200, 190 + 70 * (I - BackupIndex * 3) - 70, 18, argb(IIf(BackupC = I, 200, 120), 16, 16, 29)
+            Page.Writes "过于老旧的备份，无法取得信息", 200, 190 + 70 * (I - BackupIndex * 3) - 70 + 25, 18, argb(IIf(BackupC = I, 200, 120), 16, 16, 29)
         Else
-            Page.Paint 0, 380, 120 + 70 * (I - BackupIndex * 6) - 5 - 8, 560, 71, argb(70, 242, 242, 255)
+            Page.Writes "日期 " & BackupList(I).Date, 200, 190 + 70 * (I - BackupIndex * 3) - 70, 18, argb(IIf(BackupC = I, 200, 120), 16, 16, 29)
+            Page.Writes "共" & BackupList(I).FileCount & "个文件，总计" & Int(BackupList(I).size / 1024) & "kb", 200, 190 + 70 * (I - BackupIndex * 3) - 70 + 25, 18, argb(IIf(BackupC = I, 200, 120), 16, 16, 29)
         End If
-        If BackupList(I).Name = EmrPC.LastBranch Then
-            Page.Paint 0, 380, 120 + 70 * (I - BackupIndex * 6) - 5 - 8, 7, 71, argb(255, 35, 170, 242)
-        End If
-        Page.Writes Left(BackupList(I).Name, 22) & IIf(Len(BackupList(I).Name) > 22, "...", "") & "  (" & BackupList(I).FileCount & " 个文件)", 392, 120 + 70 * (I - BackupIndex * 6) - 2, 18, argb(255, 255, 255, 255)
-        Page.Writes BackupList(I).Date & " (" & BackupList(I).size & "字节)", 392, 120 + 70 * (I - BackupIndex * 6) - 2 + 25, 18, argb(255, 192, 192, 192)
-        If Page.ShowColorButton(0, GW - 170, 117 + 70 * (I - BackupIndex * 6) + 8, 100, 30, IIf(BackupList(I).UseTime = 0, "还原", "确认 (" & Round(5 - (GetTickCount - BackupList(I).UseTime) / 1000) & "s)"), argb(255, 255, 255, 255), IIf(BackupList(I).UseTime = 0, argb(255, 35, 170, 242), argb(255, 254, 84, 57)), IIf(BackupList(I).UseTime = 0, argb(255, 75, 210, 255), argb(255, 255, 124, 97)), 40, size:=18) = 3 Then
-            If BackupList(I).UseTime > 0 Then
-                If BackupList(I).size = -1 Then
-                    ShellExecuteA 0, "open", OPath & "\.emr\backup\", "", "", SW_SHOW
-                    BackupList(I).UseTime = 0
-                Else
-                    BackupList(I).UseTime = -1
-                    Dim Backup As EmrBackup, Cache As EmrBackup
-                    Open OPath & "\.emr\" & IIf(BackupList(I).Name = "null", "", BackupList(I).Name) & ".emrbackup" For Binary As #1
-                    Get #1, , Backup
-                    Close #1
-                    Cache.AFileHeader = Backup.AFileHeader
-                    ReDim Cache.Files(UBound(Backup.Files))
-                    For S = 1 To UBound(Backup.Files)
-                        Open OPath & "\" & Backup.Files(S).path For Binary As #1
-                        Put #1, , Backup.Files(S).Data
-                        Close #1
-                        Cache.Files(S).MD5Check = Backup.Files(S).MD5Check
-                        Cache.Files(S).path = Backup.Files(S).path
-                        ECore.Display: DoEvents
-                    Next
-                    EmrPC.FUpdate = True
-                    EmrPC.LastBranch = BackupList(I).Name
-                    Open OPath & "\.emerald" For Binary As #1
-                    Put #1, , EmrPC
-                    Close #1
-                    Open OPath & "\.emr\.cache" For Binary As #1
-                    Put #1, , Cache
-                    Close #1
-                    ReDim UFiles(0)
-                    Call UpdateProject
-                    BackupList(I).UseTime = 0
-                    MsgBox "成功。", 64
-                End If
-                ECore.NewTransform
-            Else
-                BackupList(I).UseTime = GetTickCount
-                ECore.NewTransform
-            End If
-        End If
-        If GetTickCount - BackupList(I).UseTime >= 5000 And BackupList(I).UseTime > 0 Then BackupList(I).UseTime = 0: ECore.NewTransform
+        
+        If CheckMouse(85, 190 + 70 * (I - BackupIndex * 3) - 70, GW - 85 * 2, 70) = mMouseUp Then BackupC = I
     Next
     
-    Dim max As Long
-    max = Int(UBound(BackupList) / 6) + 1
-    Page.Writes BackupIndex + 1 & "/" & max, 600, 430 + 30 * 7 + 5, 18, argb(255, 242, 242, 242), 120, 20, align:=StringAlignmentCenter
-    If BackupIndex + 1 > 1 Then
-        If Page.ShowColorButton(1, 600, 430 + 30 * 7 + 5, 20, 20, "<", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 75, 210, 255), 40, size:=16) = 3 Then
-            BackupIndex = BackupIndex - 1
+    I = BackupC
+   If Page.ShowColorButton(2, GW / 2 - 200, GH - 110, 400, 40, IIf(BackupList(I).UseTime = 0, "恢复备份" & I, "确认恢复备份" & I & " (" & Round(5 - (GetTickCount - BackupList(I).UseTime) / 1000) & "s)"), argb(255, 255, 255, 255), IIf(BackupList(I).UseTime = 0, argb(255, 103, 226, 217), argb(255, 254, 84, 57)), IIf(BackupList(I).UseTime = 0, argb(255, 60, 205, 195), argb(255, 255, 124, 97)), 40, size:=18, style:=FontStyleBold) = 3 Then
+        If BackupList(I).UseTime > 0 Then
+            If BackupList(I).size = -1 Then
+                ShellExecuteA 0, "open", OPath & "\.emr\backup\", "", "", SW_SHOW
+                BackupList(I).UseTime = 0
+            Else
+                BackupList(I).UseTime = -1
+                Dim Backup As EmrBackup, Cache As EmrBackup
+                Open OPath & "\.emr\" & IIf(BackupList(I).Name = "null", "", BackupList(I).Name) & ".emrbackup" For Binary As #1
+                Get #1, , Backup
+                Close #1
+                Cache.AFileHeader = Backup.AFileHeader
+                ReDim Cache.Files(UBound(Backup.Files))
+                For S = 1 To UBound(Backup.Files)
+                    Open OPath & "\" & Backup.Files(S).path For Binary As #1
+                    Put #1, , Backup.Files(S).Data
+                    Close #1
+                    Cache.Files(S).MD5Check = Backup.Files(S).MD5Check
+                    Cache.Files(S).path = Backup.Files(S).path
+                    ECore.Display: DoEvents
+                Next
+                EmrPC.FUpdate = True
+                EmrPC.LastBranch = BackupList(I).Name
+                Open OPath & "\.emerald" For Binary As #1
+                Put #1, , EmrPC
+                Close #1
+                Open OPath & "\.emr\.cache" For Binary As #1
+                Put #1, , Cache
+                Close #1
+                ReDim UFiles(0)
+                Call UpdateProject
+                BackupList(I).UseTime = 0
+                MsgBox "成功。", 64
+            End If
             ECore.NewTransform
+        Else
+            BackupList(I).UseTime = GetTickCount
+        End If
+    End If
+    If GetTickCount - BackupList(I).UseTime >= 5000 And BackupList(I).UseTime > 0 Then BackupList(I).UseTime = 0
+    
+    Dim max As Long
+    max = Int(UBound(BackupList) / 3) + 1
+    If BackupIndex + 1 > 1 Then
+        If Page.ShowColorButton(1, 40, 268, 40, 40, "<", argb(255, 16, 16, 24), argb(0, 35, 170, 242), argb(128, 65, 207, 197), 40, size:=16) = 3 Then
+            BackupIndex = BackupIndex - 1
         End If
     End If
     If BackupIndex + 1 < max Then
-        If Page.ShowColorButton(1, 700, 430 + 30 * 7 + 5, 20, 20, ">", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 75, 210, 255), 40, size:=16) = 3 Then
+        If Page.ShowColorButton(1, GW - 80, 268, 40, 40, ">", argb(255, 16, 16, 24), argb(0, 35, 170, 242), argb(128, 65, 207, 197), 40, size:=16) = 3 Then
             BackupIndex = BackupIndex + 1
-            ECore.NewTransform
         End If
     End If
     If BackupIndex + 1 > max Then BackupIndex = max - 1
 End Sub
 Public Sub DrawPackage()
-    Page.Writes "打包", 381, 135, 18, argb(255, 35, 170, 242)
-    Page.Writes "将你的游戏打包为安装包。", 381, 175, 18, argb(255, 242, 242, 242)
-    
+
     If PackState = 1 Then
-        Page.Writes "正在制作安装包...", 381, 205, 18, argb(255, 242, 242, 242)
-        Page.Writes PackText, 381, 235, 18, argb(255, 242, 242, 242)
-        Page.ShowLoading 600, 410, 128, 128, 3, argb(255, 35, 170, 242), argb(255, 0, 176, 240), argb(255, 64, 218, 208)
+        Page.Writes "进度", 85, 190, 18, argb(255, 0, 0, 0)
+        Page.Writes PackText, 200, 190, 18, argb(200, 32, 32, 36)
+        Page.ShowLoading GW / 2 - 24, 355, 48, 48, 3, argb(255, 0, 120, 215), argb(255, 0, 176, 240), argb(160, 64, 218, 208)
         Exit Sub
     End If
         
@@ -492,21 +492,23 @@ Public Sub DrawPackage()
     CanDo = True
     If Dir(OPath & "\app.exe") = "" Then
         CanDo = False
-        Page.Writes "[待处理]     目录下需要一个名为app.exe的游戏主程序。", 381, 255, 18, argb(255, 254, 84, 57)
+        Page.Writes "需要", 85, 190, 18, argb(255, 160, 160, 160)
+        Page.Writes "主程序 'app.exe'", 200, 190, 18, argb(200, 160, 160, 160)
     Else
-        Page.Writes "[已处理]     目录下需要一个名为app.exe的游戏主程序。", 381, 255, 18, argb(255, 35, 170, 242)
+        Page.Writes "需要", 85, 190, 18, argb(255, 0, 0, 0)
+        Page.Writes "主程序 'app.exe'", 200, 190, 18, argb(200, 16, 16, 32)
     End If
+    
     If Dir(OPath & "\app.png") = "" Then
         CanDo = False
-        Page.Writes "[待处理]     目录下需要一张名为app.png的游戏图标。", 381, 285, 18, argb(255, 254, 84, 57)
+        Page.Writes "需要", 85, 230, 18, argb(255, 160, 160, 160)
+        Page.Writes "图标 'app.png'", 200, 230, 18, argb(200, 160, 160, 160)
     Else
-        Page.Writes "[已处理]     目录下需要一张名为app.png的游戏图标。", 381, 285, 18, argb(255, 35, 170, 242)
+        Page.Writes "需要", 85, 230, 18, argb(255, 0, 0, 0)
+        Page.Writes "图标 'app.png'", 200, 230, 18, argb(200, 16, 16, 32)
     End If
-    If CanDo = False Then
-        Page.Writes "我们无法继续制作安装包。", 381, 205, 18, argb(255, 242, 242, 242)
-    Else
-        Page.Writes "一切准备就绪！", 381, 205, 18, argb(255, 242, 242, 242)
-        If Page.ShowColorButton(0, GW - 220, GH - 112, 150, 40, "制作", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 75, 210, 255), 40, size:=18) = 3 Then
+    If CanDo Then
+        If Page.ShowColorButton(2, GW / 2 - 200, GH - 110, 400, 40, "制作安装程序", argb(255, 255, 255, 255), argb(255, 105, 227, 218), argb(255, 59, 205, 195), 40, size:=18, style:=FontStyleBold) = 3 Then
             PackState = 1: PackText = "正在准备..."
             Call BuildInstaller
             PackState = 0
@@ -516,25 +518,25 @@ Public Sub DrawPackage()
 End Sub
 Public Sub DrawSettings()
     Dim Data As String
-    Page.Writes "调试工具", 381, 135, 18, argb(255, 35, 170, 242)
+
     Data = ESave.GetData("DebugMode")
-    Page.ShowColorCheckBox Data, 384, 175, 200, 20, "在屏幕顶部显示调试栏", argb(255, 242, 242, 242), argb(255, 35, 170, 242), argb(255, 242, 242, 242), 18
+    Page.ShowColorCheckBox Data, 85, 190, 200, 20, "调试时在屏幕顶部显示调试栏", argb(255, 200, 200, 200), argb(255, 60, 205, 195), argb(255, 32, 32, 36), 18
     If Data <> ESave.GetData("DebugMode") Then ESave.PutData "DebugMode", IIf(Data = True, 1, 0)
     
     Data = ESave.GetData("DisableLOGO")
-    Page.ShowColorCheckBox Data, 384, 205, 200, 20, "在所有资源加载完成后跳过LOGO动画", argb(255, 242, 242, 242), argb(255, 35, 170, 242), argb(255, 242, 242, 242), 18
+    Page.ShowColorCheckBox Data, 85, 230, 200, 20, "在所有资源加载完成后跳过加载动画", argb(255, 200, 200, 200), argb(255, 60, 205, 195), argb(255, 32, 32, 36), 18
     If Data <> ESave.GetData("DisableLOGO") Then ESave.PutData "DisableLOGO", IIf(Data = True, 1, 0)
     
     Data = ESave.GetData("HideLOGO")
-    Page.ShowColorCheckBox Data, 384, 235, 200, 20, "不要显示LOGO动画", argb(255, 242, 242, 242), argb(255, 35, 170, 242), argb(255, 242, 242, 242), 18
+    Page.ShowColorCheckBox Data, 85, 270, 200, 20, "禁用加载动画", argb(255, 200, 200, 200), argb(255, 60, 205, 195), argb(255, 32, 32, 36), 18
     If Data <> ESave.GetData("HideLOGO") Then ESave.PutData "HideLOGO", IIf(Data = True, 1, 0)
     
      Data = ESave.GetData("HideSuggest")
-    Page.ShowColorCheckBox Data, 384, 265, 200, 20, "关闭建议中心", argb(255, 242, 242, 242), argb(255, 35, 170, 242), argb(255, 242, 242, 242), 18
+    Page.ShowColorCheckBox Data, 85, 310, 200, 20, "关闭建议中心", argb(255, 200, 200, 200), argb(255, 60, 205, 195), argb(255, 32, 32, 36), 18
     If Data <> ESave.GetData("HideSuggest") Then ESave.PutData "HideSuggest", IIf(Data = True, 1, 0)
     
     Data = (Dir(VBIDEPath & "Template\Forms\Emerald Window.frm") <> "")
-    Page.ShowColorCheckBox Data, 384, 295, 200, 20, "VB工程示例文件", argb(255, 242, 242, 242), argb(255, 35, 170, 242), argb(255, 242, 242, 242), 18
+    Page.ShowColorCheckBox Data, 85, 350, 200, 20, "使用Builder提供的VB工程示例文件", argb(255, 200, 200, 200), argb(255, 60, 205, 195), argb(255, 32, 32, 36), 18
     If Data <> (Dir(VBIDEPath & "Template\Forms\Emerald Window.frm") <> "") Then
         On Error GoTo sth
         If Dir(VBIDEPath & "Template", vbDirectory) = "" Then MkDir VBIDEPath & "Template"
@@ -551,50 +553,9 @@ sth:
             Err.Clear
         End If
     End If
-    
-    Page.Writes "更新计划", 381, 345, 18, argb(255, 35, 170, 242)
-    Page.Writes "检查更新间隔 (天) : ", 381, 380, 18, argb(255, 242, 242, 242)
-    Data = ESave.GetData("UpdateCheckInterval")
-    Page.ShowEdit Data, 0, 581, 380 - 5 + 1, 280, 30, argb(255, 35, 170, 242), argb(0, 255, 255, 255), argb(50, 242, 242, 242), argb(255, 35, 170, 242), 50, size:=18
-    If Data <> ESave.GetData("UpdateCheckInterval") Then ESave.PutData "UpdateCheckInterval", Val(Data)
-    Page.Writes "连接超时时间 (毫秒) : ", 381, 410, 18, argb(255, 242, 242, 242)
-    Dim data2 As String
-    data2 = ESave.GetData("UpdateTimeOut")
-    Page.ShowEdit data2, 0, 581, 410 - 5 + 1, 280, 30, argb(255, 35, 170, 242), argb(0, 255, 255, 255), argb(50, 242, 242, 242), argb(255, 35, 170, 242), 50, size:=18
-    If data2 <> ESave.GetData("UpdateTimeOut") Then ESave.PutData "UpdateTimeOut", Val(data2)
 
-    Dim unAble As Boolean
-    If ESave.GetData("UpdateTime") <> "" Then
-        On Error Resume Next
-        If Not (Now - CDate(ESave.GetData("UpdateTime")) >= UpdateCheckInterval) Then
-            m = CheckMouse(381, 445, 170, 20)
-            Page.Writes "重置更新 ...", 381, 445, 18, IIf(m = 0, argb(255, 242, 242, 242), argb(255, 35, 170, 242)), 200, 20, style:=FontStyleUnderline
-            If m = 3 Then
-                ESave.PutData "UpdateAble", 0
-                ESave.PutData "UpdateTime", ""
-                MsgBox "重置更新成功。", 64
-                ECore.NewTransform transFadeIn, 1000
-            End If
-        Else
-            unAble = True
-        End If
-        Err.Clear
-    Else
-        unAble = True
-    End If
-    
-    If unAble Then
-        m = CheckMouse(381, 445, 250, 20)
-        Page.Writes "现在无法重置更新。", 381, 445, 18, argb(255, 148, 148, 148), 250, 20
-        m = IIf(m = 0, MousePointerConstants.vbDefault, MousePointerConstants.vbNoDrop)
-        If Screen.MousePointer <> m Then Screen.MousePointer = m
-    End If
-    
-    Page.Writes "资源管理器菜单", 381, 505, 18, argb(255, 35, 170, 242)
-    Page.Writes "将Emerald固定在资源管理器菜单上使创建工程更加便捷。", 381, 545, 18, argb(255, 242, 242, 242)
-    Page.Writes "你将在你的资源管理器中找到它 (右键背景) .", 381, 575, 18, argb(255, 242, 242, 242)
     Data = IIf(IsRegCreated("HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\command\") = True, 1, 0)
-    Page.ShowColorCheckBox Data, 384, 615, 200, 20, "Emerald菜单项", argb(255, 242, 242, 242), IIf(CMError = "", argb(255, 35, 170, 242), argb(255, 242, 242, 242)), IIf(CMError = "", argb(255, 242, 242, 242), argb(255, 242, 242, 242)), 18
+    Page.ShowColorCheckBox Data, 85, 390, 200, 20, "资源管理器菜单", argb(255, 32, 32, 36), IIf(CMError = "", argb(255, 60, 205, 195), argb(255, 32, 32, 36)), IIf(CMError = "", argb(255, 32, 32, 36), argb(255, 32, 32, 36)), 18
     If Data <> IsRegCreated("HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\command\") And CMError = "" Then
         CMError = OperContentMenu(IIf(Not CBool(Data), True, False))
         If CMError <> "" Then ECore.NewTransform transFadeIn, 300
@@ -613,64 +574,49 @@ Public Sub Update()
     Page.Clear 0
     
     If Cliped = 1 Then
-        GdipSetClipRect Page.GG, 38 * Scales, 38 * Scales, RGW - 38 * 2 * Scales, RGH - 38 * 2 * Scales, CombineModeReplace
-        Dim Rgn As Long
-        Rgn = CreateRectRgn(38 * Scales, 80 * Scales, RGW - 38 * Scales, RGH - 38 * Scales)
-        SelectClipRgn GCore.GDC, Rgn
-        SelectClipRgn ECore.CDC, Rgn
+        'GdipSetClipRect Page.GG, 20 * Scales, 20 * Scales, RGW - 20 * 2 * Scales, RGH - 20 * 2 * Scales, CombineModeReplace
+        'Dim Rgn As Long
+        'Rgn = CreateRectRgn(20 * Scales, 80 * Scales, RGW - 20 * Scales, RGH - 20 * Scales)
+        'SelectClipRgn GCore.GDC, Rgn
+        'SelectClipRgn ECore.CDC, Rgn
         Cliped = 2
     End If
     
     Page.Clear argb(0, 0, 0, 0)
-    Page.DrawImage "background" & IIf((ESave.GetData("Emerald 3.1") = "") Or (ReadProject = False And OPath <> "" And Dir(OPath & "\.emerald") = ""), "2", "") & ".png", 0, 0, Alpha:=1
+    Page.DrawImage "background.png", 0, 0, alpha:=1
     If Cliped = 0 Then Cliped = 1
     
     'Page.PaintLine 342, 32 + 24, 342, GH - 40 - 24 + 1, argb(255, 235, 235, 235), 1
     
-    Dim m As Long, HY As Long
+    Dim m As Long, HY As Long, Menus(5) As String
+    Menus(0) = "属性"
+    Menus(1) = "备份"
+    Menus(3) = "发布"
+    Menus(4) = "系统"
+    Menus(5) = "关于"
     
     m = CheckMouse(48, 52, 48, 48)
     
-    HY = 128
+    HY = GW / 2 - 5 * 80 / 2
+    
     For I = 0 To 5
         If I = 2 Then GoTo SkipThis
-        m = CheckMouse(0, HY, 313, 41)
+        m = CheckMouse(HY, 135, 80, 20)
+        Page.Writes Menus(I), HY + 40, 135, 18, argb(IIf(m > 0 Or I = PageIndex, 255, 160), 16, 16, 24), align:=StringAlignmentCenter, style:=IIf(I = PageIndex, FontStyleBold, FontStyleRegular)
         If I = PageIndex Then
-            Page.Paint 0, 38 * Scales, HY, (313 - 38) * Scales, 41, argb(30, 255, 255, 255), 100
-            Page.Paint 0, 38 * Scales, HY, (45 - 38) * Scales, 41, argb(255, 35, 170, 242), 100
-        Else
-            If m Then
-                Page.Paint 0, 38 * Scales, HY, (313 - 38) * Scales, 41, argb(60, 255, 255, 255), 100
-            Else
-                Page.Paint 0, 38 * Scales, HY, (313 - 38) * Scales, 41, argb(0, 255, 255, 255), 100
-            End If
+            Page.Paint 0, HY + 10, 165, 60, 6, argb(255, 60, 205, 195), 100
         End If
-        If m = mMouseUp Then
+        If m = 3 Then
             If OPath = "" And I <= 3 Then
-                MsgBox "请在你的Emerald工程文件夹运行Builder。", 64
+                DrawF.X = HY: DrawF.y = 135: DrawF.Width = 80: DrawF.Height = 20
+                MsgBox "请在你的Emerald工程文件夹运行Builder。", 48
             Else
                 PageIndex = I
-                'ECore.NewTransform transFadeIn, 1000
             End If
         End If
-        HY = HY + 50
+        HY = HY + 80
 SkipThis:
     Next
-    
-    Page.DrawImage "project.png", 60, 135, Alpha:=1
-    Page.Writes "工程", 110, 135, 18, argb(255, 255, 255, 255)
-    
-    Page.DrawImage "backup.png", 60, 135 + 50, Alpha:=1
-    Page.Writes "备份", 110, 135 + 50, 18, argb(255, 255, 255, 255)
-    
-    Page.DrawImage "package.png", 60, 135 + 50 * 2, Alpha:=1
-    Page.Writes "打包", 110, 135 + 50 * 2, 18, argb(255, 255, 255, 255)
-    
-    Page.DrawImage "settings.png", 60, 135 + 50 * 3, Alpha:=1
-    Page.Writes "设置", 110, 135 + 50 * 3, 18, argb(255, 255, 255, 255)
-    
-    Page.DrawImage "information.png", 60, 135 + 50 * 4, Alpha:=1
-    Page.Writes "关于", 110, 135 + 50 * 4, 18, argb(255, 255, 255, 255)
     
     Select Case PageIndex
         Case 0: DrawProject
@@ -743,9 +689,10 @@ Private Sub Class_Initialize()
     Page.Create Me
     '导入游戏资源
     If PackPos = -1 Then
-        Page.Res.NewImages App.path & "\assets", 0.75
+        Page.Res.NewImages App.path & "\assets", 0.8
         Page.Res.NewImages App.path & "\assets\icons", 24, 24
     End If
+
     StartTime = GetTickCount
     
     '创建页面

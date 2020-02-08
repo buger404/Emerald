@@ -19,7 +19,7 @@ Private Type Page
 End Type
 Private Type Transform
     Kind As TranslationKind
-    Time As Long
+    time As Long
     during As Long
 End Type
 Dim Pages() As Page, Transform As Transform
@@ -39,6 +39,116 @@ Dim F11KEYPress As Boolean, PageMode As Boolean
 Dim FreezeTime As Long
 '=======================================================
 '   Init
+    Public Function SimpleMsg(ByVal Content As String, ByVal Title As String, Buttons() As String, Optional ByVal W As Long = -1, Optional ByVal H As Long = -1, Optional UseBlur As Boolean = True, Optional Radius As Long = 60) As Integer
+        MsgType = 1
+        MsgW = IIf(W = -1, RGW * 0.6, W): MsgH = IIf(H = -1, RGH * 0.4, H)
+        MsgBtnFocus = -1: MsgBtnFocusTime = 0
+        MsgContent = Content: MsgTitle = Title
+        ReDim MsgButtons(UBound(Buttons))
+        For I = 0 To UBound(Buttons)
+            MsgButtons(I) = Buttons(I)
+        Next
+        SysPage.MsgButton = -1
+        Dim lState As Boolean
+        lState = ECore.FreezeMode
+        ECore.FreezeMode = False
+        
+        ECore.NewTransform transFadeIn, 500
+        
+        If UseBlur Then
+            Dim frm As Form
+            For Each frm In VB.Forms
+                If frm.Hwnd = GHwnd Then Exit For
+            Next frm
+            BlurTo SysPage.BDC, ECore.CDC, frm, Radius
+        Else
+            PaintDC ECore.CDC, SysPage.BDC, alpha:=1
+        End If
+        
+        Do While SysPage.MsgButton = -1
+            ECore.Display: DoEvents
+        Loop
+        
+        SimpleMsg = SysPage.MsgButton
+        ECore.NewTransform transFadeIn, 500
+        ECore.FreezeMode = lState
+    End Function
+    Public Function ScreenMsg(ByVal Content As String, Optional UseBlur As Boolean = True, Optional Radius As Long = 60) As Integer
+        MsgType = 2
+        MsgContent = Content
+        SysPage.MsgButton = -1
+        Dim lState As Boolean
+        lState = ECore.FreezeMode
+        ECore.FreezeMode = False
+        
+        ECore.NewTransform transFadeIn, 500
+        
+        If UseBlur Then
+            Dim frm As Form
+            For Each frm In VB.Forms
+                If frm.Hwnd = GHwnd Then Exit For
+            Next frm
+            BlurTo SysPage.BDC, ECore.CDC, frm, Radius
+        Else
+            PaintDC ECore.CDC, SysPage.BDC, alpha:=1
+        End If
+        
+        Do While SysPage.MsgButton = -1
+            ECore.Display: DoEvents
+        Loop
+        
+        ScreenMsg = SysPage.MsgButton
+        ECore.NewTransform transFadeIn, 500
+        ECore.FreezeMode = lState
+    End Function
+    Public Function TipMsg(ByVal Content As String, Optional ByVal Delay As Long = 2000) As Integer
+        If MsgTipTime = -2 Then Exit Function
+        
+        If CheckMouse2 >= mMouseIn Then
+            If MsgBoundRect.X <> DrawF.X Or MsgBoundRect.y <> DrawF.y Or MsgBoundRect.Width <> DrawF.Width Or MsgBoundRect.Height <> DrawF.Height Then
+                MsgBoundRect = DrawF: MsgTipTime = GetTickCount: Exit Function
+            Else
+                If IsKeyPress(VK_LCONTROL) = True Or IsKeyPress(VK_RCONTROL) = True Then MsgTipTime = GetTickCount - Delay
+                If GetTickCount - MsgTipTime < Delay Then Exit Function
+                If GetTickCount - MsgTipTime >= Delay Then MsgTipTime = -1
+            End If
+        Else
+            Exit Function
+        End If
+        Dim W As Long, H As Long
+        W = EF.GetWidth(GG, Content, 18, StringAlignmentNear, FontStyleBold)
+        H = EF.GetHeight(GG, Content, 18, StringAlignmentNear, FontStyleBold)
+        MsgW = W + 20 * 2: MsgH = H + 5 * 2
+        MsgX = DrawF.X + DrawF.Width / 2 - MsgW / 2: MsgY = DrawF.y - MsgH - 20
+        MsgTipDirection = 0
+        If MsgY < 0 Then MsgY = DrawF.y + DrawF.Height: MsgTipDirection = 1
+        If MsgX < 0 Then MsgX = 0
+        If MsgX > GW - MsgW Then MsgX = GW - MsgW
+        MsgTipColor = 0
+        StretchBlt NDC, 0, 0, 3, 3, CDC, MsgX, MsgY, MsgW, MsgH, vbSrcCopy
+        Dim temp(3) As Byte
+        CopyMemory temp(0), GetPixel(NDC, 1, 1), 4
+        If temp(0) / 255 + temp(1) / 255 + temp(2) / 255 + temp(3) / 255 <= 128 Then MsgTipColor = 1
+        
+        MsgType = 3: MsgContent = Content
+        SysPage.MsgButton = -1
+        Dim lState As Boolean
+        lState = ECore.FreezeMode
+        ECore.FreezeMode = False
+        
+        Dim frm As Form
+        For Each frm In VB.Forms
+            If frm.Hwnd = GHwnd Then Exit For
+        Next frm
+        BlurTo SysPage.BDC, ECore.CDC, frm, 255
+        
+        ECore.FreezeMode = lState
+        ECore.FreezeReset
+        
+        MsgBtnFocusTime = GetTickCount: MsgBtnFocus = -1
+        
+        If MsgTipTime = -1 Then MsgTipTime = -2
+    End Function
     Public Sub FreezeReset()
         FreezeTime = GetTickCount
     End Sub
@@ -66,6 +176,11 @@ Dim FreezeTime As Long
         FMode = nV
     End Property
     Private Sub Class_Initialize()
+        If Not (ECore Is Nothing) Then
+            Suggest "已经有一个页面管理器在运作了。", NeverClear, 2
+            'Set Me = Nothing
+            Exit Sub
+        End If
         Set ECore = Me
         ReDim Pages(0)
         CDC = CreateCDC(RGW, RGH)
@@ -149,14 +264,29 @@ Dim FreezeTime As Long
         End If
 
         ChoosePosition = False
+        Dim OrIndex As Integer, NDCMark As Boolean
         If IsKeyPress(VK_DECIMAL) And (App.LogMode = 0) Then
-            Dim OrIndex As Integer
             OrIndex = SysPage.index
             SysPage.index = 6
             SysPage.Page.Update
             GdipGraphicsClear NGG, 0
             SysPage.Page.Display NDC
             SysPage.index = OrIndex
+            NDCMark = True
+        End If
+            
+        If SysPage.MsgButton = -1 Then
+            OrIndex = SysPage.index
+            SysPage.index = 7
+            SysPage.Page.Update
+            If MsgType = 3 Then GdipGraphicsClear NGG, 0
+            SysPage.Page.Display IIf(MsgType = 3, NDC, CDC)
+            SysPage.index = OrIndex
+            If MsgType = 3 Then
+                NDCMark = True
+            Else
+                played = True: GoTo skipPage
+            End If
         End If
             
         For I = 1 To UBound(Pages)
@@ -186,7 +316,11 @@ skipPage:
             Suggest "页面""" & ActivePage & """不存在。", ClearOnUpdate, 2
         End If
         
-        If GetTickCount - Transform.Time <= Transform.during Then Call Translation
+        If NDCMark Then
+            PaintDC NDC, CDC, 0, 0, alpha:=1
+        End If
+        
+        If GetTickCount - Transform.time <= Transform.during Then Call Translation
         
         Dim Key As Boolean
         Key = IsKeyPress(VK_F11)
@@ -212,7 +346,7 @@ skipPage:
             For I = 1 To UBound(SGS)
                 If I > UBound(SGS) Then Exit For
                 If SGS(I).ClearTime = ClearOnUpdate Then GoTo ClearSGS
-                If SGS(I).ClearTime = ClearOnOnce And GetTickCount - SGS(I).Time >= 1000 Then GoTo ClearSGS
+                If SGS(I).ClearTime = ClearOnOnce And GetTickCount - SGS(I).time >= 1000 Then GoTo ClearSGS
                 GoTo NoClear
 ClearSGS:
                 SGS(I) = SGS(UBound(SGS)): ReDim Preserve SGS(UBound(SGS) - 1): I = I - 1
@@ -230,10 +364,6 @@ NoClear:
                 Next
                 FPSRecord(20) = FPS
             End If
-        End If
-        
-        If IsKeyPress(VK_DECIMAL) And (App.LogMode = 0) Then
-            PaintDC NDC, CDC, 0, 0, alpha:=1
         End If
         
         If FMode Then PaintDC CDC, FDC, 0, 0, alpha:=FancyDeepth
@@ -265,7 +395,7 @@ NoClear:
         With Transform
             .during = during
             .Kind = Kind
-            .Time = GetTickCount
+            .time = GetTickCount
         End With
         
         If Not IsMissing(newPage) Then
@@ -276,37 +406,37 @@ NoClear:
         Dim pro As Single
         Select Case Transform.Kind
             Case 0 'FadeIn
-                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
                 PaintDC ODC, CDC, alpha:=1 - pro
             Case 1 'FadeOut
-                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 0, 0, 1)
+                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 0, 0, 1)
                 PaintDC ODC, CDC, alpha:=1 - pro
             Case 2 'ToRight
-                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
                 PaintDC ODC, CDC, (pro * RGW), alpha:=1
             Case 3 'ToLeft
-                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
                 PaintDC ODC, CDC, -(pro * RGW), alpha:=1
             Case 4 'ToUp
-                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
                 PaintDC ODC, CDC, 0, -(pro * RGW), alpha:=1
             Case 5 'ToDown
-                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
                 PaintDC ODC, CDC, 0, (pro * RGW), alpha:=1
             Case 6 'ToRight(Fade)
-                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
                 PaintDC ODC, CDC, (pro * RGW), alpha:=1 - pro
             Case 7 'ToLeft(Fade)
-                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
                 PaintDC ODC, CDC, -(pro * RGW), alpha:=1 - pro
             Case 8 'ToUp(Fade)
-                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
                 PaintDC ODC, CDC, 0, -(pro * RGW), alpha:=1 - pro
             Case 9 'ToDown(Fade)
-                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
                 PaintDC ODC, CDC, 0, (pro * RGW), alpha:=1 - pro
             Case 10 'HighLight
-                pro = (GetTickCount - Transform.Time) / Transform.during
+                pro = (GetTickCount - Transform.time) / Transform.during
                 Select Case pro
                     Case Is < 0.2
                         pro = Cubic(pro / 0.2, 0, 1, 1, 1)
@@ -321,7 +451,7 @@ NoClear:
                         GdipFillRectangle GG, pB, 0, 0, RGW + 1, RGH + 1
                 End Select
             Case 11 'Dark
-                pro = (GetTickCount - Transform.Time) / Transform.during
+                pro = (GetTickCount - Transform.time) / Transform.during
                 Select Case pro
                     Case Is < 0.2
                         pro = Cubic(pro / 0.2, 0, 1, 1, 1)
@@ -336,7 +466,7 @@ NoClear:
                         GdipFillRectangle GG, pB, 0, 0, RGW + 1, RGH + 1
                 End Select
             Case 12
-                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
                 BitBlt CDC, GW - (pro * RGW), 0, RGW, RGH, CDC, 0, 0, vbSrcCopy
                 GdipSetSolidFillColor pB, argb((1 - pro) * 255, 0, 0, 0)
                 GdipFillRectangle GG, pB, GW - (pro * RGW), 0, RGW + 1, RGH + 1
@@ -344,7 +474,7 @@ NoClear:
                 GdipSetSolidFillColor pB, argb(pro * 255, 0, 0, 0)
                 GdipFillRectangle GG, pB, -(pro * RGW), 0, RGW + 1, RGH + 1
             Case 13
-                pro = Cubic((GetTickCount - Transform.Time) / Transform.during, 0, 1, 1, 1)
+                pro = Cubic((GetTickCount - Transform.time) / Transform.during, 0, 1, 1, 1)
                 BitBlt CDC, -RGW + (pro * RGW), 0, RGW, RGH, CDC, 0, 0, vbSrcCopy
                 GdipSetSolidFillColor pB, argb((1 - pro) * 255, 0, 0, 0)
                 GdipFillRectangle GG, pB, -RGW + (pro * RGW), 0, RGW + 1, RGH + 1

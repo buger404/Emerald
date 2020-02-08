@@ -116,18 +116,18 @@ Public Sub DrawPage4()
     End If
 End Sub
 Public Sub DrawPage5()
-    Page.Writes "欢迎使用 Emerald 游戏创建向导", 70, 104, 18, argb(255, 64, 64, 64)
-    Page.Writes "使用此向导快速创建您的游戏", 70, 128, 18, argb(255, 96, 96, 96)
+    Page.Writes "Emerald·创造", RGW / 2, 120, 18, argb(255, 0, 0, 0), align:=StringAlignmentCenter, style:=FontStyleBold
+    Page.Writes "使用此向导快速创建您的工程", RGW / 2, 160, 18, argb(200, 16, 16, 30), align:=StringAlignmentCenter
     
-    Page.Writes "欲创建游戏的名称", 70, 200, 18, argb(255, 35, 170, 242)
-    Page.ShowEdit ProjectName, 0, 70, 240, 500, 30, argb(255, 96, 96, 96), argb(0, 255, 255, 255), argb(255, 242, 242, 242), argb(255, 35, 170, 242), size:=18
+    Page.Writes "工程名称", 85, 200, 18, argb(255, 0, 0, 0)
+    Page.ShowEdit ProjectName, 0, 200, 200, 250, 30, argb(200, 32, 32, 36), argb(0, 255, 255, 255), argb(255, 242, 242, 242), argb(255, 62, 206, 196), size:=18
 
-    Page.Writes "选项", 70, 320, 18, argb(255, 35, 170, 242)
-    Page.ShowColorCheckBox InitWindow, 73, 360, 500, 20, "创建好一个游戏窗口", argb(255, 198, 198, 198), argb(255, 35, 170, 242), argb(255, 96, 96, 96), 18
-    Page.ShowColorCheckBox InitPage, 73, 390, 500, 20, "创建好一个游戏页面", argb(255, 198, 198, 198), argb(255, 35, 170, 242), argb(255, 96, 96, 96), 18
-    Page.ShowColorCheckBox OpenPro, 73, 420, 500, 20, "在我创建完之后打开工程", argb(255, 198, 198, 198), argb(255, 35, 170, 242), argb(255, 96, 96, 96), 18
+    Page.Writes "选项", 85, 240, 18, argb(255, 0, 0, 0)
+    Page.ShowColorCheckBox InitWindow, 85 + 3, 280, 500, 20, "创建好一个游戏窗口", argb(255, 200, 200, 200), argb(255, 60, 205, 195), argb(200, 32, 32, 36), 18
+    Page.ShowColorCheckBox InitPage, 85 + 3, 320, 500, 20, "创建好一个游戏页面", argb(255, 200, 200, 200), argb(255, 60, 205, 195), argb(200, 32, 32, 36), 18
+    Page.ShowColorCheckBox OpenPro, 85 + 3, 360, 500, 20, "在我创建完之后打开工程", argb(255, 200, 200, 200), argb(255, 60, 205, 195), argb(200, 32, 32, 36), 18
 
-    If Page.ShowColorButton(0, GW / 2 - 70, GH - 120, 140, 40, "好的", argb(255, 255, 255, 255), argb(255, 35, 170, 242), argb(255, 75, 210, 255), 40, size:=18, style:=FontStyleBold) = 3 Then
+    If Page.ShowColorButton(2, GW / 2 - 200, GH - 110, 400, 40, "开始创造", argb(255, 255, 255, 255), argb(255, 105, 227, 218), argb(255, 59, 205, 195), 40, size:=18, style:=FontStyleBold) = 3 Then
         If CheckFileName(ProjectName) = False Or ProjectName = "" Then MsgBox "这个游戏名称不能被接受呢。换一个吧。", 64: Exit Sub
         
         If Dir(OPath & "\core", vbDirectory) = "" Then MkDir OPath & "\core"
@@ -191,7 +191,7 @@ Public Sub Update()
     '游戏每一帧的过程（绘制过程请放在此处）
     
     Page.Clear 0 '清空画布
-    Page.DrawImage "background2.png", 0, 0, alpha:=1
+    Page.DrawImage "background.png", 0, 0, alpha:=1
     
     CallByName Me, "DrawPage" & PageIndex, VbMethod
 End Sub
@@ -206,8 +206,17 @@ Public Sub Enter()
     '页面进入事件
     Page.StartAnimation 1, 500
     Page.StartAnimation 2, 750
-    ProjectName = "Project1"
     Maker = ESave.GetData("Maker")
+    Dim temp() As String
+    temp = Split(OPath, "\")
+    If UBound(temp) > 0 Then
+        If temp(UBound(temp)) = "" Then ReDim Preserve temp(UBound(temp) - 1)
+    End If
+    If UBound(temp) > 0 Then
+        ProjectName = temp(UBound(temp))
+    Else
+        ProjectName = "MyProject"
+    End If
 End Sub
 Public Sub Leave()
     '页面离开事件
@@ -227,7 +236,7 @@ Private Sub Class_Initialize()
     Set Page = New GPage
     Page.Create Me
     '导入游戏资源
-    If PackPos = -1 Then Page.Res.NewImages App.path & "\assets", 0.75
+    If PackPos = -1 Then Page.Res.NewImages App.path & "\assets", 0.8
     '创建页面
     ECore.Add Page, "ToNewPage"
     
