@@ -1,37 +1,22 @@
 # Emerald
-面向游戏的轻量级绘图框架
+面向游戏的轻量级绘图框架，封装了GDI，GDI+，Bass等。
 
 # 支持
 Visual Basic 6.0  
 
 # 功能
-√ 基本图形的绘制  
-√ 即时控件  
+√ 各种图形的绘制  
+√ GUI组件  
 √ 安全游戏存档  
 √ 游戏资源管理器  
 √ 游戏页面管理器  
 √ 封装Bass的音乐播放器  
 √ 动画系统  
+√ 自定义信息框  
+√ 图形的鼠标检测  
+√ 物件碰撞箱  
+等制作游戏需要的功能。
 
 # 文档
- [Emerald Wiki](https://github.com/buger404/Emerald/wiki)
- 
-# English Version
-  
-# Emerald
-A game framework for Visual Basic 6.0.
-
-# Support
-Visual Basic 6.0  
-
-# Functions
-√ Basic Graphics Drawing  
-√ Immediate Controls  
-√ Safe Game Save  
-√ Game Resource Manager  
-√ Game Page Manager  
-√ Music Player based on Bass  
-√ Animation System  
-
-# Documentation
- [Emerald Wiki](https://github.com/buger404/Emerald/wiki)
+ [Github：Emerald Wiki](https://github.com/buger404/Emerald/wiki)  
+ [码云：Emerald Wiki](https://gitee.com/buger404/Emerald/wikis)
