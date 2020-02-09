@@ -129,15 +129,15 @@ Attribute VB_Name = "GCore"
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
-    Public Const Version As Long = 20020802      'magic update
-    Public TextHandle As Long, WaitChr As String
+    Public Const Version As Long = 20020905      'fancy update
+    Public TextHandle As Long, WaitChr As String, HasCheckUpdate As Boolean
     Public XPMode As Boolean
     Public Scales As Single
     Public FullScreenMark As Boolean
     Public UsePaint As Boolean
     Public MsgButtons() As String, MsgTitle As String, MsgContent As String, MsgW As Long, MsgH As Long, MsgX As Long, MsgY As Long
     Public MsgBtnFocus As Integer, MsgBtnFocusTime As Long, MsgType As Integer, MsgTipDirection As Integer, MsgTipColor As Integer
-    Public MsgBoundRect As GraphicsBound, MsgTipTime As Long
+    Public MsgBoundRect As GraphicsBound, MsgTipTime As Long, MsgBkColor As Long, MsgFgColor As Long, MsgEnterTime As Long
     
     Public AssetsTrees() As AssetsTree
     Dim LastKeyUpRet As Boolean
@@ -219,11 +219,11 @@ Attribute VB_Name = "GCore"
         Page.ScrollWidth = Area.Width: Page.ScrollHeight = Area.Height
         Page.ScrollMode = True
     End Sub
-    Public Sub EndScrollArea(Page As GPage, ByVal X As Long, ByVal y As Long, ByVal cx As Long, ByVal cy As Long, Optional ByVal Width As Long = -1, Optional ByVal Height As Long = -1, Optional ByVal alpha As Single = 1)
+    Public Sub EndScrollArea(Page As GPage, ByVal X As Long, ByVal y As Long, ByVal CX As Long, ByVal CY As Long, Optional ByVal Width As Long = -1, Optional ByVal Height As Long = -1, Optional ByVal alpha As Single = 1)
         If Not Page.ScrollMode Then Suggest "请先启动一个卷轴区域。", ClearOnUpdate, 1: Exit Sub
         If Width = -1 Then Width = Page.ScrollWidth
         If Height = -1 Then Height = Page.ScrollHeight
-        PaintDC Page.CDC, Page.OODC, X, y, cx, cy, Width, Height, alpha
+        PaintDC Page.CDC, Page.OODC, X, y, CX, CY, Width, Height, alpha
         Page.CDC = Page.OODC: Page.GG = Page.OOGG
         Page.ScrollMode = False
     End Sub
@@ -332,8 +332,6 @@ Attribute VB_Name = "GCore"
             Debuginfo.Hide
             DebugWindow.Show
         End If
-        
-        If App.LogMode = 0 Then Call CheckUpdate
         
         If ReLoadCount > LoadedCount Then Suggest "重复加载的资源数量过多。", NeverClear, 1
         
@@ -445,7 +443,7 @@ sth:
         '画~
         PoolDeleteEffect e '垃圾处理
     End Sub
-    Public Sub PaintDC(DC As Long, destDC As Long, Optional X As Long = 0, Optional y As Long = 0, Optional cx As Long = 0, Optional cy As Long = 0, Optional cw, Optional ch, Optional alpha)
+    Public Sub PaintDC2(DC As Long, destDC As Long, X As Long, y As Long, w As Long, h As Long, CX As Long, CY As Long, CW As Long, ch As Long, alpha As Single)
         Dim B As BLENDFUNCTION, index As Integer, bl As Long
         
         If Not IsMissing(alpha) Then
@@ -460,13 +458,30 @@ sth:
             CopyMemory bl, B, 4
         End If
         
-        If IsMissing(cw) Then cw = RGW - cx
-        If IsMissing(ch) Then ch = RGH - cy
+        AlphaBlend destDC, X, y, w, h, DC, CX, CY, CW, ch, bl
+    End Sub
+    Public Sub PaintDC(DC As Long, destDC As Long, Optional X As Long = 0, Optional y As Long = 0, Optional CX As Long = 0, Optional CY As Long = 0, Optional CW, Optional ch, Optional alpha)
+        Dim B As BLENDFUNCTION, index As Integer, bl As Long
+        
+        If Not IsMissing(alpha) Then
+            If alpha < 0 Then alpha = 0
+            If alpha > 1 Then alpha = 1
+            With B
+                .AlphaFormat = &H1
+                .BlendFlags = &H0
+                .BlendOp = 0
+                .SourceConstantAlpha = Int(alpha * 255)
+            End With
+            CopyMemory bl, B, 4
+        End If
+        
+        If IsMissing(CW) Then CW = RGW - CX
+        If IsMissing(ch) Then ch = RGH - CY
         
         If IsMissing(alpha) Then
-            BitBlt destDC, X, y, cw, ch, DC, cx, cy, vbSrcCopy
+            BitBlt destDC, X, y, CW, ch, DC, CX, CY, vbSrcCopy
         Else
-            AlphaBlend destDC, X, y, cw, ch, DC, cx, cy, cw, ch, bl
+            AlphaBlend destDC, X, y, CW, ch, DC, CX, CY, CW, ch, bl
         End If
     End Sub
     Function Cubic(t As Single, arg0 As Single, arg1 As Single, arg2 As Single, arg3 As Single) As Single
@@ -561,8 +576,10 @@ sth:
 '   Update
     Public Sub CheckUpdate()
         On Error Resume Next
+        HasCheckUpdate = True
+        
         If InternetGetConnectedState(0&, 0&) = 0 Then
-            Suggest "未连接网络，Emerald 检查更新取消。", NeverClear, 0
+            ECore.SimpleMsg "Emerald 检查更新取消，此操作将进行重试。", "未连接网络", StrArray("好的")
             Err.Clear
             Exit Sub
         End If
@@ -575,26 +592,26 @@ sth:
             
             Dim xmlHttp As Object, Ret As String, Start As Long
             Set xmlHttp = PoolCreateObject("Microsoft.XMLHTTP")
-            xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
+            xmlHttp.Open "GET", "https://gitee.com/buger404/Emerald/blob/master/Version.txt", True
             xmlHttp.send
                          
             Start = GetTickCount
             Do While xmlHttp.ReadyState <> 4
                 If GetTickCount - Start >= UpdateTimeOut Then
-                    Suggest "Emerald 检查更新超时。", NeverClear, 0
+                    ECore.SimpleMsg "Emerald 检查更新超时，此操作将进行重试。", "连接超时", StrArray("好的")
                     Exit Sub
                 End If
-                Sleep 10: DoEvents
+                ECore.Display: DoEvents
             Loop
-            Ret = xmlHttp.responseText
+            Ret = Split(Split(xmlHttp.responseText, "<pre><div class='line' id='LC1'>")(1), "&#x000A;</div></pre></div></div>")(0)
             Set xmlHttp = Nothing
             Debug.Print Now, "Emerald：检查版本完毕，最新版本号 " & Val(Ret)
             
             If Val(Ret) > Version And App.LogMode = 0 Then
                 Data.PutData "UpdateAble", 1
-                If MsgBox("发现Emerald存在新版本，您希望现在前往下载吗？", vbYesNo + 48, "Emerald") = vbNo Then Exit Sub
+                If ECore.SimpleMsg("发现新的可用Emerald 版本：V" & Val(Ret), "新版本可用", StrArray("现在下载", "下次")) = 1 Then Exit Sub
                 
-                ShellExecuteA 0, "open", "https://github.com/Red-Error404/Emerald/release", "", "", SW_SHOW
+                ShellExecuteA 0, "open", "https://github.com/buger404/Emerald/releases", "", "", SW_SHOW
                 Data.PutData "UpdateAble", 0
             End If
         Else

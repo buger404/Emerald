@@ -8,17 +8,17 @@ Public CmdMark As String, SetupErr As Long, Repaired As Boolean
 Public AppInfo() As String
 Public Cmd As String
 Public Abouting As Boolean
-Public Function TestFile(Path As String, IncludeText As String) As Boolean
+Public Function TestFile(path As String, IncludeText As String) As Boolean
     Dim temp As String
-    If Dir(Path) = "" Then Exit Function
-    Open Path For Input As #1
+    If Dir(path) = "" Then Exit Function
+    Open path For Input As #1
     Do While Not EOF(1)
         Line Input #1, temp
         If InStr(temp, IncludeText) > 0 Then TestFile = True: Exit Do
     Loop
     Close #1
 End Function
-Public Sub CheckUpdate()
+Public Sub CheckUpdate2()
     On Error GoTo ErrHandle
     
     Dim WSHShell As Object, temp As String
@@ -119,7 +119,7 @@ Sub Setup()
     On Error Resume Next
     
     Dim exeP As String
-    exeP = """" & App.Path & "\Builder.exe" & """"
+    exeP = """" & App.path & "\Builder.exe" & """"
     
     SetupPage.SetupInfo = "正在创建：WScript.Shell对象"
     SetupPage.Progress = 0.1
@@ -158,7 +158,7 @@ Sub Setup()
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\DisplayName", "Emerald"
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\DisplayVersion", "Indev " & Version
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\Publisher", "Error 404"
-    WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\InstallLocation", App.Path
+    WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\InstallLocation", App.path
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\URLInfoAbout", "http://red-error404.github.io/233"
     WSHShell.RegWrite "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\UninstallString", exeP & " ""-uninstall"""
     
@@ -166,13 +166,13 @@ Sub Setup()
     
     SetupPage.SetupInfo = "正在复制：Visual Basic 6 模板文件（1/2）"
     SetupPage.Progress = 0.8
-    FileCopy App.Path & "\Example\Emerald 游戏窗口.frm", VBIDEPath & "Template\Forms\Emerald 游戏窗口.frm"
+    FileCopy App.path & "\Example\Emerald 游戏窗口.frm", VBIDEPath & "Template\Forms\Emerald 游戏窗口.frm"
     
     Call FakeSleep
     
     SetupPage.SetupInfo = "正在复制：Visual Basic 6 模板文件（2/2）"
     SetupPage.Progress = 0.9
-    FileCopy App.Path & "\Example\Emerald 页面.cls", VBIDEPath & "Template\Classes\Emerald 页面.cls"
+    FileCopy App.path & "\Example\Emerald 页面.cls", VBIDEPath & "Template\Classes\Emerald 页面.cls"
     
     Call FakeSleep
     
@@ -184,7 +184,7 @@ End Sub
 Sub CheckVersion()
     On Error Resume Next
     Dim exeP As String, sh As String
-    exeP = """" & App.Path & "\Builder.exe" & """"
+    exeP = """" & App.path & "\Builder.exe" & """"
     Set WSHShell = PoolCreateObject("WScript.Shell")
     
     sh = WSHShell.RegRead("HKEY_CLASSES_ROOT\Directory\shell\emerald\version")
@@ -207,7 +207,7 @@ Sub Repair()
 End Sub
 Sub Main2()
     Dim targetEXE As String
-    targetEXE = App.Path & "\" & App.EXEName & ".exe"
+    targetEXE = App.path & "\" & App.EXEName & ".exe"
     'targetEXE = "C:\Program Files\Minesweeper\Uninstall.exe"
     'targetEXE = "D:\MyDoc\Emerald\Export\Minesweeper - 安装包.exe"
     
@@ -251,16 +251,16 @@ UninstallGame:
         Get #1, , SPackage
         Close #1
         If UBound(SPackage.Files) = 1 Then
-            If SPackage.Files(1).Path = "setup.config" Then
+            If SPackage.Files(1).path = "setup.config" Then
                 '执行卸载程序
-                Open App.Path & "\setup.config" For Binary As #1
+                Open App.path & "\setup.config" For Binary As #1
                 Put #1, , SPackage.Files(1).Data
                 Close #1
                 GoTo UninstallGame
             End If
         End If
         
-        If SPackage.Files(0).Path <> "" Then
+        If SPackage.Files(0).path <> "" Then
             Open tempPath & "\setupappicon.png" For Binary As #1
             Put #1, , SPackage.Files(0).Data
             Close #1
@@ -273,7 +273,7 @@ UninstallGame:
         Exit Sub
     End If
     
-    Call CheckUpdate
+    Call CheckUpdate2
     Call GetVBIDEPath
     Call GetInstalledPath
     Call Repair
@@ -379,7 +379,7 @@ UninstallGame:
         appn = InputAsk("创建工程", "输入你的可爱的工程名称(*^▽^*)~", "完成", "取消")
         If CheckFileName(appn) = False Or appn = "" Then Dialog "愤怒", "错误的工程名称。", "诶？": Unload MainWindow: End
         
-        Open App.Path & "\Example\example.vbp" For Input As #1
+        Open App.path & "\Example\example.vbp" For Input As #1
         Do While Not EOF(1)
         Line Input #1, t
         f = f & t & vbCrLf
@@ -405,9 +405,9 @@ SkipName:
         If Dir(p & "\assets\debug", vbDirectory) = "" Then MkDir p & "\assets\debug"
         If Dir(p & "\music", vbDirectory) = "" Then MkDir p & "\music"
         
-        CopyInto App.Path & "\core", p & "\core", True
-        CopyInto App.Path & "\assets\debug", p & "\assets\debug"
-        CopyInto App.Path & "\framework", p
+        CopyInto App.path & "\core", p & "\core", True
+        CopyInto App.path & "\assets\debug", p & "\assets\debug"
+        CopyInto App.path & "\framework", p
         
         Open p & "\.emerald" For Output As #1
         Print #1, Version 'version

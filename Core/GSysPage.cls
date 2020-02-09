@@ -45,6 +45,11 @@ Public Sub Update()
     End Select
 End Sub
 Public Sub ScreenMsgDrawer()
+    Dim upro As Single
+    upro = (GetTickCount - MsgEnterTime) / 500
+    If upro > 1 Then upro = 1
+    upro = Cubic(upro, 0, 1, 1, 1)
+
     Dim m As MButtonState
     
     Page.Clear 0
@@ -52,7 +57,7 @@ Public Sub ScreenMsgDrawer()
     
     Page.Paint 0, 0, 0, RGW + 1, RGH + 1, argb(80, 0, 0, 0)
     
-    Page.Writes MsgContent, RGW / 2, RGH / 2 - 10, 20, argb(255, 255, 255, 255), align:=StringAlignmentCenter, BorderColor:=argb(160, 16, 16, 16), BorderSize:=1, style:=FontStyleBold
+    Page.Writes MsgContent, RGW / 2, RGH / 2 + RGH / 2 * 0.2 * (1 - upro) - 10, 20, argb(255 * upro, 255, 255, 255), align:=StringAlignmentCenter, BorderColor:=argb(160 * upro, 16, 16, 16), BorderSize:=1, style:=FontStyleBold
 
     m = CheckMouse(0, 0, RGW, RGH)
     
@@ -63,35 +68,48 @@ Public Sub TipMsgDrawer()
     
     Dim pro As Single, bpro As Single
     If MsgBtnFocusTime <> 0 Then
-        pro = (GetTickCount - MsgBtnFocusTime) / 500
+        pro = (GetTickCount - MsgBtnFocusTime) / IIf(MsgBtnFocus = -1, 500, 200)
         If pro > 1 Then pro = 1
         pro = Cubic(pro, 0, 1, 1, 1)
         If MsgBtnFocus = -1 Then
-            bpro = 1 - pro
-        Else
             bpro = pro
+        Else
+            bpro = 1 - pro
         End If
     End If
     
     Page.Clear 0
-    PaintDC BDC, Page.CDC, MsgX, MsgY, MsgX, MsgY, MsgW, MsgH, (1 - bpro)
+    PaintDC BDC, Page.CDC, MsgX + MsgW / 2 * (1 - bpro), MsgY, MsgX + MsgW / 2 * (1 - bpro), MsgY, MsgW * bpro, MsgH, bpro
     
-    Dim BkC As Long
-    BkC = IIf(MsgTipColor = 1, argb(120 * (1 - bpro), 255, 255, 255), argb(120 * (1 - bpro), 0, 0, 0))
-    Page.Paint 0, MsgX, MsgY, MsgW + 1, MsgH + 1, BkC
+    Dim C(4) As Byte
+    CopyMemory C(0), MsgBkColor, 4
+    Page.Paint 0, MsgX + MsgW / 2 * (1 - bpro), MsgY, MsgW * bpro + 1, MsgH + 1, argb(C(3) * bpro, C(2), C(1), C(0))
     
     DrawF = MsgBoundRect
     m = CheckMouse2
-    If m = mMouseOut Then
+    If m = mMouseOut And MsgBtnFocus = -1 Then
+        MsgBtnFocusTime = GetTickCount: MsgBtnFocus = 0
         MsgBoundRect.X = -404: MsgTipTime = 0
+    End If
+    If MsgBtnFocus = 1 And bpro = 0 Then
         Me.MsgButton = 1: MsgBtnFocusTime = GetTickCount: MsgBtnFocus = 0
     End If
     
-    Page.Writes MsgContent, MsgX + 20, MsgY + 4, 18, IIf(MsgTipColor = 1, argb(255 * (1 - bpro), 0, 0, 0), argb(255 * (1 - bpro), 255, 255, 255)), style:=FontStyleBold
+    CopyMemory C(0), MsgFgColor, 4
+    Page.Writes MsgContent, MsgX + 20 + MsgW / 2 * (1 - bpro), MsgY + 4, 18, argb(C(3) * bpro, C(2), C(1), C(0)), style:=FontStyleBold
 
     'Page.Paint 0, MsgX, MsgY, MsgW + 1, MsgH + 1, IIf(MsgTipColor = 1, argb(40, 255, 255, 255), argb(40, 0, 0, 0)), style:=1
 End Sub
 Public Sub SimpleMsgDrawer()
+    Dim upro As Single, upro2 As Single
+    upro = (GetTickCount - MsgEnterTime) / 500
+    If upro > 1 Then upro = 1
+    upro = Cubic(upro, 0, 1, 1, 1)
+    upro2 = (GetTickCount - MsgEnterTime - 250) / 500
+    If upro2 < 0 Then upro2 = 0
+    If upro2 > 1 Then upro2 = 1
+    upro2 = Cubic(upro2, 0, 1, 1, 1)
+
     Dim m As MButtonState
     
     Page.Clear 0
@@ -99,10 +117,10 @@ Public Sub SimpleMsgDrawer()
     
     Page.Paint 0, 0, 0, RGW + 1, RGH + 1, argb(80, 0, 0, 0)
     
-    Page.Paint 2, RGW / 2, RGH / 2, MsgW, MsgH, argb(255, 255, 255, 255), 20, pos:=posOnCenter
+    Page.Paint 2, RGW / 2, RGH - RGH / 2 * upro, MsgW * upro, MsgH * upro, argb(255 * upro, 255, 255, 255), 20, pos:=posOnCenter
     
-    Page.Writes MsgTitle, RGW / 2, RGH / 2 - MsgH / 2 + 20, 18, argb(255, 0, 0, 0), style:=FontStyleBold, align:=StringAlignmentCenter
-    Page.Writes MsgContent, RGW / 2 - MsgW / 2 + 20, RGH / 2 - MsgH / 2 + 60, 18, argb(255, 64, 64, 70), MsgW - 40, MsgH - 60 - 35 - 20, StringAlignmentCenter
+    Page.Writes MsgTitle, RGW / 2, RGH / 2 - MsgH / 2 + 20, 18, argb(255 * upro2, 0, 0, 0), style:=FontStyleBold, align:=StringAlignmentCenter
+    Page.Writes MsgContent, RGW / 2 - MsgW / 2 + 20, RGH / 2 - MsgH / 2 + 60, 18, argb(255 * upro2, 64, 64, 70), MsgW - 40, MsgH - 60 - 35 - 20, StringAlignmentCenter
 
     Dim pro As Single, bpro As Single
     If MsgBtnFocusTime <> 0 Then
@@ -115,15 +133,15 @@ Public Sub SimpleMsgDrawer()
             bpro = pro
         End If
     End If
-    Page.Paint 2, RGW / 2, RGH / 2 + MsgH / 2 - 20 - 20, MsgW * 0.9, 40, argb(255, 232 + (65 - 232) * bpro, 232 + (204 - 232) * bpro, 232 + (194 - 232) * bpro), 100, pos:=posOnCenter
+    Page.Paint 2, RGW / 2, RGH / 2 + MsgH / 2 - 20 - 20, MsgW * 0.9 * upro2, 40, argb(255 * upro2, 232 + (65 - 232) * bpro, 232 + (204 - 232) * bpro, 232 + (194 - 232) * bpro), 100, pos:=posOnCenter
     m = CheckMouse2
     Dim WSplit As Long, I As Integer, basey As Long, basex As Long
     basex = RGW / 2 - MsgW * 0.9 / 2
     basey = RGH / 2 + MsgH / 2 - 20 - 20 - 20
     WSplit = MsgW * 0.9 / (UBound(MsgButtons) + 1)
     For I = 0 To UBound(MsgButtons)
-        If I < UBound(MsgButtons) Then Page.Paint 0, basex + WSplit * (I + 1) * IIf(I <> MsgBtnFocus, 1 - bpro, 1) - 2, basey + 4, 4, 32, argb(50 * (1 - bpro) + 1, 0, 0, 0)
-        Page.Writes MsgButtons(I), basex + WSplit * I * IIf(I = MsgBtnFocus, 1 - bpro, 1), basey + 6, 18, argb(255 * IIf(I <> MsgBtnFocus, 1 - bpro, 1), 36 + (255 - 36) * IIf(I = MsgBtnFocus, bpro, 0), 36 + (255 - 36) * IIf(I = MsgBtnFocus, bpro, 0), 36 + (255 - 36) * IIf(I = MsgBtnFocus, bpro, 0)), WSplit * IIf(I <> MsgBtnFocus, 1 - bpro, 1) + 1 + (MsgW * 0.9 - WSplit) * IIf(I = MsgBtnFocus, bpro, 0), 22, StringAlignmentCenter, IIf(I = MsgBtnFocus, FontStyleBold, FontStyleRegular)
+        If I < UBound(MsgButtons) Then Page.Paint 0, basex + WSplit * (I + 1) * IIf(I <> MsgBtnFocus, 1 - bpro, 1) - 2, basey + 4, 4, 32, argb(50 * (1 - bpro) * upro2 + 1, 0, 0, 0)
+        Page.Writes MsgButtons(I), basex + WSplit * I * IIf(I = MsgBtnFocus, 1 - bpro, 1), basey + 6, 18, argb(255 * IIf(I <> MsgBtnFocus, 1 - bpro, 1) * upro2, 36 + (255 - 36) * IIf(I = MsgBtnFocus, bpro, 0), 36 + (255 - 36) * IIf(I = MsgBtnFocus, bpro, 0), 36 + (255 - 36) * IIf(I = MsgBtnFocus, bpro, 0)), WSplit * IIf(I <> MsgBtnFocus, 1 - bpro, 1) + 1 + (MsgW * 0.9 - WSplit) * IIf(I = MsgBtnFocus, bpro, 0), 22, StringAlignmentCenter, IIf(I = MsgBtnFocus, FontStyleBold, FontStyleRegular)
         If MsgBtnFocus = -1 And m > 0 Then
             If Mouse.X >= basex + WSplit * I And Mouse.X <= basex + WSplit * (I + 1) Then
                 MsgBtnFocus = I: MsgBtnFocusTime = GetTickCount
@@ -333,28 +351,46 @@ Public Sub LOGODialog()
     If tpro2 < 0 Then tpro2 = 0
     tpro2 = Cubic(tpro2, 0, 1, 1, 1)
     
-    Page.Clear argb(255, 255, 255, 255)
+    Page.Clear argb(255, 32, 32, 40)
         
     Dim pro As Single
     pro = (LoadedCount / PreLoadCount)
     
     Page.DrawImage "profile.png", GW / 2, GH / 2 - 90 * tpro, alpha:=1 * tpro, pos:=posOnCenter
-    Page.DrawImage "elogo.png", GW / 2 - 115, GH - 45, alpha:=1 * tpro2, pos:=posOnCenter
-    Page.Writes "Powered by Emerald", GW / 2 + 25, GH - 57, 18, argb(170 * tpro2, 27, 27, 27), align:=StringAlignmentCenter
+    'Page.DrawImage "elogo.png", GW / 2 - 115, GH - 45, alpha:=1 * tpro2, pos:=posOnCenter
+    Page.Writes "MADE WITH EMERALD", GW / 2, GH - 57, 16, argb(120 * tpro2, 242, 242, 242), align:=StringAlignmentCenter
     
-    Page.ShowLoading GW / 2 - 24, GH / 2 + GH * 0.25 - 24, 48, 48, 4, argb(255 * tpro2, 100, 62, 255), argb(255 * tpro2, 0, 176, 240), argb(255 * tpro2, 64, 218, 208)
+    If pro = 1 Then GoTo skipLoading
+    Dim cpro As Single, basey As Long, dpro As Single
+    basey = GH / 2 + (GH * 0.2 / 2 + 17 - 40) * tpro2
+    For I = 0 To 4
+        cpro = ((GetTickCount - I * 350) Mod 4000) / 4000
+        If cpro <= 0.3 Then
+            cpro = cpro / 0.3
+            cpro = Cubic(cpro, 0, 0, 0.47, 0.47)
+        ElseIf cpro <= 0.6 Then
+            cpro = (cpro - 0.3) / 0.3 * 0.06 + 0.47
+        Else
+            cpro = (cpro - 0.6) / 0.4
+            cpro = Cubic(cpro, 0.53, 0.53, 1, 1)
+        End If
+        dpro = IIf(cpro > 0.5, (1 - (cpro - 0.5) / 0.5), (cpro / 0.5)) * tpro2
+        Page.Paint 1, (GW + 48) * cpro - 24, basey + (GH - basey) / 2 - 23, 10, 10, argb(dpro * 255, 255 - 155 * dpro, 255 - 20 * dpro, 255 - 30 * dpro)
+    Next
     
-    Page.Writes App.ProductName, GW / 2, GH / 2 + 100 + (GH * 0.2 / 2 - 160) * tpro, 20, argb(255 * tpro, 32, 32, 32), align:=StringAlignmentCenter, style:=FontStyleBold
+skipLoading:
     
-    Page.Writes "正在启动 " & Int(pro * 100) & "%", GW / 2, GH / 2 + (GH * 0.2 / 2 + 17 - 40) * tpro2, 18, argb(200 * tpro2, 64, 64, 64), align:=StringAlignmentCenter
+    Page.Writes App.ProductName, GW / 2, GH / 2 + 100 + (GH * 0.2 / 2 - 160) * tpro, 18, argb(255 * tpro, 242, 242, 242), align:=StringAlignmentCenter, style:=FontStyleBold
+    
+    Page.Writes "正在启动 " & Int(pro * 100) & "%", GW / 2, GH / 2 + (GH * 0.2 / 2 + 17 - 40) * tpro2, 16, argb(200 * tpro2, 242, 242, 242), align:=StringAlignmentCenter
 
     If DisableLOGO Then
-        ECore.NewTransform transToLeft, 1000
+        ECore.NewTransform transFadeIn, 500
         DoneMark = True
         Exit Sub
     End If
     If PreLoadCount = LoadedCount And (GetTickCount - EnterTime) >= 3000 Then
-        ECore.NewTransform transToLeft, 1000
+        ECore.NewTransform transFadeIn, 500
         DoneMark = True
     End If
     
@@ -405,9 +441,9 @@ Private Sub Class_Initialize()
     Page.Res.NewImages App.path & "\assets\debug"
     BDC = CreateCDC(RGW, RGH)
     If Dir(App.path & "\assets\sets\profile.png") <> "" Then
-        Page.Res.newImage App.path & "\assets\sets\profile.png", 148, 148, "profile.png"
+        Page.Res.newImage App.path & "\assets\sets\profile.png", 160, 160, "profile.png"
     Else
-        Page.Res.newImage App.path & "\assets\debug\icon.png", 148, 148, "profile.png"
+        Page.Res.newImage App.path & "\assets\debug\icon.png", 160, 160, "profile.png"
     End If
     Page.Res.newImage App.path & "\assets\debug\logo.png", 64, 64, "elogo.png"
     

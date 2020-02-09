@@ -39,20 +39,21 @@ Dim F11KEYPress As Boolean, PageMode As Boolean
 Dim FreezeTime As Long
 '=======================================================
 '   Init
-    Public Function SimpleMsg(ByVal Content As String, ByVal Title As String, Buttons() As String, Optional ByVal W As Long = -1, Optional ByVal H As Long = -1, Optional UseBlur As Boolean = True, Optional Radius As Long = 60) As Integer
+    Public Function SimpleMsg(ByVal Content As String, ByVal Title As String, buttons() As String, Optional ByVal w As Long = -1, Optional ByVal h As Long = -1, Optional UseBlur As Boolean = True, Optional Radius As Long = 60) As Integer
         MsgType = 1
-        MsgW = IIf(W = -1, RGW * 0.6, W): MsgH = IIf(H = -1, RGH * 0.4, H)
+        MsgW = IIf(w = -1, RGW * 0.6, w): MsgH = IIf(h = -1, RGH * 0.4, h)
         MsgBtnFocus = -1: MsgBtnFocusTime = 0
         MsgContent = Content: MsgTitle = Title
-        ReDim MsgButtons(UBound(Buttons))
-        For I = 0 To UBound(Buttons)
-            MsgButtons(I) = Buttons(I)
+        ReDim MsgButtons(UBound(buttons))
+        For I = 0 To UBound(buttons)
+            MsgButtons(I) = buttons(I)
         Next
         SysPage.MsgButton = -1
         Dim lState As Boolean
         lState = ECore.FreezeMode
         ECore.FreezeMode = False
         
+        MsgEnterTime = GetTickCount
         ECore.NewTransform transFadeIn, 500
         
         If UseBlur Then
@@ -72,6 +73,7 @@ Dim FreezeTime As Long
         SimpleMsg = SysPage.MsgButton
         ECore.NewTransform transFadeIn, 500
         ECore.FreezeMode = lState
+        
     End Function
     Public Function ScreenMsg(ByVal Content As String, Optional UseBlur As Boolean = True, Optional Radius As Long = 60) As Integer
         MsgType = 2
@@ -93,6 +95,8 @@ Dim FreezeTime As Long
             PaintDC ECore.CDC, SysPage.BDC, alpha:=1
         End If
         
+        MsgEnterTime = GetTickCount
+        
         Do While SysPage.MsgButton = -1
             ECore.Display: DoEvents
         Loop
@@ -100,8 +104,9 @@ Dim FreezeTime As Long
         ScreenMsg = SysPage.MsgButton
         ECore.NewTransform transFadeIn, 500
         ECore.FreezeMode = lState
+        
     End Function
-    Public Function TipMsg(ByVal Content As String, Optional ByVal Delay As Long = 2000) As Integer
+    Public Function TipMsg(ByVal Content As String, Optional ByVal Delay As Long = 2000, Optional ByVal BackColor As Long = -1, Optional ByVal TextColor As Long = -1) As Integer
         If MsgTipTime = -2 Then Exit Function
         
         If CheckMouse2 >= mMouseIn Then
@@ -115,20 +120,24 @@ Dim FreezeTime As Long
         Else
             Exit Function
         End If
-        Dim W As Long, H As Long
-        W = EF.GetWidth(GG, Content, 18, StringAlignmentNear, FontStyleBold)
-        H = EF.GetHeight(GG, Content, 18, StringAlignmentNear, FontStyleBold)
-        MsgW = W + 20 * 2: MsgH = H + 5 * 2
-        MsgX = DrawF.X + DrawF.Width / 2 - MsgW / 2: MsgY = DrawF.y - MsgH - 20
+        Dim w As Long, h As Long
+        w = EF.GetWidth(GG, Content, 18, StringAlignmentNear, FontStyleBold)
+        h = EF.GetHeight(GG, Content, 18, StringAlignmentNear, FontStyleBold)
+        MsgW = w + 20 * 2: MsgH = h + 5 * 2
+        MsgX = DrawF.X + DrawF.Width / 2 - MsgW / 2: MsgY = DrawF.y - MsgH - 10
         MsgTipDirection = 0
         If MsgY < 0 Then MsgY = DrawF.y + DrawF.Height: MsgTipDirection = 1
         If MsgX < 0 Then MsgX = 0
         If MsgX > GW - MsgW Then MsgX = GW - MsgW
-        MsgTipColor = 0
-        StretchBlt NDC, 0, 0, 3, 3, CDC, MsgX, MsgY, MsgW, MsgH, vbSrcCopy
-        Dim temp(3) As Byte
-        CopyMemory temp(0), GetPixel(NDC, 1, 1), 4
-        If temp(0) / 255 + temp(1) / 255 + temp(2) / 255 + temp(3) / 255 <= 128 Then MsgTipColor = 1
+        MsgTipColor = 1
+        PaintDC2 CDC, NDC, 0, 0, 3, 3, MsgX, MsgY, MsgW, MsgH, 1
+        Dim temp(3) As Byte, Color As Long, total As Long
+        Color = GetPixel(NDC, 1, 1)
+        CopyMemory temp(0), Color, 4
+        For I = 0 To 3
+            total = total + temp(I)
+        Next
+        If total / 3 <= 128 Then MsgTipColor = 0
         
         MsgType = 3: MsgContent = Content
         SysPage.MsgButton = -1
@@ -141,6 +150,11 @@ Dim FreezeTime As Long
             If frm.Hwnd = GHwnd Then Exit For
         Next frm
         BlurTo SysPage.BDC, ECore.CDC, frm, 255
+        
+        MsgBkColor = BackColor
+        If MsgBkColor = -1 Then MsgBkColor = IIf(MsgTipColor = 0, argb(180, 255, 255, 255), argb(180, 0, 0, 0))
+        MsgFgColor = TextColor
+        If MsgFgColor = -1 Then MsgFgColor = IIf(MsgTipColor = 0, argb(255, 0, 0, 0), argb(255, 255, 255, 255))
         
         ECore.FreezeMode = lState
         ECore.FreezeReset
@@ -250,6 +264,10 @@ Dim FreezeTime As Long
         
         t = Timer * 1000
         
+        If Not HasCheckUpdate Then
+            If App.LogMode = 0 Then Call CheckUpdate
+        End If
+        
         If ECore Is Me Then
             If (Not FirstPlay) Then
                 FirstPlay = True: SysPage.OpenTime = GetTickCount: SysPage.index = 1
@@ -258,8 +276,8 @@ Dim FreezeTime As Long
             If (Not SysPage.DoneMark) Then
                 SysPage.Page.Update
                 SysPage.Page.Display CDC
-                played = True
-                GoTo skipPage
+                If SysPage.MsgButton = -1 Then GoTo DrawMessage
+                played = True: GoTo skipPage
             End If
         End If
 
@@ -276,6 +294,7 @@ Dim FreezeTime As Long
         End If
             
         If SysPage.MsgButton = -1 Then
+DrawMessage:
             OrIndex = SysPage.index
             SysPage.index = 7
             SysPage.Page.Update
@@ -288,7 +307,9 @@ Dim FreezeTime As Long
                 played = True: GoTo skipPage
             End If
         End If
-            
+        
+        If SysPage.DoneMark = False Then played = True: GoTo skipPage
+        
         For I = 1 To UBound(Pages)
             CurrentPage = I
             If ActivePage = Pages(I).Name Or (Pages(I).p.TopPage And (Not ErrorMark)) Then

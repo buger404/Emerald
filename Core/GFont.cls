@@ -17,6 +17,7 @@ Private Declare Function AddFontResource Lib "gdi32" Alias "AddFontResourceA" (B
 Private Declare Function RemoveFontResource Lib "gdi32" Alias "RemoveFontResourceA" (ByVal lpFileName As String) As Long
 Dim brush As Long, fFile As String, fFam As Long, StrF(2) As Long, Font(8, 1 To 1000) As Long, Spath As Long, Spen As Long
 Public EmHeight As Long
+Public RenderMode As Integer
 '========================================================
 '   Init
     Public Sub MakeFont(Name As String)
@@ -36,6 +37,7 @@ Public EmHeight As Long
         PoolCreateSolidFill argb(255, 64, 64, 64), brush
         PoolCreatePath FillModeAlternate, Spath
         PoolCreatePen1 0, 1, UnitPixel, Spen
+        RenderMode = 1
         
         EmeraldInstalled = True
     End Sub
@@ -83,23 +85,26 @@ Public EmHeight As Long
         
         GetHeight = R.Bottom
     End Function
-    Public Sub Writes(Text As String, X As Single, y As Single, g As Long, Color As Long, ByVal size As Long, W As Single, H As Single, ByVal align As StringAlignment, ByVal style As FontStyle, Optional ByVal BorderColor As Long, Optional ByVal BorderSize As Long = 0)
+    Public Sub Writes(Text As String, X As Single, Y As Single, g As Long, Color As Long, ByVal size As Long, W As Single, H As Single, ByVal align As StringAlignment, ByVal style As FontStyle, Optional ByVal BorderColor As Long, Optional ByVal BorderSize As Long = 0)
         'On Error Resume Next
         If Font(style, size) = 0 Then
             PoolCreateFont fFam, size, style, UnitPixel, Font(style, size)
         End If
         If EmHeight = 0 Then EmHeight = GetHeight(g, "ABCDEFG", 18, StringAlignmentNear, FontStyleRegular)
         
-        GdipResetPath Spath
-        GdipAddPathString Spath, StrPtr(Text), -1, fFam, style, size, NewRectF(X, y, W, H), StrF(align)
-        GdipSetSolidFillColor brush, Color
-        'GdipDrawString g, StrPtr(Text), -1, Font(style, size), NewRectF(X, y, w, h), StrF(align), brush
-        
-        GdipFillPath g, brush, Spath
-        If BorderSize > 0 Then
-            GdipSetPenColor Spen, BorderColor
-            GdipSetPenWidth Spen, BorderSize
-            GdipDrawPath g, Spen, Spath
+        If RenderMode = 0 Then
+            GdipDrawString g, StrPtr(Text), -1, Font(style, size), NewRectF(X, Y, W, H), StrF(align), brush
+        Else
+            GdipResetPath Spath
+            GdipAddPathString Spath, StrPtr(Text), -1, fFam, style, size, NewRectF(X, Y, W, H), StrF(align)
+            GdipSetSolidFillColor brush, Color
+            
+            GdipFillPath g, brush, Spath
+            If BorderSize > 0 Then
+                GdipSetPenColor Spen, BorderColor
+                GdipSetPenWidth Spen, BorderSize
+                GdipDrawPath g, Spen, Spath
+            End If
         End If
     End Sub
 '========================================================

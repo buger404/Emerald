@@ -423,8 +423,13 @@ Public Sub DrawBackup()
         If CheckMouse(85, 190 + 70 * (I - BackupIndex * 3) - 70, GW - 85 * 2, 70) = mMouseUp Then BackupC = I
     Next
     
+    If UBound(BackupList) = 0 Then
+        Page.Writes "空空如也~", GW / 2, GH / 2 - 40, 18, argb(255, 0, 0, 0), align:=StringAlignmentCenter
+        Exit Sub
+    End If
+    
     I = BackupC
-   If Page.ShowColorButton(2, GW / 2 - 200, GH - 110, 400, 40, IIf(BackupList(I).UseTime = 0, "恢复备份" & I, "确认恢复备份" & I & " (" & Round(5 - (GetTickCount - BackupList(I).UseTime) / 1000) & "s)"), argb(255, 255, 255, 255), IIf(BackupList(I).UseTime = 0, argb(255, 103, 226, 217), argb(255, 254, 84, 57)), IIf(BackupList(I).UseTime = 0, argb(255, 60, 205, 195), argb(255, 255, 124, 97)), 40, size:=18, style:=FontStyleBold) = 3 Then
+    If Page.ShowColorButton(2, GW / 2 - 200, GH - 110, 400, 40, IIf(BackupList(I).UseTime = 0, "恢复备份" & I, "确认恢复备份" & I & " (" & Round(5 - (GetTickCount - BackupList(I).UseTime) / 1000) & "s)"), argb(255, 255, 255, 255), IIf(BackupList(I).UseTime = 0, argb(255, 103, 226, 217), argb(255, 254, 84, 57)), IIf(BackupList(I).UseTime = 0, argb(255, 60, 205, 195), argb(255, 255, 124, 97)), 40, size:=18, style:=FontStyleBold) = 3 Then
         If BackupList(I).UseTime > 0 Then
             If BackupList(I).size = -1 Then
                 ShellExecuteA 0, "open", OPath & "\.emr\backup\", "", "", SW_SHOW
@@ -520,7 +525,7 @@ Public Sub DrawSettings()
     Dim Data As String
 
     Data = ESave.GetData("DebugMode")
-    Page.ShowColorCheckBox Data, 85, 190, 200, 20, "调试时在屏幕顶部显示调试栏", argb(255, 200, 200, 200), argb(255, 60, 205, 195), argb(255, 32, 32, 36), 18
+    Page.ShowColorCheckBox Data, 85, 190, 150, 20, "调试时在屏幕底部显示调试栏", argb(255, 200, 200, 200), argb(255, 60, 205, 195), argb(255, 32, 32, 36), 18
     If Data <> ESave.GetData("DebugMode") Then ESave.PutData "DebugMode", IIf(Data = True, 1, 0)
     
     Data = ESave.GetData("DisableLOGO")
@@ -606,13 +611,12 @@ Public Sub Update()
         If I = PageIndex Then
             Page.Paint 0, HY + 10, 165, 60, 6, argb(255, 60, 205, 195), 100
         End If
-        If m = 3 Then
-            If OPath = "" And I <= 3 Then
-                DrawF.X = HY: DrawF.y = 135: DrawF.Width = 80: DrawF.Height = 20
-                MsgBox "请在你的Emerald工程文件夹运行Builder。", 48
-            Else
-                PageIndex = I
-            End If
+        DrawF.X = HY: DrawF.y = 135: DrawF.Width = 80: DrawF.Height = 20
+        
+        If OPath = "" And I <= 3 Then
+            ECore.TipMsg "请在你的Emerald工程文件夹运行Builder~", 0
+        ElseIf m = 3 Then
+            PageIndex = I
         End If
         HY = HY + 80
 SkipThis:
