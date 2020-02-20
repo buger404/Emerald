@@ -560,7 +560,7 @@ sth:
     End If
 
     Data = IIf(IsRegCreated("HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\command\") = True, 1, 0)
-    Page.ShowColorCheckBox Data, 85, 390, 200, 20, "资源管理器菜单", argb(255, 32, 32, 36), IIf(CMError = "", argb(255, 60, 205, 195), argb(255, 32, 32, 36)), IIf(CMError = "", argb(255, 32, 32, 36), argb(255, 32, 32, 36)), 18
+    Page.ShowColorCheckBox Data, 85, 390, 200, 20, "资源管理器菜单", argb(255, 200, 200, 200), IIf(CMError = "", argb(255, 60, 205, 195), argb(255, 32, 32, 36)), IIf(CMError = "", argb(255, 32, 32, 36), argb(255, 32, 32, 36)), 18
     If Data <> IsRegCreated("HKEY_CLASSES_ROOT\Directory\Background\shell\emerald\command\") And CMError = "" Then
         CMError = OperContentMenu(IIf(Not CBool(Data), True, False))
         If CMError <> "" Then ECore.NewTransform transFadeIn, 300

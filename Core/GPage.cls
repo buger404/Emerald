@@ -20,7 +20,7 @@ Private Type AniTask
     custom As Boolean
     func As String
     profunc As Integer
-    delay As Long
+    Delay As Long
     mark As Boolean
 End Type
 Dim GTick As Long
@@ -70,7 +70,7 @@ Public IsSystem As Boolean
         Dim I As Integer
         For I = 1 To UBound(Anis)
             If Not Anis(I).mark Then
-                If (GetTickCount - Anis(I).Start - Anis(I).delay) > Anis(I).during Then
+                If (GetTickCount - Anis(I).Start - Anis(I).Delay) > Anis(I).during Then
                     Call DrawBox.AnimationDone(I)
                     Anis(I).mark = True
                 End If
@@ -233,7 +233,7 @@ Public IsSystem As Boolean
         If animation <> 0 Then
             If Not Anis(animation).mark Then
                 Dim pro As Single
-                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).Start - Anis(animation).delay) / Anis(animation).during)
+                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).Start - Anis(animation).Delay) / Anis(animation).during)
                 
                 If Anis(animation).custom Then
                     CallByName DrawBox, Anis(animation).func, VbMethod, OX, OY, ow, oh, 0, pro
@@ -288,6 +288,7 @@ Public IsSystem As Boolean
         End With
         
         If IsSystem Then Exit Sub
+        If App.LogMode <> 0 Then Exit Sub
         
         If Debug_focus Then
             GdipSetPenWidth Pen, 1
@@ -306,7 +307,7 @@ Public IsSystem As Boolean
             Call JudgeChoosePosition(OX, OY, ow, oh)
         End If
     End Sub
-    Public Sub DrawImage(n, ByVal X As Long, ByVal y As Long, Optional cx, Optional cy, Optional cw, Optional ch, Optional alpha, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0, Optional Direction As ImgDirection = DirNormal)
+    Public Sub DrawImage(n, ByVal X As Long, ByVal y As Long, Optional cx, Optional cy, Optional CW, Optional ch, Optional alpha, Optional pos As PosAlign = posNormal, Optional animation As Integer = 0, Optional Direction As ImgDirection = DirNormal)
         If ECore.FreezeAvailable And (Not IsSystem) Then Exit Sub
         
         'If OutOfScroll Then Exit Sub
@@ -314,7 +315,7 @@ Public IsSystem As Boolean
             X = X * Scales: y = y * Scales
             If Not IsMissing(cx) Then cx = cx * Scales
             If Not IsMissing(cy) Then cy = cy * Scales
-            If Not IsMissing(cw) Then cw = cw * Scales
+            If Not IsMissing(CW) Then CW = CW * Scales
             If Not IsMissing(ch) Then ch = ch * Scales
         End If
         Dim B As BLENDFUNCTION, index As Integer, bl As Long
@@ -327,7 +328,7 @@ Public IsSystem As Boolean
             pro = 1
             If animation <> 0 Then
                 If Not Anis(animation).mark Then
-                    pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).Start - Anis(animation).delay) / Anis(animation).during)
+                    pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).Start - Anis(animation).Delay) / Anis(animation).during)
                 End If
             End If
             alpha = alpha * pro
@@ -351,7 +352,7 @@ Public IsSystem As Boolean
         
         If IsMissing(cx) Then ocx = 0 Else: ocx = cx
         If IsMissing(cy) Then ocy = 0 Else: ocy = cy
-        If IsMissing(cw) Then ocw = Res.ImgSize(index, imgGetWidth) - ocx Else: ocw = cw
+        If IsMissing(CW) Then ocw = Res.ImgSize(index, imgGetWidth) - ocx Else: ocw = CW
         If IsMissing(ch) Then och = Res.ImgSize(index, imgGetHeight) - ocy Else: och = ch
         
         If pos = 1 Then OX = Int(OX - ocw / 2): OY = Int(OY - och / 2)
@@ -391,6 +392,7 @@ Public IsSystem As Boolean
         End With
         
         If IsSystem Then Exit Sub
+        If App.LogMode <> 0 Then Exit Sub
         
         If Debug_focus Then
             GdipSetPenWidth Pen, 1
@@ -429,7 +431,7 @@ Public IsSystem As Boolean
         If animation <> 0 Then
             If Not Anis(animation).mark Then
                 Dim pro As Single, co(3) As Byte, al As Single
-                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).Start - Anis(animation).delay) / Anis(animation).during)
+                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).Start - Anis(animation).Delay) / Anis(animation).during)
                 CopyMemory co(0), Color, 4
                 al = co(3): al = al / 255
                 
@@ -453,6 +455,7 @@ Public IsSystem As Boolean
         End With
         
         If IsSystem Then Exit Sub
+        If App.LogMode <> 0 Then Exit Sub
         
         If Debug_focus Then
             GdipSetPenWidth Pen, 1
@@ -487,7 +490,7 @@ Public IsSystem As Boolean
         If animation <> 0 Then
             If Not Anis(animation).mark Then
                 Dim pro As Single, co(3) As Byte, al As Single
-                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).Start - Anis(animation).delay) / Anis(animation).during)
+                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).Start - Anis(animation).Delay) / Anis(animation).during)
                 CopyMemory co(0), Color, 4
                 al = co(3): al = al / 255
                 
@@ -517,6 +520,7 @@ Public IsSystem As Boolean
         End With
         
         If IsSystem Then Exit Sub
+        If App.LogMode <> 0 Then Exit Sub
         
         If Debug_focus Then
             GdipSetPenWidth Pen, 1
@@ -547,17 +551,10 @@ Public IsSystem As Boolean
         Dim OX As Single, OY As Single, ow As Single, oh As Single
         OX = X: OY = y: ow = w: oh = h
         
-        If ScrollMode Then
-            OX = OX + ScrollX + ScrollBX: OY = OY + ScrollY + ScrollBY
-            Dim Ret As Long
-            GdipIsVisibleRect GG, OX - 1, OY - 1, ow, oh, Ret
-            If Not Ret Then OutOfScroll = True: Exit Sub
-        End If
-        
         If animation <> 0 Then
             If Not Anis(animation).mark Then
                 Dim pro As Single, co(3) As Byte, al As Single
-                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).Start - Anis(animation).delay) / Anis(animation).during)
+                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).Start - Anis(animation).Delay) / Anis(animation).during)
                 CopyMemory co(0), Color, 4
                 al = co(3): al = al / 255
                 
@@ -621,6 +618,7 @@ ReShape:
         End With
         
         If IsSystem Then Exit Sub
+        If App.LogMode <> 0 Then Exit Sub
         
         If Debug_focus Then
             GdipSetPenWidth Pen, 1
@@ -657,7 +655,7 @@ ReShape:
         If animation <> 0 Then
             If Not Anis(animation).mark Then
                 Dim pro As Single, co(3) As Byte, al As Single
-                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).Start - Anis(animation).delay) / Anis(animation).during)
+                pro = CallByName(EAni, "GetProgress_" & Anis(animation).profunc, VbMethod, (GetTickCount - Anis(animation).Start - Anis(animation).Delay) / Anis(animation).during)
                 CopyMemory co(0), Color, 4
                 al = co(3): al = al / 255
                 
@@ -703,6 +701,7 @@ ReShape:
         End With
         
         If IsSystem Then Exit Sub
+        If App.LogMode <> 0 Then Exit Sub
         
         If Debug_focus Then
             GdipSetPenWidth Pen, 1
@@ -752,6 +751,7 @@ ReShape:
         If style = 1 Then GdipDrawPath GG, Pen, path
         
         If IsSystem Then Exit Sub
+        If App.LogMode <> 0 Then Exit Sub
         
         If Debug_focus Then
             GdipSetPenWidth Pen, 1
@@ -790,6 +790,7 @@ ReShape:
         If style = 1 Then GdipDrawPath GG, Pen, path
         
         If IsSystem Then Exit Sub
+        If App.LogMode <> 0 Then Exit Sub
         
         If Debug_focus Then
             GdipSetPenWidth Pen, 1
@@ -812,9 +813,9 @@ ReShape:
         
         NewAnimation = UBound(Anis)
     End Function
-    Public Sub StartAnimation(id As Integer, Optional delay As Long = 0)
+    Public Sub StartAnimation(id As Integer, Optional Delay As Long = 0)
         Anis(id).Start = GetTickCount
-        Anis(id).delay = delay
+        Anis(id).Delay = Delay
         Anis(id).mark = False
     End Sub
     Public Function AnimationDone(id As Integer) As Boolean
@@ -977,7 +978,7 @@ ReShape:
         
         m = CheckMouse(X, y, w, Int(h / 2))
         DrawImage I, X, y, cy:=0, ch:=Int(h / 2), alpha:=1
-        DrawImage I, X, y, cy:=Int(h / 2), cw:=value * w, ch:=Int(h / 2), alpha:=1
+        DrawImage I, X, y, cy:=Int(h / 2), CW:=value * w, ch:=Int(h / 2), alpha:=1
         
         If m > 0 And Mouse.button > 0 Then
             value = (Mouse.X - X) / w

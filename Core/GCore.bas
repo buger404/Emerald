@@ -129,8 +129,8 @@ Attribute VB_Name = "GCore"
     Public FPSWarn As Long
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
-    Public Const Version As Long = 20020905      'fancy update
-    Public TextHandle As Long, WaitChr As String, HasCheckUpdate As Boolean
+    Public Const Version As Long = 20022001      'o update
+    Public TextHandle As Long, WaitChr As String, LastUpdateTime As Long, HighCPUPermission As Integer
     Public XPMode As Boolean
     Public Scales As Single
     Public FullScreenMark As Boolean
@@ -219,11 +219,11 @@ Attribute VB_Name = "GCore"
         Page.ScrollWidth = Area.Width: Page.ScrollHeight = Area.Height
         Page.ScrollMode = True
     End Sub
-    Public Sub EndScrollArea(Page As GPage, ByVal X As Long, ByVal y As Long, ByVal CX As Long, ByVal CY As Long, Optional ByVal Width As Long = -1, Optional ByVal Height As Long = -1, Optional ByVal alpha As Single = 1)
+    Public Sub EndScrollArea(Page As GPage, ByVal X As Long, ByVal y As Long, ByVal cx As Long, ByVal cy As Long, Optional ByVal Width As Long = -1, Optional ByVal Height As Long = -1, Optional ByVal alpha As Single = 1)
         If Not Page.ScrollMode Then Suggest "请先启动一个卷轴区域。", ClearOnUpdate, 1: Exit Sub
         If Width = -1 Then Width = Page.ScrollWidth
         If Height = -1 Then Height = Page.ScrollHeight
-        PaintDC Page.CDC, Page.OODC, X, y, CX, CY, Width, Height, alpha
+        PaintDC Page.CDC, Page.OODC, X, y, cx, cy, Width, Height, alpha
         Page.CDC = Page.OODC: Page.GG = Page.OOGG
         Page.ScrollMode = False
     End Sub
@@ -272,6 +272,15 @@ Attribute VB_Name = "GCore"
         GDC = GetDC(GHwnd)
     End Sub
     Public Sub StartEmerald(Hwnd As Long, w As Long, h As Long, Optional DPIPolicy As Boolean = True)
+        If w >= Screen.Width / Screen.TwipsPerPixelX * 0.9 And h >= Screen.Height / Screen.TwipsPerPixelY * 0.9 Then
+            Dim Win As EmeraldWindow, FSPer As Integer
+            Set Win = New EmeraldWindow
+            FSPer = Win.NewPermissionDialog("全屏", "该应用请求覆盖你的屏幕" & vbCrLf & "为了最佳游戏或应用体验效果可能需要全屏" & vbCrLf & "拒绝后将使用默认窗口大小" & vbCrLf & "请求授权的应用：" & App.Title)
+            If FSPer = 0 Then w = 800: h = 600
+        End If
+
+        HighCPUPermission = -1
+    
         ReDim ChooseLines(0)
     
         Scales = 1
@@ -443,7 +452,7 @@ sth:
         '画~
         PoolDeleteEffect e '垃圾处理
     End Sub
-    Public Sub PaintDC2(DC As Long, destDC As Long, X As Long, y As Long, w As Long, h As Long, CX As Long, CY As Long, CW As Long, ch As Long, alpha As Single)
+    Public Sub PaintDC2(DC As Long, destDC As Long, X As Long, y As Long, w As Long, h As Long, cx As Long, cy As Long, CW As Long, ch As Long, alpha As Single)
         Dim B As BLENDFUNCTION, index As Integer, bl As Long
         
         If Not IsMissing(alpha) Then
@@ -458,9 +467,9 @@ sth:
             CopyMemory bl, B, 4
         End If
         
-        AlphaBlend destDC, X, y, w, h, DC, CX, CY, CW, ch, bl
+        AlphaBlend destDC, X, y, w, h, DC, cx, cy, CW, ch, bl
     End Sub
-    Public Sub PaintDC(DC As Long, destDC As Long, Optional X As Long = 0, Optional y As Long = 0, Optional CX As Long = 0, Optional CY As Long = 0, Optional CW, Optional ch, Optional alpha)
+    Public Sub PaintDC(DC As Long, destDC As Long, Optional X As Long = 0, Optional y As Long = 0, Optional cx As Long = 0, Optional cy As Long = 0, Optional CW, Optional ch, Optional alpha)
         Dim B As BLENDFUNCTION, index As Integer, bl As Long
         
         If Not IsMissing(alpha) Then
@@ -475,13 +484,13 @@ sth:
             CopyMemory bl, B, 4
         End If
         
-        If IsMissing(CW) Then CW = RGW - CX
-        If IsMissing(ch) Then ch = RGH - CY
+        If IsMissing(CW) Then CW = RGW - cx
+        If IsMissing(ch) Then ch = RGH - cy
         
         If IsMissing(alpha) Then
-            BitBlt destDC, X, y, CW, ch, DC, CX, CY, vbSrcCopy
+            BitBlt destDC, X, y, CW, ch, DC, cx, cy, vbSrcCopy
         Else
-            AlphaBlend destDC, X, y, CW, ch, DC, CX, CY, CW, ch, bl
+            AlphaBlend destDC, X, y, CW, ch, DC, cx, cy, CW, ch, bl
         End If
     End Sub
     Function Cubic(t As Single, arg0 As Single, arg1 As Single, arg2 As Single, arg3 As Single) As Single
@@ -572,55 +581,6 @@ sth:
             If TypeName(f) <> "EmeraldWindow" Then f.Enabled = False
         Next
     End Function
-'========================================================
-'   Update
-    Public Sub CheckUpdate()
-        On Error Resume Next
-        HasCheckUpdate = True
-        
-        If InternetGetConnectedState(0&, 0&) = 0 Then
-            ECore.SimpleMsg "Emerald 检查更新取消，此操作将进行重试。", "未连接网络", StrArray("好的")
-            Err.Clear
-            Exit Sub
-        End If
-        
-        Dim Data As New GSaving
-        Data.Create "Emerald.Core"
-        Data.AutoSave = True
-        If Now - CDate(Data.GetData("UpdateTime")) >= UpdateCheckInterval Or Data.GetData("UpdateAble") = 1 Then
-            Data.PutData "UpdateTime", Now
-            
-            Dim xmlHttp As Object, Ret As String, Start As Long
-            Set xmlHttp = PoolCreateObject("Microsoft.XMLHTTP")
-            xmlHttp.Open "GET", "https://gitee.com/buger404/Emerald/blob/master/Version.txt", True
-            xmlHttp.send
-                         
-            Start = GetTickCount
-            Do While xmlHttp.ReadyState <> 4
-                If GetTickCount - Start >= UpdateTimeOut Then
-                    ECore.SimpleMsg "Emerald 检查更新超时，此操作将进行重试。", "连接超时", StrArray("好的")
-                    Exit Sub
-                End If
-                ECore.Display: DoEvents
-            Loop
-            Ret = Split(Split(xmlHttp.responseText, "<pre><div class='line' id='LC1'>")(1), "&#x000A;</div></pre></div></div>")(0)
-            Set xmlHttp = Nothing
-            Debug.Print Now, "Emerald：检查版本完毕，最新版本号 " & Val(Ret)
-            
-            If Val(Ret) > Version And App.LogMode = 0 Then
-                Data.PutData "UpdateAble", 1
-                If ECore.SimpleMsg("发现新的可用Emerald 版本：V" & Val(Ret), "新版本可用", StrArray("现在下载", "下次")) = 1 Then Exit Sub
-                
-                ShellExecuteA 0, "open", "https://github.com/buger404/Emerald/releases", "", "", SW_SHOW
-                Data.PutData "UpdateAble", 0
-            End If
-        Else
-            Debug.Print Now, "Emerald：上次检查更新时间 " & CDate(Data.GetData("UpdateTime"))
-        End If
-        
-        Set Data = Nothing
-        Err.Clear
-    End Sub
 '========================================================
 '   AssetsTree
     Public Function AddAssetsTree(Tree As AssetsTree, arg1 As Variant, arg2 As Variant)

@@ -34,17 +34,17 @@ End Type
 
 Public Declare Function SetWindowCompositionAttribute Lib "user32.dll" (ByVal Hwnd As Long, ByRef Data As WindowsCompostionAttributeData) As Long
 
-Enum WindowCompositionAttribute
+Public Enum WindowCompositionAttribute
     WCA_ACCENT_POLICY = 19
 End Enum
 
-Type WindowsCompostionAttributeData
+Public Type WindowsCompostionAttributeData
     Attribute As WindowCompositionAttribute
     Data As Long
-    SizeOfData As Integer
+    SizeOfData As Long
 End Type
 
-Enum AccentState
+Public Enum AccentState
     ACCENT_DISABLED = 0
     ACCENT_ENABLE_GRADIENT = 1
     ACCENT_ENABLE_TRANSPARENTGRADIENT = 2
@@ -53,31 +53,28 @@ Enum AccentState
     ACCENT_INVALID_STATE = 5
 End Enum
 
-Type AccentPolicy
+Public Type AccentPolicy
     State As AccentState
-    flags As Integer
-    GradientColor As Integer
-    id As Integer
+    flags As Long
+    GradientColor As Long
+    id As Long
 End Type
-
-Public Sub Win10Blur(Hwnd As Long)
-    Dim Accent As AccentPolicy
-    Accent.State = 3
-
-    Dim AccentStructSize As Long
-    AccentStructSize = 16
+Public Sub Win10Blur(Hwnd As Long, Color As Long)
+    Dim Accent As AccentPolicy, Data As WindowsCompostionAttributeData
     
-    Dim AccentPtr As Long
-    AccentPtr = VarPtr(Accent)
+    With Accent
+        .State = AccentState.ACCENT_ENABLE_ACRYLICBLURBEHIND
+        .GradientColor = Color
+    End With
     
-    Dim Data As WindowsCompostionAttributeData
     With Data
         .Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY
         .SizeOfData = 16
-        .Data = AccentPtr
+        .Data = VarPtr(Accent)
     End With
     
     SetWindowCompositionAttribute ByVal Hwnd, Data
+    
 End Sub
 
 Sub Win7Aeros(Hwnd As Long)
@@ -89,11 +86,13 @@ Sub Win7Aeros(Hwnd As Long)
     DwmEnableBlurBehindWindow Hwnd, B
 End Sub
 
-Sub BlurWindow(Hwnd As Long)
+Sub BlurWindow(Hwnd As Long, Optional BlurColor As Long = -1)
     Dim strComputer, objWMIService, colItems, objItem, strOSversion As String
     strComputer = "."
     Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\cimv2")
     Set colItems = objWMIService.ExecQuery("Select * from Win32_OperatingSystem")
+    
+    If BlurColor = -1 Then BlurColor = argb(120, 64, 64, 72)
     
     For Each objItem In colItems
         strOSversion = objItem.Version
@@ -102,7 +101,7 @@ Sub BlurWindow(Hwnd As Long)
     Select Case Left(strOSversion, 3)
     Case "10."                                              'Windows 10
         osver = Split(strOSversion, ".")
-        If Val(osver(2)) >= 15063 Then Win10Blur Hwnd
+        If Val(osver(2)) >= 15063 Then Win10Blur Hwnd, BlurColor
     Case "6.1"                                              'Windows 7
         Win7Aeros Hwnd
     Case Else                                               'Dont Blur

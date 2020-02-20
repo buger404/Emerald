@@ -23,7 +23,7 @@ Private Type SaveFile
 End Type
 Dim MySave As SaveFile
 Public AutoSave As Boolean
-Public sToken As Boolean, Path As String
+Public sToken As Boolean, path As String
 Public Key As String
 '========================================================
 '   Init
@@ -32,9 +32,9 @@ Public Key As String
     
         If XPMode Then
             If Dir("C:\Emerad\", vbDirectory) = "" Then MkDir "C:\Emerad\"
-            Path = "C:\Emerad\" & Name
+            path = "C:\Emerad\" & Name
         Else
-            Path = "C:\Users\" & PoolCreateObject("Wscript.Network").Username & "\AppData\Local\" & Name
+            path = "C:\Users\" & PoolCreateObject("Wscript.Network").Username & "\AppData\Local\" & Name
         End If
         
         AutoSave = True
@@ -42,29 +42,19 @@ Public Key As String
         If Not IsMissing(BMKey) Then Key = BMKey
         
         ReDim MySave.Data(0)
-        If Dir(Path & "\", vbDirectory) = "" Then
+        If Dir(path & "\", vbDirectory) = "" Then
             If Name <> "Emerald.Core" Then
                 SysPage.index = 0: SysPage.Key = 0
-                If XPMode Then
-                    SysPage.Key = MsgBox("你希望该应用在以下位置保存数据吗？" & vbCrLf & ESave.Path & vbCrLf & "*如果不允许，该应用可能永远保持初始状态。", 64 + vbYesNo) = vbYes
-                Else
-                    Dim Win As Object
-                    Set Win = StartScreenDialog(600, 400, SysPage)
-                    Set SysPage.Win = Win
-                    Do While Not Win.AcceptMark
-                        DoEvents
-                    Loop
-                    Unload Win
-                End If
-                
-                If SysPage.Key = 1 Then MkDir Path & "\": Create = True
+                Dim win As New EmeraldWindow
+                sToken = (win.NewPermissionDialog("存档读写", "该应用请求在您的计算机的下列位置储存数据：" & vbCrLf & ESave.path & vbCrLf & vbCrLf & "拒绝可能导致“无法存档”之类的问题" & vbCrLf & "请求授权的应用：" & App.Title & "(" & Name & ")") = 1)
+                If sToken Then Create = True
             Else
-                MkDir Path & "\"
+                MkDir path & "\"
             End If
         Else
-            If Dir(Path & "\save") <> "" Then
+            If Dir(path & "\save") <> "" Then
                 On Error GoTo ErrHandle
-                Open Path & "\save" For Binary As #1
+                Open path & "\save" For Binary As #1
                 Get #1, , MySave
                 Close #1
                 Call CheckSave
@@ -110,7 +100,7 @@ ErrHandle:
     End Function
     Public Sub Save()
         If sToken = False Then Exit Sub
-        Open Path & "\save" For Binary As #1
+        Open path & "\save" For Binary As #1
         Put #1, , MySave
         Close #1
     End Sub

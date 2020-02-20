@@ -396,23 +396,23 @@ skipLoading:
     
 End Sub
 Public Sub SaveDialog()
-    Page.Paint 0, 0, 0, 600, 76, argb(255, 242, 242, 242)
-    Page.DrawImage "save.png", 40, 40, alpha:=1
-    Page.Writes "你希望该应用在以下位置保存数据吗？" & vbCrLf & ESave.path, 40, 130, 18, argb(255, 64, 64, 64)
+    Page.Paint 0, 0, 0, 900, 76, argb(255, 255, 214, 139)
+    Page.DrawImage "data.png", 22, 23, alpha:=1
+    Page.Writes "你希望该应用在以下位置保存数据吗？" & vbCrLf & ESave.path, 40, 130, 18, argb(255, 0, 0, 0)
     
-    Page.Writes "*如果不允许，该应用可能永远保持初始状态。", 40, 400 - 110, 16, argb(255, 96, 96, 96)
+    Page.Writes "*如果不允许，该应用可能永远保持初始状态。", 40, 400 - 110, 18, argb(255, 0, 0, 0), style:=FontStyleBold
     
     Dim MouseT As Integer
     MouseT = CheckMouse(600 - 140 * 2 + 20, 400 - 60, 100, 30)
     
-    Page.Paint 0, 600 - 140 * 2 + 20, 400 - 60, 100, 30, IIf(MouseT <> 0, argb(255, 247, 181, 99), argb(255, 223, 165, 92))
-    Page.Writes "允许（Y）", 600 - 140 * 2 + 20, 400 - 57, 16, argb(255, 255, 255, 255), 110, 30, StringAlignmentCenter
+    Page.Paint 0, 600 - 140 * 2 + 17, 400 - 60, 100, 30, IIf(MouseT <> 0, argb(255, 225, 184, 109), argb(255, 255, 214, 139))
+    Page.Writes "允许(Y)", 600 - 140 * 2 + 17, 400 - 59, 18, argb(255, 0, 0, 0), 100, 30, StringAlignmentCenter
     If IsKeyPress(VK_Y) Or (MouseT > 1) Then Key = 1: Win.Accept
     
     MouseT = CheckMouse(600 - 140 * 1 + 10, 400 - 60, 100, 30)
     
-    Page.Paint 0, 600 - 140 * 1 + 10, 400 - 60, 100, 30, IIf(MouseT <> 0, argb(255, 180, 180, 180), argb(255, 200, 200, 200))
-    Page.Writes "拒绝（N）", 600 - 140 * 1 + 10, 400 - 57, 16, argb(255, 48, 48, 48), 110, 30, StringAlignmentCenter
+    Page.Paint 0, 600 - 140 * 1 + 7, 400 - 60, 100, 30, IIf(MouseT <> 0, argb(255, 180, 180, 180), argb(255, 200, 200, 200))
+    Page.Writes "拒绝(N)", 600 - 140 * 1 + 7, 400 - 59, 18, argb(255, 0, 0, 0), 100, 30, StringAlignmentCenter
     If IsKeyPress(VK_N) Or (MouseT > 1) Then Key = 0: Win.Accept
 End Sub
 Public Sub Wheel(Direction As Integer, Depth As Single)
@@ -436,8 +436,11 @@ End Sub
 Private Sub Class_Initialize()
     Set Page = New GPage
     Page.IsSystem = True
-    
+    Dim LGW As Long, LGH As Long
+    LGW = RGW: LGH = RGH
+    RGW = Screen.Width / Screen.TwipsPerPixelX: RGH = Screen.Height / Screen.TwipsPerPixelY
     Page.Create Me
+    RGW = LGW: RGH = LGH
     Page.Res.NewImages App.path & "\assets\debug"
     BDC = CreateCDC(RGW, RGH)
     If Dir(App.path & "\assets\sets\profile.png") <> "" Then

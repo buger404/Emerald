@@ -211,9 +211,9 @@ Dim FreezeTime As Long
         FreezeDelay = 3000
         Call FreezeReset
     End Sub
-    Public Sub Layered(Optional WithAero As Boolean = False)
+    Public Sub Layered(Optional WithAero As Boolean = False, Optional BlurColor As Long = -1)
         SetWindowLongA GHwnd, GWL_EXSTYLE, GetWindowLongA(GHwnd, GWL_EXSTYLE) Or WS_EX_LAYERED
-        If WithAero Then BlurWindow GHwnd
+        If WithAero Then BlurWindow GHwnd, BlurColor
         IsLayered = True
     End Sub
     Public Sub Dispose()
@@ -258,15 +258,21 @@ Dim FreezeTime As Long
 '========================================================
 '   Draw
     Public Sub Display()
+        If GetTickCount - LastUpdateTime < 16 Then
+            If HighCPUPermission = 0 Then
+                Sleep 16
+            ElseIf HighCPUPermission = -1 Then
+                Dim Win As EmeraldWindow
+                Set Win = New EmeraldWindow
+                HighCPUPermission = Win.NewPermissionDialog("高性能模式", "该应用请求开启高性能模式" & vbCrLf & "开启后应用性能将提升，流畅度提升，但计算机耗电加速" & vbCrLf & "拒绝后可能导致画面卡顿" & vbCrLf & "请求授权的应用：" & App.Title & "(影响级别：" & (16 - (GetTickCount - LastUpdateTime)) & ")")
+            End If
+        End If
+    
         If ErrorMark2 Then Exit Sub
 
         Dim o As Boolean, t As Long, played As Boolean
         
         t = Timer * 1000
-        
-        If Not HasCheckUpdate Then
-            If App.LogMode = 0 Then Call CheckUpdate
-        End If
         
         If ECore Is Me Then
             If (Not FirstPlay) Then
@@ -408,6 +414,8 @@ NoClear:
         If Mouse.State = 2 Then Mouse.State = 0
         
         If FreezeResetBegin Then FreezeResetBegin = False: Call FreezeReset
+        
+        LastUpdateTime = GetTickCount
     End Sub
 '========================================================
 '   Transform
