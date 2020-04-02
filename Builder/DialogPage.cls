@@ -27,9 +27,9 @@ Public Sub Update()
     Page.Writes Title, GW / 2 - 600 / 2 + 20, GH / 2 - 250 / 2 + 20, 30, argb(255, 27, 27, 27), style:=FontStyleBold
     Page.Writes Context, GW / 2 - 600 / 2 + 23, GH / 2 - 250 / 2 + 70, 18, argb(150, 27, 27, 27)
     
-    For i = 0 To UBound(buttons)
-        If Page.ShowColorButton(0, GW / 2 - 600 / 2 + 600 - 120 * (UBound(buttons) + 1) + i * 120, GH / 2 - 250 / 2 + 250 - 40 - 20, 100, 40, CStr(buttons(i)), argb(255, 255, 255, 255), argb(255, 85, 219, 211), argb(255, 55, 189, 181), size:=16) = 3 Then
-            Key = i + 1
+    For I = 0 To UBound(buttons)
+        If Page.ShowColorButton(0, GW / 2 - 600 / 2 + 600 - 120 * (UBound(buttons) + 1) + I * 120, GH / 2 - 250 / 2 + 250 - 40 - 20, 100, 40, CStr(buttons(I)), argb(255, 255, 255, 255), argb(255, 85, 219, 211), argb(255, 55, 189, 181), size:=16) = 3 Then
+            Key = I + 1
         End If
     Next
     
@@ -59,10 +59,10 @@ Public Sub AnimationDone(id As Integer)
     '动画播放结束事件
     'id：结束的动画ID
 End Sub
-Public Sub NewDialog(t As String, c As String, btn())
+Public Sub NewDialog(t As String, C As String, btn())
     buttons = btn
     Title = t
-    Context = c
+    Context = C
     Key = 0
     ECore.NewTransform transFadeIn, 700, "DialogPage"
 End Sub
@@ -76,7 +76,7 @@ Private Sub Class_Initialize()
     ECore.Add Page, "DialogPage"
     
     '===============================================
-    '   如果需要添加动画，请放置在此处
+    '   动画
     
     '===============================================
 End Sub

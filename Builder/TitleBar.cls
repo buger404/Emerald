@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 '======================================
 '   页面绘制器
     Dim Page As GPage
-    Dim SX As Long, SY As Long
+    Dim sx As Long, sy As Long
 '======================================
 
 Public Sub Update()
@@ -24,8 +24,8 @@ Public Sub Update()
     
     m = CheckMouse(231, 8, 98, 94)
     If m >= 1 And Mouse.button = 1 Then
-        If SX = -1 Then
-            SX = MainWindow.Left: SY = MainWindow.top
+        If sx = -1 Then
+            sx = MainWindow.Left: sy = MainWindow.top
         End If
         ReleaseCapture
         SendMessageA MainWindow.Hwnd, WM_SYSCOMMAND, SC_MOVE Or HTCAPTION, 0
@@ -33,10 +33,10 @@ Public Sub Update()
         Mouse.State = 0
     End If
     If m = 2 Then
-        If MainWindow.Left = SX And MainWindow.top = SY Then
+        If MainWindow.Left = sx And MainWindow.top = sy Then
             TargetY = Screen.Height + MainWindow.Height * 2
         End If
-        SX = -1: Mouse.State = 0: Mouse.button = 0
+        sx = -1: Mouse.State = 0: Mouse.button = 0
     End If
 End Sub
 Public Sub Wheel(Direction As Integer, Depth As Single)
@@ -67,9 +67,9 @@ Private Sub Class_Initialize()
     Page.TopPage = True '置顶页面
     '创建页面
     ECore.Add Page, "TitleBar"
-    SX = -1
+    sx = -1
     '===============================================
-    '   如果需要添加动画，请放置在此处
+    '   动画
     
     '===============================================
 End Sub

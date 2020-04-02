@@ -20,8 +20,8 @@ Attribute VB_Exposed = False
     Public ProjectName As String, InitWindow As Boolean, InitPage As Boolean, OpenPro As Boolean
 '======================================
 Public Sub DrawPage0()
-    Page.Writes "欢迎使用 Emerald 3.1", GW / 2, 220, 18, argb(255, 64, 64, 64), align:=StringAlignmentCenter, animation:=1
-    Page.Writes "更棒的UI和用户体验", GW / 2, 250, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter, animation:=2
+    Page.Writes "欢迎使用 Emerald", GW / 2, 220, 18, argb(255, 64, 64, 64), align:=StringAlignmentCenter, animation:=1
+    Page.Writes "创造不一样的vb应用", GW / 2, 250, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter, animation:=2
     
     If Page.ShowColorButton(2, GW / 2 - 200, GH - 110, 400, 40, "开始吧", argb(255, 255, 255, 255), argb(255, 105, 227, 218), argb(255, 59, 205, 195), 40, size:=18, style:=FontStyleBold) = 3 Then
         If IsRegCreated("HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Uninstall\Emerald\DisplayIcon") Then
@@ -49,7 +49,7 @@ Public Sub DrawPage1()
 End Sub
 Public Sub DrawPage2()
     Page.Writes "留下你的足迹", GW / 2, 190, 18, argb(255, 64, 64, 64), align:=StringAlignmentCenter, animation:=1
-    Page.Writes "告诉我你的名字，它将会显示在你的游戏中。", GW / 2, 230, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter, animation:=2
+    Page.Writes "告诉我你的名字，它将会显示在你的应用中。", GW / 2, 230, 18, argb(255, 96, 96, 96), align:=StringAlignmentCenter, animation:=2
     Page.ShowEdit Maker, 0, GW / 2 - 180, 270, 360, 40, argb(200, 32, 32, 36), argb(255, 242, 242, 242), argb(255, 232, 232, 232), argb(255, 62, 206, 196), size:=18
     If Page.ShowColorButton(2, GW / 2 - 200, GH - 110, 400, 40, "下一步", argb(255, 255, 255, 255), argb(255, 105, 227, 218), argb(255, 59, 205, 195), 40, size:=18, style:=FontStyleBold) = 3 Then
         If Maker = "" Then MsgBox "请告诉我你的名字。", 64: Exit Sub
@@ -60,33 +60,32 @@ Public Sub DrawPage2()
 End Sub
 Public Sub DrawPage3()
     Page.Writes "最后一步 ...", GW / 2, 170, 18, argb(255, 64, 64, 64), align:=StringAlignmentCenter, animation:=1, style:=FontStyleBold
-    Page.ShowColorCheckBox AcceptMIT, GW / 2 - 150, 230, 300, 20, "我会遵守MIT开源协议的", argb(255, 198, 198, 198), argb(255, 59, 205, 195), argb(255, 96, 96, 96), 18
+    Page.ShowColorCheckBox AcceptMIT, GW / 2 - 150, 230, 300, 20, "开启Emerald调试栏", argb(255, 198, 198, 198), argb(255, 59, 205, 195), argb(255, 96, 96, 96), 18
     Page.ShowColorCheckBox CopyModel, GW / 2 - 150, 270, 300, 20, "请将示例文件复制到我的VB目录中", argb(255, 198, 198, 198), argb(255, 59, 205, 195), argb(255, 96, 96, 96), 18
     Page.ShowColorCheckBox CreateContentMenu, GW / 2 - 150, 310, 300, 20, "在右键菜单中添加Emerald", argb(255, 198, 198, 198), argb(255, 59, 205, 195), argb(255, 96, 96, 96), 18
     
     Dim m As Long
     m = CheckMouse(125, GH - 175, 200, 30)
-    Page.Writes "MIT开源协议是什么？", 125, GH - 175, 18, IIf(m = 0, argb(255, 96, 96, 96), argb(255, 59, 205, 195)), 200, 30, StringAlignmentNear, FontStyleUnderline
+    Page.Writes "如何使用调试模式？", 125, GH - 175, 18, IIf(m = 0, argb(255, 96, 96, 96), argb(255, 59, 205, 195)), 200, 30, StringAlignmentNear, FontStyleUnderline
     If m = 3 Then
-        ShellExecuteA 0, "open", "https://github.com/buger404/Emerald/blob/master/LICENSE", "", "", SW_SHOW
+        ShellExecuteA 0, "open", App.path & "\wiki\05.调试模式.html", "", "", SW_SHOW
     End If
     
-    If AcceptMIT Then
-        If Page.ShowColorButton(2, GW / 2 - 200, GH - 110, 400, 40, "完成", argb(255, 255, 255, 255), argb(255, 105, 227, 218), argb(255, 59, 205, 195), 40, size:=18, style:=FontStyleBold) = 3 Then
-            If CopyModel Then
-                If Dir(VBIDEPath & "Template", vbDirectory) = "" Then MkDir VBIDEPath & "Template"
-                FileCopy App.path & "\Example\Emerald Window.frm", VBIDEPath & "Template\Forms\Emerald Window.frm"
-                FileCopy App.path & "\Example\Emerald Page.cls", VBIDEPath & "Template\Classes\Emerald Page.cls"
-            End If
-            If CreateContentMenu Then OperContentMenu False
-            ESave.PutData "Emerald 3.1", "√"
-            
-            GdipResetClip WelcomePage.Page.GG
-            SelectClipRgn GCore.GDC, 0
-            SelectClipRgn ECore.CDC, 0
-            WelcomePage.Cliped = 0
-            ECore.ActivePage = "WelcomePage"
+    
+    If Page.ShowColorButton(2, GW / 2 - 200, GH - 110, 400, 40, "完成", argb(255, 255, 255, 255), argb(255, 105, 227, 218), argb(255, 59, 205, 195), 40, size:=18, style:=FontStyleBold) = 3 Then
+        If CopyModel Then
+            If Dir(VBIDEPath & "Template", vbDirectory) = "" Then MkDir VBIDEPath & "Template"
+            FileCopy App.path & "\Example\Emerald Window.frm", VBIDEPath & "Template\Forms\Emerald Window.frm"
+            FileCopy App.path & "\Example\Emerald Page.cls", VBIDEPath & "Template\Classes\Emerald Page.cls"
         End If
+        If CreateContentMenu Then OperContentMenu False
+        ESave.PutData "Emerald 3.1", "√"
+        ESave.PutData "DebugMode", IIf(AcceptMIT, 1, 0)
+        GdipResetClip WelcomePage.Page.GG
+        SelectClipRgn GCore.GDC, 0
+        SelectClipRgn ECore.CDC, 0
+        WelcomePage.Cliped = 0
+        ECore.ActivePage = "WelcomePage"
     End If
 End Sub
 Public Sub DrawPage4()
@@ -202,6 +201,7 @@ Public Sub AnimationMsg(id As String, msg As String)
 End Sub
 Public Sub Enter()
     '页面进入事件
+    AcceptMIT = True: CopyModel = True: CreateContentMenu = True
     Page.StartAnimation 1, 500
     Page.StartAnimation 2, 750
     Maker = ESave.GetData("Maker")
@@ -241,7 +241,7 @@ Private Sub Class_Initialize()
     Page.NewAnimation False, "FadeIn", 2, 500
     Page.NewAnimation False, "FadeIn", 2, 500
     '===============================================
-    '   如果需要添加动画，请放置在此处
+    '   动画
     
     '===============================================
 End Sub

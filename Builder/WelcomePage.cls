@@ -290,7 +290,6 @@ End Sub
 Public Sub DrawAbout()
     If GetTickCount - StartTime >= 8000 And StartTime <> 0 Then
         StartTime = 0
-        Call CheckOnLineUpdate
         ECore.NewTransform transFadeIn, 1000
     End If
 
@@ -298,40 +297,13 @@ Public Sub DrawAbout()
     Page.Writes "20" & Mid(Version, 1, 2) & "." & Val(Mid(Version, 3, 2)) & "." & Val(Mid(Version, 5, 2)) & " 第" & Val(Mid(Version, 7, 2)) & "次版本", 200, 190, 18, argb(200, 32, 32, 36)
     Page.Writes "制作", 85, 230, 18, argb(255, 0, 0, 0)
     Page.Writes "Error404 (QQ 1361778219)", 200, 230, 18, argb(200, 32, 32, 36)
-    Page.Writes "支持", 85, 270, 18, argb(255, 0, 0, 0)
-    Page.Writes "Inter.Net，南笙", 200, 270, 18, argb(200, 32, 32, 36)
-    Page.Writes "更新", 85, 310, 18, argb(255, 0, 0, 0)
-    If NewVersion = 0 Then
-        Page.ShowLoading 200, 310 + 2, 20, 20, 3, argb(255, 0, 120, 215), argb(255, 0, 176, 240), argb(160, 64, 218, 208)
-        Page.Writes "正在检查更新...", 230, 310, 18, argb(200, 32, 32, 36)
-    ElseIf NewVersion = 3 Then
-        Page.Writes "连接超时", 200, 310, 18, argb(200, 254, 84, 57)
-    ElseIf NewVersion > Version Then
-        Page.Writes "更新可用", 200, 310, 18, argb(255, 35, 170, 242), 200, 22, style:=FontStyleUnderline
-        If CheckMouse2 = mMouseUp Then ShellExecuteA 0, "open", "https://github.com/buger404/Emerald/releases", "", "", SW_SHOW
-    Else
-        Page.Writes "官方最新版", 200, 310, 18, argb(200, 32, 32, 36)
-    End If
     
     Page.Writes "使用帮助", 85, 430, 18, argb(255, 0, 0, 0)
     m = CheckMouse(200, 430, 195, 20)
-    Page.Writes "Github : Emerald Wiki", 200, 430, 18, IIf(m = 0, argb(200, 32, 32, 36), argb(255, 60, 205, 195)), 200, 25, style:=FontStyleUnderline
-    If m = 3 Then ShellExecuteA 0, "open", "https://github.com/buger404/Emerald/wiki", "", "", SW_SHOW
+    Page.Writes "Emerald Wiki", 200, 430, 18, IIf(m = 0, argb(200, 32, 32, 36), argb(255, 60, 205, 195)), 200, 25, style:=FontStyleUnderline
+    If m = 3 Then ShellExecuteA 0, "open", App.path & "\wiki\", "", "", SW_SHOW
     m = IIf(m = 0, MousePointerConstants.vbDefault, MousePointerConstants.vbArrowQuestion)
     If Screen.MousePointer <> m Then Screen.MousePointer = m
-    
-    Dim Data As String
-    Page.Writes "检查间隔", 85, 350, 18, argb(255, 0, 0, 0)
-    Data = ESave.GetData("UpdateCheckInterval") & "天"
-    Page.ShowEdit Data, 0, 200, 350 - 1, 280, 30, argb(200, 32, 32, 36), argb(0, 16, 16, 24), argb(255, 242, 242, 242), argb(255, 62, 206, 196), size:=18
-    Data = Replace(Data, "天", "")
-    If Data <> ESave.GetData("UpdateCheckInterval") Then ESave.PutData "UpdateCheckInterval", Val(Data)
-    Page.Writes "超时时间", 85, 390, 18, argb(255, 0, 0, 0)
-    Dim data2 As String
-    data2 = ESave.GetData("UpdateTimeOut") & "ms"
-    Page.ShowEdit data2, 0, 200, 390 - 1, 280, 30, argb(200, 32, 32, 36), argb(0, 16, 16, 24), argb(255, 242, 242, 242), argb(255, 62, 206, 196), size:=18
-    data2 = Replace(data2, "ms", "")
-    If data2 <> ESave.GetData("UpdateTimeOut") Then ESave.PutData "UpdateTimeOut", Val(data2)
 
 End Sub
 Public Sub DrawProject()

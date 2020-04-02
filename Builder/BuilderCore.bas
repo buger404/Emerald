@@ -247,44 +247,6 @@ Public Function OperContentMenu(Remove As Boolean) As String
     
     Set WSHShell = Nothing
 End Function
-Public Sub CheckOnLineUpdate()
-    On Error Resume Next
-    
-    If InternetGetConnectedState(0&, 0&) = 0 Then
-        NewVersion = 3
-        Exit Sub
-    End If
-    
-    Dim Data As New GSaving
-    Data.Create "Emerald.Core"
-    Data.AutoSave = True
-    If Now - CDate(Data.GetData("UpdateTime")) >= UpdateCheckInterval Or Data.GetData("UpdateAble") = 1 Then
-        Data.PutData "UpdateTime", Now
-        
-        Dim xmlHttp As Object, Ret As String, Start As Long
-        Set xmlHttp = PoolCreateObject("Microsoft.XMLHTTP")
-        xmlHttp.Open "GET", "https://raw.githubusercontent.com/Red-Error404/Emerald/master/Version.txt", True
-        xmlHttp.send
-        
-        Start = GetTickCount
-        Do While xmlHttp.ReadyState <> 4
-            If GetTickCount - Start >= UpdateTimeOut Then
-                NewVersion = 3
-                Exit Sub
-            End If
-            ECore.Display
-            Sleep 10: DoEvents
-        Loop
-        Ret = xmlHttp.responseText
-        Set xmlHttp = Nothing
-
-        NewVersion = Val(Ret)
-        Data.PutData "UpdateAble", 1
-    Else
-        NewVersion = Version
-    End If
-End Sub
-
 Public Function GetDirName() As String
     Dim bi As BROWSEINFO
     Dim R As Long
