@@ -307,6 +307,7 @@ Public Property Get ResourceGIFTick(index As Integer) As Long
     ResourceGIFTick = Mems(index).GIF.tick
 End Property
 Public Sub GIFTick(index As Integer)
+    Mems(index).GIF.time = GetTickCount
     Mems(index).GIF.tick = Mems(index).GIF.tick + 1
     If Mems(index).GIF.tick > Mems(index).GIF.Count Then Mems(index).GIF.tick = 0
 End Sub
@@ -314,7 +315,7 @@ Public Property Get ResourceGIFCount(index As Integer) As Long
     ResourceGIFCount = Mems(index).GIF.Count
 End Property
 Public Property Get ResourceGIFTime(index As Integer) As Long
-    ResourceGIFTime = Mems(index).GIF.Time
+    ResourceGIFTime = Mems(index).GIF.time
 End Property
 Public Property Get ResourceName(index As Integer) As Long
     ResourceName = Mems(index).Name

@@ -120,12 +120,12 @@ Public Sub DrawPage5()
     Page.ShowEdit ProjectName, 0, 200, 200, 250, 30, argb(200, 32, 32, 36), argb(0, 255, 255, 255), argb(255, 242, 242, 242), argb(255, 62, 206, 196), size:=18
 
     Page.Writes "选项", 85, 240, 18, argb(255, 0, 0, 0)
-    Page.ShowColorCheckBox InitWindow, 85 + 3, 280, 500, 20, "创建好一个游戏窗口", argb(255, 200, 200, 200), argb(255, 60, 205, 195), argb(200, 32, 32, 36), 18
-    Page.ShowColorCheckBox InitPage, 85 + 3, 320, 500, 20, "创建好一个游戏页面", argb(255, 200, 200, 200), argb(255, 60, 205, 195), argb(200, 32, 32, 36), 18
+    Page.ShowColorCheckBox InitWindow, 85 + 3, 280, 500, 20, "创建好一个应用窗口", argb(255, 200, 200, 200), argb(255, 60, 205, 195), argb(200, 32, 32, 36), 18
+    Page.ShowColorCheckBox InitPage, 85 + 3, 320, 500, 20, "创建好一个应用页面", argb(255, 200, 200, 200), argb(255, 60, 205, 195), argb(200, 32, 32, 36), 18
     Page.ShowColorCheckBox OpenPro, 85 + 3, 360, 500, 20, "在我创建完之后打开工程", argb(255, 200, 200, 200), argb(255, 60, 205, 195), argb(200, 32, 32, 36), 18
 
     If Page.ShowColorButton(2, GW / 2 - 200, GH - 110, 400, 40, "开始创造", argb(255, 255, 255, 255), argb(255, 105, 227, 218), argb(255, 59, 205, 195), 40, size:=18, style:=FontStyleBold) = 3 Then
-        If CheckFileName(ProjectName) = False Or ProjectName = "" Then MsgBox "这个游戏名称不能被接受呢。换一个吧。", 64: Exit Sub
+        If CheckFileName(ProjectName) = False Or ProjectName = "" Then MsgBox "这个应用名称不能被接受呢。换一个吧。", 64: Exit Sub
         
         If Dir(OPath & "\core", vbDirectory) = "" Then MkDir OPath & "\core"
         If Dir(OPath & "\code", vbDirectory) = "" Then MkDir OPath & "\code"
@@ -150,10 +150,10 @@ Public Sub DrawPage5()
         
         f = Replace(f, "{app}", ProjectName)
         f = Replace(f, "{maker}", EmrPC.Maker)
-        f = Replace(f, "{include}", IIf(InitWindow, "Form=Code\GameWindow.frm" & vbCrLf, "") & IIf(InitPage, "Class=GamePage; Code\GamePage.cls" & vbCrLf, ""))
+        f = Replace(f, "{include}", IIf(InitWindow, "Form=Code\AppWindow.frm" & vbCrLf, "") & IIf(InitPage, "Class=AppPage; Code\AppPage.cls" & vbCrLf, ""))
         
-        If InitWindow Then FileCopy App.path & "\Example\Emerald Window.frm", OPath & "\code\GameWindow.frm"
-        If InitPage Then FileCopy App.path & "\Example\Emerald Page.cls", OPath & "\code\GamePage.cls"
+        If InitWindow Then FileCopy App.path & "\Example\Emerald Window.frm", OPath & "\code\AppWindow.frm"
+        If InitPage Then FileCopy App.path & "\Example\Emerald Page.cls", OPath & "\code\AppPage.cls"
         
         Open OPath & "\" & ProjectName & ".vbp" For Output As #1
         Print #1, f

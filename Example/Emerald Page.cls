@@ -6,18 +6,20 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "GamePage"
+Attribute VB_Name = "AppPage"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'======================================
+'   该类模块是由Emerald创建的 页面控制器 模板
 '======================================
 '   页面绘制器
     Dim Page As GPage
 '======================================
 
 Public Sub Update()
-    '游戏每一帧的过程（绘制过程请放在此处）
+    '应用界面每一帧刷新会调用的方法（页面绘制i代码请放在此处）
     
     Page.Clear '清空画布
 
@@ -51,13 +53,10 @@ Public Sub AnimationDone(id As Integer)
     'id：结束的动画ID
 End Sub
 Private Sub Class_Initialize()
-    '创建页面绘制器
-    Set Page = New GPage
-    Page.Create Me
-    '导入游戏资源
-    Page.Res.NewImages App.Path & "\assets"
-    '创建页面
-    ECore.Add Page, "[你的页面名称]"
+    Set Page = New GPage  '创建页面绘制器
+    Page.Create Me  '将绘制器与控制器绑定
+    Page.Res.NewImages App.Path & "\assets"  '导入资源
+    ECore.Add Page, "[你的页面名称]"  '创建页面
     
     '===============================================
     '   如果需要添加动画，请放置在此处

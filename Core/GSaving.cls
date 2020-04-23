@@ -64,13 +64,13 @@ Public Key As String
 ErrHandle:
                 If Err.Number <> 0 Then
                     MsgBox "存档已经损坏！", 16, DisplayName: ReDim MySave.Data(0)
-                    Suggest "游戏存档损坏。", NeverClear, 2
+                    Suggest "应用存档损坏。", NeverClear, 2
                 End If
             End If
             Create = True
         End If
         
-        If Create = False Then Suggest "游戏存档授权失败。", NeverClear, 1
+        If Create = False Then Suggest "应用存档授权失败。", NeverClear, 1
         sToken = Create
         
     End Function
@@ -90,7 +90,7 @@ ErrHandle:
         If msg <> "" Then
             Call Save
             MsgBox "已经发现并删除存档中以下非法数据：" & vbCrLf & msg, 64
-            Suggest "游戏存档中含有非法数据。", NeverClear, 1
+            Suggest "应用存档中含有非法数据。", NeverClear, 1
         End If
     End Sub
 '========================================================

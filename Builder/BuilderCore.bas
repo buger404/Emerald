@@ -92,6 +92,7 @@ Public Sub Main()
         End If
         
         SetupMode = True
+        SetWindowPos MainWindow.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOZORDER Or SWP_NOMOVE
         MainWindow.Show
         MainWindow.Caption = SPackage.GameName & "  Installer"
         SetWindowLongA MainWindow.Hwnd, GWL_STYLE, _
@@ -136,6 +137,7 @@ UninstallGame:
     Line Input #1, te
     SPackage.GameName = te
     Close #1
+    SetWindowPos MainWindow.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOZORDER Or SWP_NOMOVE
     MainWindow.Caption = SPackage.GameName & "  Uninstaller"
     SetWindowLongA MainWindow.Hwnd, GWL_STYLE, _
     GetWindowLongA(MainWindow.Hwnd, GWL_STYLE) Or WS_CAPTION Or WS_MINIMIZEBOX Or WS_BORDER

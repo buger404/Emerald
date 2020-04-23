@@ -221,7 +221,7 @@ Sub Main2()
     
     If LCase(Trim(Replace(Command$, """", ""))) = "-uninstallgame" Then
 UninstallGame:
-        If Dialog("卸载", "确实要卸载该游戏吗？", "是", "手滑") <> 1 Then Unload MainWindow: End
+        If Dialog("卸载", "确实要卸载该应用吗？", "是", "手滑") <> 1 Then Unload MainWindow: End
         CmdMark = "Uninstall"
         SetupMode = True
         ECore.NewTransform , 700, "SetupPage"
@@ -332,7 +332,7 @@ UninstallGame:
                 If pmode Then
                     If Dialog("打包", "现在开始打包吗？", "好", "不要") <> 1 Then Unload MainWindow: End
                     If Dir(Cmd & "\app.exe") = "" Then
-                        Dialog "警告", "找不到游戏主程序：app.exe，请设置。", "行"
+                        Dialog "警告", "找不到应用主程序：app.exe，请设置。", "行"
                         Unload MainWindow: End
                     End If
                     Dim QQ As Long, Maker As String, Name As String, Describe As String, GVersion As String
@@ -349,7 +349,7 @@ UninstallGame:
                     Loop
                     Close #1
                     If Name = "" Then
-                        Dialog "警告", "游戏名称不能为空。", "行"
+                        Dialog "警告", "应用名称不能为空。", "行"
                         Unload MainWindow: End
                     End If
                     MakePackage Cmd, Maker, Name, GVersion, Describe, QQ

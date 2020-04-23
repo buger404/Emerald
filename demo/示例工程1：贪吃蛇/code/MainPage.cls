@@ -29,7 +29,7 @@ Public Sub Update()
     Page.DrawImage "background.png", Mouse.X / GW * 8 - 8, Mouse.y / GH * 8 - 8
     Page.DrawImage "logo.png", GW / 2, GH / 2, alpha:=1, pos:=posOnCenter
     
-    If CheckMouse(0, 0, GW, GH) = mMouseUp Then
+    If CheckMouse(0, 0, GW, GH - 50) = mMouseUp Then
         ECore.SimpleMsg "按↑↓←→移动", "操作说明", StrArray("好的！")
         ECore.NewTransform transFadeIn, 300, "GamePage"
     End If

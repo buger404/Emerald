@@ -175,7 +175,6 @@ Public Sub RunExec()
             End Select
         Case "backup"
             SetConsoleColor colors.ErrText
-            WriteLine "Note£ºThis function will be removed on 7.20 ."
             SetConsoleColor colors.DefaultText
             Select Case Params(1)
                 Case "-help"
@@ -823,19 +822,19 @@ Public Sub Update()
     End If
     
     If Debug_mouse Then Page.Paint 0, GW - 48, 0, 49, GH, argb(60, 255, 255, 255)
-    Page.DrawImage "mouse" & Mouse.button & ".png", GW - 48, 54 / 2 - 48 / 2 + 1, alpha:=1
+    Page.DrawImage "click.png", GW - 48, 54 / 2 - 48 / 2 + 1 + 4, alpha:=1
 
     If Debuginfo.Visible Then Page.Paint 0, GW - 48 * 3, 0, 49, GH, argb(60, 255, 255, 255)
-    Page.DrawImage "menu.png", GW - 48 * 3, 54 / 2 - 48 / 2 + 1, alpha:=1
+    Page.DrawImage "menu.png", GW - 48 * 3 + 6, 54 / 2 - 48 / 2 + 1 + 6, alpha:=1
 
     If Debug_umode Then Page.Paint 0, GW - 48 * 5, 0, 49, GH, argb(60, 255, 255, 255)
-    Page.DrawImage "u" & Debug_umode & ".png", GW - 48 * 5, 54 / 2 - 48 / 2 + 1, alpha:=1
+    Page.DrawImage "u" & Debug_umode & ".png", GW - 48 * 5 + 6, 54 / 2 - 48 / 2 + 1 + 6, alpha:=1
 
     If Debug_pos Then Page.Paint 0, GW - 48 * 4, 0, 49, GH, argb(60, 255, 255, 255)
-    Page.DrawImage "pos.png", GW - 48 * 4, 54 / 2 - 48 / 2 + 1, alpha:=1
+    Page.DrawImage "pos.png", GW - 48 * 4 + 6, 54 / 2 - 48 / 2 + 1 + 6, alpha:=1
 
     If Debug_data Then Page.Paint 0, GW - 48 * 2, 0, 49, GH, argb(60, 255, 255, 255)
-    Page.DrawImage "data.png", GW - 48 * 2, 54 / 2 - 48 / 2 + 1, alpha:=1
+    Page.DrawImage "data.png", GW - 48 * 2 + 6, 54 / 2 - 48 / 2 + 1 + 6, alpha:=1
 
     Page.Paint 0, 0, 0, GW + 1, 6, argb(255, 36, 173, 243)
     If FPS <> 0 Then

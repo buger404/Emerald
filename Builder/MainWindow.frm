@@ -35,6 +35,7 @@ Attribute VB_Exposed = False
 '==================================================
 Private Sub DrawTimer_Timer()
     '»æÖÆ
+    
     NowY = NowY + (TargetY - NowY) / 10
     If Me.top <> NowY Then Me.top = NowY
     If Me.top > Screen.Height + Me.Height * 1.5 Then

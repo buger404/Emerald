@@ -271,7 +271,7 @@ Attribute VB_Name = "GCore"
         If w >= Screen.Width / Screen.TwipsPerPixelX * 0.9 And h >= Screen.Height / Screen.TwipsPerPixelY * 0.9 Then
             Dim Win As EmeraldWindow, FSPer As Integer
             Set Win = New EmeraldWindow
-            FSPer = Win.NewPermissionDialog("全屏", "该应用请求覆盖你的屏幕" & vbCrLf & "为了最佳游戏或应用体验效果可能需要全屏" & vbCrLf & "拒绝后将使用默认窗口大小" & vbCrLf & "请求授权的应用：" & App.Title)
+            FSPer = Win.NewPermissionDialog("全屏", "该应用请求覆盖你的屏幕" & vbCrLf & "为了最佳应用体验效果可能需要全屏" & vbCrLf & "拒绝后将使用默认窗口大小" & vbCrLf & "请求授权的应用：" & App.Title)
             If FSPer = 0 Then w = 800: h = 600
         End If
 

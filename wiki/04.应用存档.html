@@ -1,9 +1,9 @@
 <!DOCTYPE html><html><head>
-      <title>33.&#x6E38;&#x620F;&#x7F29;&#x653E;</title>
+      <title>04.&#x5E94;&#x7528;&#x5B58;&#x6863;</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       
-      <link rel="stylesheet" href="file:///c:\Users\13617\.vscode\extensions\shd101wyy.markdown-preview-enhanced-0.5.2\node_modules\@shd101wyy\mume\dependencies\katex\katex.min.css">
+      <link rel="stylesheet" href="file:///c:\Users\13617\.vscode\extensions\shd101wyy.markdown-preview-enhanced-0.5.3\node_modules\@shd101wyy\mume\dependencies\katex\katex.min.css">
       
       
 
@@ -263,10 +263,11 @@ pre[data-line] .line-highlight[data-end]:after {
     </head>
     <body for="html-export">
       <div class="mume markdown-preview  ">
-      <h1 class="mume-header" id="%E6%B8%B8%E6%88%8F%E7%BC%A9%E6%94%BE">&#x6E38;&#x620F;&#x7F29;&#x653E;</h1>
+      <h1 class="mume-header" id="%E5%88%9B%E5%BB%BA%E4%BD%A0%E7%9A%84%E5%AD%98%E6%A1%A3">&#x521B;&#x5EFA;&#x4F60;&#x7684;&#x5B58;&#x6863;</h1>
 
-<p>&#x5C06;&#x6E38;&#x620F;&#x753B;&#x9762;&#x7F29;&#x653E;&#xFF0C;<strong>&#x8BE5;&#x64CD;&#x4F5C;&#x53EA;&#x80FD;&#x5728;&#x6240;&#x6709;&#x8D44;&#x6E90;&#x548C;&#x9875;&#x9762;&#x672A;&#x52A0;&#x8F7D;&#x4E4B;&#x524D;&#x8FDB;&#x884C;&#x3002;</strong></p>
-<h1 class="mume-header" id="scalegame%E6%96%B9%E6%B3%95">ScaleGame&#x65B9;&#x6CD5;</h1>
+<p>&#x5E94;&#x7528;&#x7684;&#x5B58;&#x6863;&#x7531;<code>ESave</code>&#x8FDB;&#x884C;&#x7BA1;&#x7406;&#xFF0C;&#x9ED8;&#x8BA4;&#x662F;&#x4E0D;&#x521B;&#x5EFA;&#x7684;&#xFF0C;&#x5982;&#x679C;&#x9700;&#x8981;&#x521B;&#x5EFA;&#xFF0C;&#x8BF7;&#x8F6C;&#x5230;&#x5E94;&#x7528;&#x7A97;&#x53E3;&#x7684;<code>Form_Load</code>&#x8FC7;&#x7A0B;&#xFF0C;&#x5C06;&#x6CE8;&#x91CA;&#x6709;&#x201C;&#x521B;&#x5EFA;&#x5B58;&#x6863;&#x201D;&#x7684;&#x90E8;&#x5206;&#x7684;&#x6CE8;&#x91CA;&#x7B26;&#x53F7;&#x5220;&#x53BB;&#x3002;<br>
+&#x5B58;&#x6863;&#x4F7F;&#x7528;<code>ESave.Create</code>&#x8FDB;&#x884C;&#x521B;&#x5EFA;&#xFF0C;&#x9ED8;&#x8BA4;&#x4E0D;&#x63D0;&#x4F9B;key,&#x4F7F;&#x7528;&#x5B58;&#x6863;&#x524D;&#x8BF7;&#x52A1;&#x5FC5;&#x8BBE;&#x7F6E;&#x60A8;&#x7684;&#x5B58;&#x6863;key&#x3002;</p>
+<h2 class="mume-header" id="esavecreate-%E5%8F%82%E6%95%B0%E8%A7%A3%E8%AF%B4">ESave.Create &#x53C2;&#x6570;&#x89E3;&#x8BF4;</h2>
 
 <table>
 <thead>
@@ -278,45 +279,107 @@ pre[data-line] .line-highlight[data-end]:after {
 </thead>
 <tbody>
 <tr>
-<td>Percent</td>
-<td>Single</td>
-<td>&#x7F29;&#x653E;&#x767E;&#x5206;&#x6BD4;</td>
+<td>name</td>
+<td>String</td>
+<td>&#x5B58;&#x6863;&#x540D;&#x79F0;&#xFF0C;&#x8BF7;&#x4E0D;&#x8981;&#x9009;&#x62E9;&#x592A;&#x8FC7;&#x4E8E;&#x5E38;&#x89C1;&#x7684;&#x540D;&#x5B57;&#xFF0C;&#x9632;&#x6B62;&#x548C;&#x5176;&#x4ED6;&#x5E94;&#x7528;&#x7684;&#x5B58;&#x6863;&#x53D1;&#x751F;&#x51B2;&#x7A81;&#x3002;</td>
 </tr>
 <tr>
-<td>ScaleMode</td>
-<td>EScalePolicy</td>
-<td>&#x7F29;&#x653E;&#x7B56;&#x7565;</td>
+<td>[optional] BMKey</td>
+<td>String</td>
+<td>&#x9A8C;&#x8BC1;&#x5B58;&#x6863;&#x6240;&#x4F7F;&#x7528;&#x7684;&#x79D8;&#x94A5;&#x3002;</td>
 </tr>
 </tbody>
 </table>
-<h1 class="mume-header" id="escalepolicy%E6%9E%9A%E4%B8%BE">EScalePolicy&#x679A;&#x4E3E;</h1>
+<blockquote>
+<p><strong>NOTE:</strong><br>
+&#x8BF7;&#x5728;&#x4EE3;&#x7801;&#x4E2D;&#x59A5;&#x5584;&#x505A;&#x597D;&#x79D8;&#x94A5;&#x7684;&#x4FDD;&#x5BC6;&#xFF0C;&#x9632;&#x6B62;&#x79D8;&#x94A5;&#x88AB;&#x7A83;&#x53D6;&#x3002;<br>
+&#x5982;&#x679C;&#x60F3;&#x4E0D;&#x51FA;&#x8BE5;&#x4F7F;&#x7528;&#x4EC0;&#x4E48;&#x79D8;&#x94A5;&#xFF0C;&#x53EF;&#x4EE5;&#x5728;&#x7ACB;&#x5373;&#x9762;&#x677F;&#x4E2D;&#x8F93;&#x5165;<code>Debug.Print GetBMKey</code>&#x6765;&#x83B7;&#x53D6;&#x79D8;&#x94A5;&#x3002;<br>
+<strong>&#x4E00;&#x65E6;&#x8BBE;&#x7F6E;&#x540E;&#xFF0C;&#x8BF7;&#x4E0D;&#x8981;&#x4FEE;&#x6539;&#x4F60;&#x7684;&#x79D8;&#x94A5;&#xFF0C;&#x5426;&#x5219;&#x5C06;&#x5BFC;&#x81F4;&#x5E94;&#x7528;&#x5B58;&#x6863;&#x5B8C;&#x5168;&#x4E22;&#x5931;&#x3002;</strong></p>
+</blockquote>
+<h1 class="mume-header" id="%E4%BD%BF%E7%94%A8%E5%AD%98%E6%A1%A3">&#x4F7F;&#x7528;&#x5B58;&#x6863;</h1>
+
+<p>&#x4F60;&#x53EF;&#x4EE5;&#x4F7F;&#x7528;<code>ESave.GetData</code>&#x83B7;&#x53D6;&#x5B58;&#x6863;&#x6570;&#x636E;&#xFF0C;&#x5E76;&#x4F7F;&#x7528;<code>ESave.PutData</code>&#x8BBE;&#x7F6E;&#x5B58;&#x6863;&#x6570;&#x636E;&#x3002;</p>
+<h2 class="mume-header" id="esavegetdata-%E5%8F%82%E6%95%B0%E8%A7%A3%E8%AF%B4">ESave.GetData &#x53C2;&#x6570;&#x89E3;&#x8BF4;</h2>
 
 <table>
 <thead>
 <tr>
-<th>&#x540D;&#x79F0;</th>
-<th>&#x503C;</th>
+<th>&#x53C2;&#x6570;&#x540D;</th>
+<th>&#x7C7B;&#x578B;</th>
 <th>&#x8BF4;&#x660E;</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>ScaleDefault</td>
-<td>0</td>
-<td>&#x5E38;&#x89C4;&#x7F29;&#x653E;&#xFF0C;&#x6309;&#x7167;&#x7ED9;&#x5B9A;&#x7684;&#x6BD4;&#x7387;&#x7F29;&#x653E;</td>
-</tr>
-<tr>
-<td>ScaleFullScreen</td>
-<td>1</td>
-<td>&#x4F7F;&#x6E38;&#x620F;&#x7F29;&#x653E;&#x5230;&#x5168;&#x5C4F;&#xFF0C;Emerald&#x5C06;&#x4F1A;&#x4F18;&#x5148;&#x8003;&#x8651;&#x9002;&#x5E94;Y&#x8F74;&#x7684;&#x53D8;&#x5316;&#xFF0C;&#x800C;&#x4E0D;&#x662F;X&#x8F74;&#x7684;&#x3002;&#x4F7F;&#x7528;&#x6B64;&#x7B56;&#x7565;&#x5EFA;&#x8BAE;&#x7A97;&#x53E3;&#x521D;&#x59CB;&#x5927;&#x5C0F;&#x6BD4;&#x7387;&#x8BBE;&#x7F6E;&#x4E3A;&#x63A5;&#x8FD1;&#x5E38;&#x7528;&#x5206;&#x8FA9;&#x6BD4;&#x7387;&#x3002;<strong>&#x6B64;&#x65F6;ScaleGame&#x7684;&#x7B2C;&#x4E00;&#x4E2A;&#x53C2;&#x6570;Percent&#x662F;&#x65E0;&#x6548;&#x7684;&#x3002;</strong></td>
-</tr>
-<tr>
-<td>ScaleSuitable</td>
-<td>2</td>
-<td>&#x4F7F;&#x6E38;&#x620F;&#x6309;&#x7167;&#x5206;&#x8FA9;&#x6BD4;&#x7387;&#x7B49;&#x6BD4;&#x7387;&#x7F29;&#x653E;&#x9002;&#x5E94;&#x5C4F;&#x5E55;&#x5927;&#x5C0F;&#xFF0C;&#x6B64;&#x65F6;ScaleGame&#x7684;&#x7B2C;&#x4E00;&#x4E2A;&#x53C2;&#x6570;Percent&#x4EE3;&#x8868;&#x7A97;&#x53E3;&#x8986;&#x76D6;&#x6574;&#x4E2A;&#x5C4F;&#x5E55;&#x7684;&#x767E;&#x5206;&#x6BD4;</td>
+<td>name</td>
+<td>String</td>
+<td>&#x6570;&#x636E;&#x540D;&#x79F0;</td>
 </tr>
 </tbody>
 </table>
+<blockquote>
+<p>NOTE&#xFF1A;<br>
+&#x8FD9;&#x662F;&#x4E00;&#x4E2A;&#x51FD;&#x6570;&#x3002;&#x5F53;&#x6307;&#x5B9A;&#x7684;&#x5B58;&#x6863;&#x6570;&#x636E;&#x4E0D;&#x5B58;&#x5728;&#x65F6;&#x5C06;&#x8FD4;&#x56DE;&#x7A7A;&#x5B57;&#x7B26;&#x4E32;&#x3002;</p>
+</blockquote>
+<h2 class="mume-header" id="esaveputdata-%E5%8F%82%E6%95%B0%E8%A7%A3%E8%AF%B4">ESave.PutData &#x53C2;&#x6570;&#x89E3;&#x8BF4;</h2>
+
+<table>
+<thead>
+<tr>
+<th>&#x53C2;&#x6570;&#x540D;</th>
+<th>&#x7C7B;&#x578B;</th>
+<th>&#x8BF4;&#x660E;</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td>String</td>
+<td>&#x6570;&#x636E;&#x540D;&#x79F0;</td>
+</tr>
+<tr>
+<td>value</td>
+<td>String</td>
+<td>&#x6570;&#x636E;&#x503C;</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>NOTE:<br>
+&#x5982;&#x679C;&#x60A8;&#x5F00;&#x542F;&#x4E86;&#x81EA;&#x52A8;&#x5B58;&#x6863;&#xFF0C;&#x8BF7;&#x4E0D;&#x8981;&#x9891;&#x7E41;&#x4FEE;&#x6539;&#x6570;&#x636E;&#x3002;</p>
+</blockquote>
+<h2 class="mume-header" id="esavesave-%E8%A7%A3%E8%AF%B4">ESave.Save &#x89E3;&#x8BF4;</h2>
+
+<p>&#x8BE5;&#x65B9;&#x6CD5;&#x5C06;&#x4F1A;&#x4FDD;&#x5B58;&#x4F60;&#x7684;&#x5B58;&#x6863;&#x5230;&#x78C1;&#x76D8;&#x3002;<br>
+&#x8BE5;&#x65B9;&#x6CD5;&#x4E0D;&#x9700;&#x8981;&#x4EFB;&#x4F55;&#x53C2;&#x6570;&#x3002;</p>
+<h1 class="mume-header" id="%E8%87%AA%E5%8A%A8%E5%AD%98%E6%A1%A3">&#x81EA;&#x52A8;&#x5B58;&#x6863;</h1>
+
+<p>Emerald&#x63D0;&#x4F9B;&#x4E86;&#x81EA;&#x52A8;&#x5B58;&#x6863;&#x529F;&#x80FD;&#xFF0C;&#x5728;&#x4F60;&#x6BCF;&#x6B21;&#x4FEE;&#x6539;&#x5B58;&#x6863;&#x6570;&#x636E;&#x540E;&#x90FD;&#x4F1A;&#x8FDB;&#x884C;&#x5B58;&#x6863;&#x3002;<br>
+&#x81EA;&#x52A8;&#x5B58;&#x6863;&#x7684;&#x5F00;&#x542F;&#x65B9;&#x6CD5;&#x5982;&#x4E0B;&#xFF1A;</p>
+<pre data-role="codeBlock" data-info="vb" class="language-vb">ESave<span class="token punctuation">.</span>AutoSave <span class="token operator">=</span> <span class="token boolean">True</span>
+</pre><h1 class="mume-header" id="%E5%AD%98%E6%A1%A3%E6%95%B0%E6%8D%AE%E9%A1%B9%E7%AE%A1%E7%90%86%E4%B8%8D%E5%B8%B8%E7%94%A8">&#x5B58;&#x6863;&#x6570;&#x636E;&#x9879;&#x7BA1;&#x7406;&#xFF08;&#x4E0D;&#x5E38;&#x7528;&#xFF09;</h1>
+
+<h2 class="mume-header" id="esavecount">ESave.Count</h2>
+
+<p>&#x8FD4;&#x56DE;&#x503C;&#xFF1A;<code>Long</code><br>
+&#x8BF4;&#x660E;&#xFF1A;&#x53D6;&#x5F97;&#x5B58;&#x6863;&#x5185;&#x6570;&#x636E;&#x9879;&#x7684;&#x603B;&#x4E2A;&#x6570;&#x3002;</p>
+<h2 class="mume-header" id="esavegetname">ESave.GetName</h2>
+
+<p>&#x8FD4;&#x56DE;&#x503C;&#xFF1A;<code>String</code><br>
+&#x53C2;&#x6570;&#xFF1A;</p>
+<ul>
+<li>Index<br>
+&#x7C7B;&#x578B;&#xFF1A;<code>Integer</code><br>
+&#x8BF4;&#x660E;&#xFF1A;&#x6307;&#x5B9A;&#x5B58;&#x6863;&#x6570;&#x636E;&#x9879;&#x7684;&#x5E8F;&#x53F7;</li>
+</ul>
+<p>&#x8BF4;&#x660E;&#xFF1A;&#x53D6;&#x5F97;&#x6307;&#x5B9A;&#x7F16;&#x53F7;&#x7684;&#x6570;&#x636E;&#x9879;&#x7684;&#x540D;&#x79F0;&#x3002;</p>
+<h2 class="mume-header" id="esavepath">ESave.Path</h2>
+
+<p>&#x7C7B;&#x578B;&#xFF1A;<code>String</code><br>
+&#x8BF4;&#x660E;&#xFF1A;&#x5B58;&#x6863;&#x4FDD;&#x5B58;&#x5728;&#x78C1;&#x76D8;&#x4E0A;&#x7684;&#x4F4D;&#x7F6E;&#x3002;</p>
+<blockquote>
+<p>&#x6CE8;&#x610F;&#xFF1A;<strong>&#x8BF7;&#x4E0D;&#x8981;&#x4FEE;&#x6539;&#x8FD9;&#x4E2A;&#x4F4D;&#x7F6E;&#x3002;</strong></p>
+</blockquote>
 
       </div>
       

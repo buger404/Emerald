@@ -49,7 +49,7 @@ Private Sub Form_Load()
     
     Page.IsSystem = True
     Page.Create Charge
-    Page.Res.NewImages App.path & "\assets\debug", 48, 48
+    Page.Res.NewImages App.path & "\assets\debug", 36, 36
     If Dir(App.path & "\assets\sets\profile.png") <> "" Then
         Page.Res.newImage App.path & "\assets\sets\profile.png", 36, 36, "profile.png"
     Else
@@ -86,7 +86,7 @@ Private Sub Form_Load()
                 Case 3
                     .ToolTipText = "控制台"
                 Case 1
-                    .ToolTipText = "鼠标状态指示&点击检测矩形"
+                    .ToolTipText = "点击检测矩形"
                 Case 5
                     .ToolTipText = "界面设计器吸附模式"
                 Case 4
