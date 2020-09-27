@@ -32,39 +32,39 @@ Attribute VB_Exposed = False
         GetProgress_3 = Cubic(pro, 0, 1, 1, 1)
     End Function
 '================================================================
-    'Animation Project
-    Public Sub FadeIn(X, Y, w, h, Alpha, pro As Single)
-        Alpha = Alpha * pro
+    'Animation Solution
+    Public Sub FadeIn(X, y, w, h, alpha, pro As Single)
+        alpha = alpha * pro
     End Sub
-    Public Sub FadeOut(X, Y, w, h, Alpha, pro As Single)
-        Alpha = Alpha - Alpha * pro
+    Public Sub FadeOut(X, y, w, h, alpha, pro As Single)
+        alpha = alpha - alpha * pro
     End Sub
-    Public Sub FlyInFromLeft(X, Y, w, h, Alpha, pro As Single)
+    Public Sub FlyInFromLeft(X, y, w, h, alpha, pro As Single)
         X = X * pro
     End Sub
-    Public Sub FlyInFromRight(X, Y, w, h, Alpha, pro As Single)
+    Public Sub FlyInFromRight(X, y, w, h, alpha, pro As Single)
         X = X + (GW - X) * pro
     End Sub
-    Public Sub FlyInFromTop(X, Y, w, h, Alpha, pro As Single)
-        Y = Y * pro
+    Public Sub FlyInFromTop(X, y, w, h, alpha, pro As Single)
+        y = y * pro
     End Sub
-    Public Sub FlyInFromBottom(X, Y, w, h, Alpha, pro As Single)
-        Y = Y + (GH - Y) * pro
+    Public Sub FlyInFromBottom(X, y, w, h, alpha, pro As Single)
+        y = y + (GH - y) * pro
     End Sub
-    Public Sub FlyInFromLeftFade(X, Y, w, h, Alpha, pro As Single)
+    Public Sub FlyInFromLeftFade(X, y, w, h, alpha, pro As Single)
         X = X * pro
-        Alpha = Alpha * pro
+        alpha = alpha * pro
     End Sub
-    Public Sub FlyInFromRightFade(X, Y, w, h, Alpha, pro As Single)
+    Public Sub FlyInFromRightFade(X, y, w, h, alpha, pro As Single)
         X = X + (GW - X) * pro
-        Alpha = Alpha * pro
+        alpha = alpha * pro
     End Sub
-    Public Sub FlyInFromTopFade(X, Y, w, h, Alpha, pro As Single)
-        Y = Y * pro
-        Alpha = Alpha * pro
+    Public Sub FlyInFromTopFade(X, y, w, h, alpha, pro As Single)
+        y = y * pro
+        alpha = alpha * pro
     End Sub
-    Public Sub FlyInFromBottomFade(X, Y, w, h, Alpha, pro As Single)
-        Y = Y + (GH - Y) * pro
-        Alpha = Alpha * pro
+    Public Sub FlyInFromBottomFade(X, y, w, h, alpha, pro As Single)
+        y = y + (GH - y) * pro
+        alpha = alpha * pro
     End Sub
 '================================================================

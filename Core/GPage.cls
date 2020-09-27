@@ -46,7 +46,11 @@ Public IsSystem As Boolean
         PoolCreateFromHdc CDC, GG
         
         GdipSetSmoothingMode GG, SmoothingModeAntiAlias
-        GdipSetTextRenderingHint GG, TextRenderingHintAntiAlias
+        If EF.RenderMode = RenderModeClearType Then
+            GdipSetTextRenderingHint GG, TextRenderingHintClearTypeGridFit
+        Else
+            GdipSetTextRenderingHint GG, TextRenderingHintAntiAlias
+        End If
         
         Set DrawBox = dBox
         

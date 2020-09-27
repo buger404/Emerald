@@ -17,7 +17,7 @@ Private Declare Function AddFontResource Lib "gdi32" Alias "AddFontResourceA" (B
 Private Declare Function RemoveFontResource Lib "gdi32" Alias "RemoveFontResourceA" (ByVal lpFileName As String) As Long
 Dim brush As Long, fFile As String, fFam As Long, StrF(2) As Long, Font(8, 1 To 1000) As Long, Spath As Long, Spen As Long
 Public EmHeight As Long
-Public RenderMode As Integer
+Public RenderMode As ERenderMode
 '========================================================
 '   Init
     Public Sub MakeFont(Name As String)
@@ -85,19 +85,20 @@ Public RenderMode As Integer
         
         GetHeight = R.Bottom
     End Function
-    Public Sub Writes(Text As String, X As Single, Y As Single, g As Long, Color As Long, ByVal size As Long, W As Single, H As Single, ByVal align As StringAlignment, ByVal style As FontStyle, Optional ByVal BorderColor As Long, Optional ByVal BorderSize As Long = 0)
+    Public Sub Writes(Text As String, X As Single, y As Single, g As Long, Color As Long, ByVal size As Long, w As Single, h As Single, ByVal align As StringAlignment, ByVal style As FontStyle, Optional ByVal BorderColor As Long, Optional ByVal BorderSize As Long = 0)
         'On Error Resume Next
         If Font(style, size) = 0 Then
             PoolCreateFont fFam, size, style, UnitPixel, Font(style, size)
         End If
         If EmHeight = 0 Then EmHeight = GetHeight(g, "ABCDEFG", 18, StringAlignmentNear, FontStyleRegular)
         
-        If RenderMode = 0 Then
-            GdipDrawString g, StrPtr(Text), -1, Font(style, size), NewRectF(X, Y, W, H), StrF(align), brush
+        GdipSetSolidFillColor brush, Color
+        
+        If RenderMode <> RenderModeFillPath Then
+            GdipDrawString g, StrPtr(Text), -1, Font(style, size), NewRectF(X, y, w, h), StrF(align), brush
         Else
             GdipResetPath Spath
-            GdipAddPathString Spath, StrPtr(Text), -1, fFam, style, size, NewRectF(X, Y, W, H), StrF(align)
-            GdipSetSolidFillColor brush, Color
+            GdipAddPathString Spath, StrPtr(Text), -1, fFam, style, size, NewRectF(X, y, w, h), StrF(align)
             
             GdipFillPath g, brush, Spath
             If BorderSize > 0 Then

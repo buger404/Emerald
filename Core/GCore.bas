@@ -113,6 +113,11 @@ Attribute VB_Name = "GCore"
         ScaleFullScreen = 1
         ScaleSuitable = 2
     End Enum
+    Public Enum ERenderMode
+        RenderModeDefault = 0
+        RenderModeFillPath = 1
+        RenderModeClearType = 2
+    End Enum
     Public Type ScrollArea
         Width As Long
         Height As Long
@@ -131,7 +136,7 @@ Attribute VB_Name = "GCore"
     Public EmeraldInstalled As Boolean
     Public BassInstalled As Boolean
     '版本号说明：[年份][月份][日期][版次]
-    Public Const Version As Long = 20040201     '20年4月2日，第1个版本
+    Public Const Version As Long = 20092701     '20年9月27日，第1个版本
     Public TextHandle As Long, WaitChr As String, LastUpdateTime As Long, HighCPUPermission As Integer
     Public XPMode As Boolean
     Public Scales As Single

@@ -27,6 +27,21 @@ Public sToken As Boolean, path As String
 Public Key As String
 '========================================================
 '   Init
+    Public Function FetchUserName() As String
+        On Error Resume Next
+        FetchUserName = "default"
+        FetchUserName = PoolCreateObject("Wscript.Network").Username
+    End Function
+    Public Sub CheckFullPath(path As String)
+        Dim S() As String
+        S = Split(path, "\")
+        Dim p As String
+        p = S(0) & "\"
+        For I = 1 To UBound(S)
+            p = p & S(I) & "\"
+            If Dir(p, vbDirectory) = "" Then MkDir p
+        Next
+    End Sub
     Public Function Create(Name As String, Optional BMKey) As Boolean
         If ESave Is Nothing Then Set ESave = Me
     
@@ -34,8 +49,10 @@ Public Key As String
             If Dir("C:\Emerad\", vbDirectory) = "" Then MkDir "C:\Emerad\"
             path = "C:\Emerad\" & Name
         Else
-            path = "C:\Users\" & PoolCreateObject("Wscript.Network").Username & "\AppData\Local\" & Name
+            path = "C:\Users\" & FetchUserName & "\AppData\Local\" & Name
         End If
+        
+        Call CheckFullPath(path)
         
         AutoSave = True
         
@@ -64,13 +81,13 @@ Public Key As String
 ErrHandle:
                 If Err.Number <> 0 Then
                     MsgBox "存档已经损坏！", 16, DisplayName: ReDim MySave.Data(0)
-                    Suggest "应用存档损坏。", NeverClear, 2
+                    Suggest "游戏存档损坏。", NeverClear, 2
                 End If
             End If
             Create = True
         End If
         
-        If Create = False Then Suggest "应用存档授权失败。", NeverClear, 1
+        If Create = False Then Suggest "游戏存档授权失败。", NeverClear, 1
         sToken = Create
         
     End Function
@@ -90,7 +107,7 @@ ErrHandle:
         If msg <> "" Then
             Call Save
             MsgBox "已经发现并删除存档中以下非法数据：" & vbCrLf & msg, 64
-            Suggest "应用存档中含有非法数据。", NeverClear, 1
+            Suggest "游戏存档中含有非法数据。", NeverClear, 1
         End If
     End Sub
 '========================================================
@@ -132,4 +149,5 @@ ErrHandle:
         If AutoSave Then Call Save
     End Sub
 '========================================================
+
 
