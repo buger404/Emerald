@@ -46,8 +46,12 @@ Public IsSystem As Boolean
         PoolCreateFromHdc CDC, GG
         
         GdipSetSmoothingMode GG, SmoothingModeAntiAlias
-        If EF.RenderMode = RenderModeClearType Then
-            GdipSetTextRenderingHint GG, TextRenderingHintClearTypeGridFit
+        If Not EF Is Nothing Then
+            If EF.RenderMode = RenderModeClearType Then
+                GdipSetTextRenderingHint GG, TextRenderingHintClearTypeGridFit
+            Else
+                GdipSetTextRenderingHint GG, TextRenderingHintAntiAlias
+            End If
         Else
             GdipSetTextRenderingHint GG, TextRenderingHintAntiAlias
         End If
